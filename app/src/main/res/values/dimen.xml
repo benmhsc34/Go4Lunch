@@ -1,8 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="default_large_margin">20dip</dimen>
-    <dimen name="default_margin">10dip</dimen>
-    <dimen name="default_title_size">20sp</dimen>
-    <dimen name="default_text_size">13sp</dimen>
-    <dimen name="default_text_size_mini">8sp</dimen>
+
+    <!-- MAIN ACTIVITY DIMENS -->
+    <dimen name="logo_height">200dip</dimen>
+    <dimen name="logo_width">200dip</dimen>
+    <dimen name="logo_top_margin">75dip</dimen>
+
+    <dimen name="margin">5dip</dimen>
+    <dimen name="half_margin">10dip</dimen>
+    <dimen name="large_margin">15dip</dimen>
+    <dimen name="big_margin">20dip</dimen>
+    <dimen name="very_big_margin">50dip</dimen>
+    <dimen name="top_margin">10dip</dimen>
+    <dimen name="bottom_margin">10dip</dimen>
+    <dimen name="start_margin">40dip</dimen>
+    <dimen name="end_margin">40dip</dimen>
+
+    <dimen name="title_size">63sp</dimen>
+    <dimen name="text_size_description">11sp</dimen>
+    <dimen name="text_size_button">13sp</dimen>
+    <dimen name="text_size_mini">8sp</dimen>
+
+    <!-- NavigationView Header -->
+    <dimen name="nav_header_height">230dp</dimen>
+    <dimen name="nav_header_text_size">12sp</dimen>
+
+    <!-- RESTAURANT CARD ACTIVITY DIMENS -->
+    <dimen name="card_align_margin">3dip</dimen>
+    <dimen name="card_top_margin">4dip</dimen>
+    <dimen name="card_start_margin">10dip</dimen>
+    <dimen name="card_fab_image_size">32dip</dimen>
+
+    <!-- Item recycler view -->
+    <dimen name="recycler_padding">1dip</dimen>
+    <dimen name="recycler_image_width">75dip</dimen>
+    <dimen name="recycler_image_height">75dip</dimen>
+    <dimen name="recycler_image_margin">5dip</dimen>
+    <dimen name="recycler_text_margin">10dp</dimen>
+
 </resources>

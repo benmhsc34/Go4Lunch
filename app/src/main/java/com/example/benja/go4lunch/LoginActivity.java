@@ -1,12 +1,17 @@
 package com.example.benja.go4lunch;
 
 import android.content.Intent;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
+import com.example.benja.go4lunch.controllers.MainActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -32,11 +37,15 @@ public class LoginActivity extends BaseActivity {
     // ACTIONS
     // --------------------
 
+
     @Override
     protected void onResume() {
         super.onResume();
         // 5 - Update UI when activity is resuming
     //    this.updateUIWhenResuming();
+        FirebaseApp.initializeApp(this);
+
+        this.startSignInActivity();
     }
 
     @OnClick(R.id.main_activity_button_login)
@@ -45,9 +54,7 @@ public class LoginActivity extends BaseActivity {
       //  if (this.isCurrentUserLogged()){
       //      this.startProfileActivity();
       //  } else {
-        FirebaseApp.initializeApp(this);
 
-        this.startSignInActivity();
        // }
     }
 
@@ -65,7 +72,7 @@ public class LoginActivity extends BaseActivity {
                         .setAvailableProviders(
                                 Arrays.asList(new AuthUI.IdpConfig.EmailBuilder().build(), //EMAIL
                                         new AuthUI.IdpConfig.GoogleBuilder().build(), // SUPPORT GOOGLE
-                                            new AuthUI.IdpConfig.FacebookBuilder().build())) // FACEBOOK
+                                        new AuthUI.IdpConfig.FacebookBuilder().build())) // FACEBOOK
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.ic_launcher_background)
                         .build(),
@@ -88,7 +95,7 @@ public class LoginActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // 4 - Handle SignIn Activity response on activity result
- //       this.handleResponseAfterSignIn(requestCode, resultCode, data);
+        this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
 
@@ -109,7 +116,7 @@ public class LoginActivity extends BaseActivity {
     // --------------------
     // UTILS
     // --------------------
-/*
+
     // 3 - Method that handles response after SignIn Activity close
     private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data) {
 
@@ -119,6 +126,7 @@ public class LoginActivity extends BaseActivity {
             if (resultCode == RESULT_OK) { // SUCCESS
                 this.createUserInFirestore();
                 showSnackBar(this.coordinatorLayout, getString(R.string.connection_succeed));
+                startWelcomeActivity();
             } else { // ERRORS
                 if (response == null) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
@@ -144,10 +152,13 @@ public class LoginActivity extends BaseActivity {
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
 
-            UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid, username,null, null, null, urlPicture).addOnFailureListener(this.onFailureListener());
         }
     }
 
-*/
+    private void startWelcomeActivity(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
 }
