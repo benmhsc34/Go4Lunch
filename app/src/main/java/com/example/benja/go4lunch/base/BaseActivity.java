@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Toast;
 
 
@@ -25,13 +26,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     // LIFE CYCLE
     // --------------------
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(this.getFragmentLayout());
-        ButterKnife.bind(this); //Configure Butterknife
+
+        // Get & serialise all views
+        ButterKnife.bind(this);
     }
 
+    // Force developer implement those methods
+    protected abstract View getCoordinatorLayout(); // Layout of the CoordinatorLayout of the Child Activity
     public abstract int getFragmentLayout();
 
     // --------------------

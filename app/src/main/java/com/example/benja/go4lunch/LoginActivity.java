@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
@@ -24,6 +25,12 @@ import butterknife.OnClick;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 public class LoginActivity extends BaseActivity {
+
+
+    @Override
+    protected View getCoordinatorLayout() {
+        return null;
+    }
 
     @Override
     public int getFragmentLayout() { return R.layout.activity_login; }

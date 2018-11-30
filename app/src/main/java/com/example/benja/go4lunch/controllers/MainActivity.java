@@ -39,13 +39,21 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        this.configureDrawerLayout();
+        this.configureToolBar();
+        this.configureNavigationHeader();
+        this.configureNavigationView();
     }
 
     @Override
+    protected View getCoordinatorLayout() {
+        return mCoordinatorLayout;
+    }
+
+
+    @Override
     public int getFragmentLayout() {
-        return 0;
+        return R.layout.activity_main;
     }
 
     protected void configureToolBar() {
@@ -117,6 +125,7 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
             userEmail.setText(email);
         }
     }
+
 
     // >> ACTIONS <-------
     @Override

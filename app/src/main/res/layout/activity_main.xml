@@ -23,7 +23,6 @@
             android:orientation="vertical">
 
             <!-- Toolbar Importation -->
-            <!-- Toolbar Importation -->
             <include
                 layout="@layout/toolbar"
                 android:layout_width="match_parent"
