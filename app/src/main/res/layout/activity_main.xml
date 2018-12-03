@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_welcome_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"
-    tools:context=".controllers.MainActivity">
+    tools:context=".controllers.MainActivity"
+    tools:openDrawer="start">
 
     <!-- WelcomeActivity RootView -->
     <android.support.design.widget.CoordinatorLayout
@@ -23,10 +22,18 @@
             android:orientation="vertical">
 
             <!-- Toolbar Importation -->
-            <include
-                layout="@layout/toolbar"
+            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/toolbar"
+                colorControlNormal="@android:color/white"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+
+                android:minHeight="?attr/actionBarSize"
+
+                android:theme="@style/ToolbarTheme"
+                app:titleTextAppearance="@style/Toolbar.TitleText" />
 
             <!-- Body layout -->
             <RelativeLayout
@@ -37,18 +44,18 @@
                     android:id="@+id/activity_welcome_frame_layout_bottom_navigation"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_above="@id/activity_welcome_bottom_navigation"/>
+                    android:layout_above="@id/activity_welcome_bottom_navigation" />
 
                 <android.support.design.widget.BottomNavigationView
                     android:id="@+id/activity_welcome_bottom_navigation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom"
                     android:background="@android:color/white"
                     app:itemIconTint="@drawable/bottom_navigation_colors"
                     app:itemTextColor="@drawable/bottom_navigation_colors"
-                    app:menu="@menu/bottom_navigation_menu"
-                    android:layout_alignParentBottom="true" />
+                    app:menu="@menu/bottom_navigation_menu" />
 
             </RelativeLayout>
 
@@ -63,9 +70,11 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/navigationDrawerBackground"
+        android:fitsSystemWindows="true"
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/activity_welcome_menu_drawer" />
+        app:menu="@menu/activity_welcome_menu_drawer"
+        app:headerLayout="@layout/activity_welcome_nav_header"
+        />
 
 </android.support.v4.widget.DrawerLayout>

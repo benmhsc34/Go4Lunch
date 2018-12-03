@@ -73,7 +73,7 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textColor="@android:color/white"
-                        android:hint="User Name"/>
+                        android:hint="Bigbenyayi"/>
 
                     <!-- User Email -->
                     <TextView
@@ -85,7 +85,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textColor="@android:color/white"
-                        android:hint="email"/>
+                        android:hint="benjamincorben@gmail.com"/>
 
                 </LinearLayout>
 
