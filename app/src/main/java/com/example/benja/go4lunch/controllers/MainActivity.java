@@ -37,8 +37,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
+import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import butterknife.BindView;
@@ -94,7 +96,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("Location: ", location.toString());
+                SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                mPreferences.edit().putString("locationLatitude", String.valueOf(location.getLatitude())).apply();
+                mPreferences.edit().putString("locationLongitude", String.valueOf(location.getLongitude())).apply();
+                
+                
+
                 Log.d("locationlocation", String.valueOf(location.getLatitude()));
             }
 
@@ -133,7 +140,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
+                
             }
         }
     }
@@ -318,7 +325,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //Instantiate fragment used by BottomNavigationView
         mMapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
-        //   mListRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
+        mListRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
         //   mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance(null);
 
         // Save the active Fragment
@@ -327,6 +334,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Obtain SupportFragmentManager Object
         mFragmentManager = getSupportFragmentManager();
         // Add the three fragment in fragmentManager and leave active only the fragment MapViewFragment
+        mFragmentManager.beginTransaction()
+                .add(R.id.activity_welcome_frame_layout_bottom_navigation, mListRestaurantsViewFragment,"ListViewFragment")
+                .hide(mListRestaurantsViewFragment).commit();
 
         mFragmentManager.beginTransaction()
                 .add(R.id.activity_welcome_frame_layout_bottom_navigation, mMapViewFragment, "MapViewFragment")

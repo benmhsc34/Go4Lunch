@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -73,7 +74,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     // _ The geographical location where the device is currently located.
     // _ That is, the last-known location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
-
+    double latitude;
+    double longitude;
 
 
 
@@ -195,13 +197,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
      */
 
     private void showCurrentLocation() {
-
         Log.d(TAG, "showCurrentLocation: ");
-        Log.d(TAG, "showCurrentLocation: mLastKnownLocation.getLatitude()  = " + 33.950765);
-        Log.d(TAG, "showCurrentLocation: mLastKnownLocation.getLongitude() = " + -118.158569);
+        Log.d(TAG, "showCurrentLocation: mLastKnownLocation.getLatitude()  = " + latitude);
+        Log.d(TAG, "showCurrentLocation: mLastKnownLocation.getLongitude() = " + longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(33.950765,
-                        -118.158569), DEFAULT_ZOOM));
+                new LatLng(latitude,
+                        longitude), DEFAULT_ZOOM));
 
         // Update Location UI
         updateLocationUI();
@@ -237,8 +238,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         }
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(33.950765,
-                        -118.158569), DEFAULT_ZOOM));
+                new LatLng(latitude,
+                        longitude), DEFAULT_ZOOM));
 
         // Update Location UI
         MapViewFragment.this.updateLocationUI();
@@ -300,6 +301,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        SharedPreferences preferences = context.getSharedPreferences("PREFERENCE_KEY_NAME", 0);
+        latitude = Double.valueOf(preferences.getString("locationLatitude", "0"));
+        longitude = Double.valueOf(preferences.getString("locationLongitude", "0"));
+        Log.d("ajbxng", String.valueOf(latitude));
         // CallBack for ShowSnackBar
         if (context instanceof ShowSnackBarListener) {
             mListener = (ShowSnackBarListener) context;

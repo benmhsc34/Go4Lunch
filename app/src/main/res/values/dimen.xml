@@ -13,7 +13,6 @@
     <dimen name="very_big_margin">50dip</dimen>
     <dimen name="top_margin">10dip</dimen>
     <dimen name="bottom_margin">10dip</dimen>
-    <dimen name="start_margin">40dip</dimen>
     <dimen name="end_margin">40dip</dimen>
 
     <dimen name="title_size">63sp</dimen>
