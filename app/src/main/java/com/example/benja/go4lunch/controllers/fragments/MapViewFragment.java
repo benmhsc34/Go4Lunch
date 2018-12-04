@@ -4,8 +4,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -36,7 +38,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import static android.support.v4.content.ContextCompat.getSystemService;
+import static android.content.Context.MODE_PRIVATE;
+import static java.lang.reflect.Modifier.PRIVATE;
+
 
 /**************************************************************************************************
  *
@@ -69,6 +73,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     // _ The geographical location where the device is currently located.
     // _ That is, the last-known location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
+
 
 
 
@@ -188,7 +193,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     /**
      * Method that places the map on a current location
      */
+
     private void showCurrentLocation() {
+
         Log.d(TAG, "showCurrentLocation: ");
         Log.d(TAG, "showCurrentLocation: mLastKnownLocation.getLatitude()  = " + 33.950765);
         Log.d(TAG, "showCurrentLocation: mLastKnownLocation.getLongitude() = " + -118.158569);

@@ -1,12 +1,22 @@
 package com.example.benja.go4lunch.controllers;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,13 +43,19 @@ import com.google.android.gms.maps.model.LatLng;
 
 import butterknife.BindView;
 
-public class MainActivity extends BaseActivity implements  NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener {
 
-    @BindView(R.id.activity_welcome_coordinator_layout) CoordinatorLayout mCoordinatorLayout;
-    @BindView(R.id.activity_welcome_bottom_navigation) BottomNavigationView bottomNavigationView;
-    @BindView(R.id.activity_welcome_drawer_layout) DrawerLayout mDrawerLayout;
-    @BindView(R.id.activity_welcome_nav_view) NavigationView mNavigationView;
-    @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.activity_welcome_coordinator_layout)
+    CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.activity_welcome_bottom_navigation)
+    BottomNavigationView bottomNavigationView;
+    @BindView(R.id.activity_welcome_drawer_layout)
+    DrawerLayout mDrawerLayout;
+    @BindView(R.id.activity_welcome_nav_view)
+    NavigationView mNavigationView;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+
 
     // Declare three fragment for used with the Bottom Navigation view
     private Fragment mMapViewFragment;
@@ -61,6 +77,9 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
     // The entry point to the Fused Location Provider.
     //private FusedLocationProviderClient mFusedLocationProviderClient;
 
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +89,53 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
         this.configureNavigationHeader();
         this.configureNavigationView();
         this.configureBottomView();
+
+        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.d("Location: ", location.toString());
+                Log.d("locationlocation", String.valueOf(location.getLatitude()));
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            return;
+        } else {
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+            }
+        }
     }
 
     @Override
@@ -91,6 +157,7 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -99,6 +166,7 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
         getMenuInflater().inflate(R.menu.activity_welcome_menu_toolbar, menu);
         return true;
     }
+
     // ---------------------------------------------------------------------------------------------
     //                                     NAVIGATION DRAWER
     // ---------------------------------------------------------------------------------------------
@@ -134,7 +202,7 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
         TextView userName = navigationHeader.findViewById(R.id.navigation_header_user_name);
         TextView userEmail = navigationHeader.findViewById(R.id.navigation_header_user_email);
 
-        if (this.getCurrentUser() != null){
+        if (this.getCurrentUser() != null) {
 
             //Get picture URL from FireBase
             if (this.getCurrentUser().getPhotoUrl() != null) {
@@ -155,11 +223,12 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
             userEmail.setText(email);
         }
     }
+
     // ---------------------------------------------------------------------------------------------
     //                                 BOTTOM NAVIGATION VIEW
     // ---------------------------------------------------------------------------------------------
     // Configure the BottomNavigationView
-    private void configureBottomView(){
+    private void configureBottomView() {
 
         // Configure the BottomNavigationView Listener
         bottomNavigationView.setOnNavigationItemSelectedListener(
@@ -168,8 +237,9 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
         // Add three fragments used by the FragmentManager and activates only the Fragment MapViewFragment
         addFragmentsInFragmentManager();
     }
+
     // >> ACTIONS <-------
-    private Boolean updateMainFragment(Integer integer){
+    private Boolean updateMainFragment(Integer integer) {
         switch (integer) {
             case R.id.action_map_view:
                 // Hide the active fragment and activates the fragment mMapViewFragment
@@ -191,7 +261,6 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
     }
 
 
-
     // >> ACTIONS <-------
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -204,15 +273,15 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
                 // Get additional data from FireStore : restaurantIdentifier of the User choice
                 UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
                     User currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser.getRestaurantIdentifier() != null ) {
+                    if (currentUser.getRestaurantIdentifier() != null) {
                         // Go to restaurant card
-                     //   goToRestaurantActivity(currentUser);
+                        //   goToRestaurantActivity(currentUser);
                     }
                 });
             case R.id.activity_welcome_drawer_settings:
                 break;
             case R.id.activity_welcome_drawer_logout:
-         //       this.signOutUserFromFireBase();
+                //       this.signOutUserFromFireBase();
                 break;
             default:
                 break;
@@ -245,12 +314,12 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
     // ---------------------------------------------------------------------------------------------
     //                                      FRAGMENTS
     // ---------------------------------------------------------------------------------------------
-    private void addFragmentsInFragmentManager(){
+    private void addFragmentsInFragmentManager() {
 
         //Instantiate fragment used by BottomNavigationView
         mMapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
-     //   mListRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
-     //   mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance(null);
+        //   mListRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
+        //   mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance(null);
 
         // Save the active Fragment
         mActiveFragment = mMapViewFragment;
@@ -260,7 +329,9 @@ public class MainActivity extends BaseActivity implements  NavigationView.OnNavi
         // Add the three fragment in fragmentManager and leave active only the fragment MapViewFragment
 
         mFragmentManager.beginTransaction()
-                .add(R.id.activity_welcome_frame_layout_bottom_navigation, mMapViewFragment,"MapViewFragment")
+                .add(R.id.activity_welcome_frame_layout_bottom_navigation, mMapViewFragment, "MapViewFragment")
                 .commit();
     }
+
+
 }
