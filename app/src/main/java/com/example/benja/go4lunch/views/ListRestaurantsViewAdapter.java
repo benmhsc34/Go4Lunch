@@ -1,76 +1,121 @@
 package com.example.benja.go4lunch.views;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.bumptech.glide.RequestManager;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.models.Restaurant;
+import com.squareup.picasso.Picasso;
 
-import java.util.Map;
+import java.util.List;
 
-public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaurantsViewHolder> {
+import butterknife.ButterKnife;
 
-    // For Debug
-    private static final String TAG = ListRestaurantsViewAdapter.class.getSimpleName();
+import static android.graphics.Color.GREEN;
+import static android.graphics.Color.RED;
 
-    // Declaring a Glide object
-    private RequestManager mGlide;
+public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaurantsViewAdapter.ViewHolder> {
 
-    // Declare Options<User>
-    Map<String, Restaurant> mListRestaurant;
+    private List<Restaurant> restaurantList;
+    private Context context;
+    private OnItemClickListener mListener;
 
-    // CONSTRUCTOR
-    public ListRestaurantsViewAdapter(Map<String, Restaurant> listRestaurant
-            , RequestManager glide) {
-        Log.d(TAG, "ListRestaurantsViewAdapter: ");
-        mListRestaurant = listRestaurant;
-        mGlide = glide;
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
+
+    public ListRestaurantsViewAdapter(List<Restaurant> listItems, Context context) {
+        this.restaurantList = listItems;
+        this.context = context;
+
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.fragment_list_restaurants_view_item, viewGroup, false);
+        return new ViewHolder(v);
     }
 
     @Override
-    public ListRestaurantsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // CREATE VIEW HOLDER AND INFLATING ITS XML LAYOUT
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.fragment_list_restaurants_view_item, parent, false);
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
+        final Restaurant restaurantItem = restaurantList.get(i);
 
-        return new ListRestaurantsViewHolder(view);
-    }
+        viewHolder.restaurantName.setText(restaurantItem.getName());
+        viewHolder.restaurantAddress.setText(restaurantItem.getAddress());
+        if (restaurantItem.getOpeningTime()){
+            viewHolder.restaurantOpeningHours.setText("OPEN");
+            viewHolder.restaurantOpeningHours.setTextColor(GREEN);
 
-    // UPDATE VIEW HOLDER WITH A DETAILS RESTAURANT
-    @Override
-    public void onBindViewHolder(ListRestaurantsViewHolder viewHolder, int position) {
-        Log.d(TAG, "onBindViewHolder: ");
+        } else {
+            viewHolder.restaurantOpeningHours.setText("CLOSED");
+            viewHolder.restaurantOpeningHours.setTextColor(RED);
+        }
+        viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
+        Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 
-        viewHolder.updateWithRestaurantDetails(mListRestaurant.
-                get(getRestaurantIdentifier(position)), mGlide);
+    /*    viewHolder.linearLayout.setOnClickListener(view -> {
+            Intent myIntent = new Intent(context, WebviewActivity.class);
+            myIntent.putExtra("websiteUrl", restaurantItem.getUrlWebsite());
+            context.startActivity(myIntent);
+            //    viewHolder.relativeLayout.setBackgroundColor(R.color.colorPrimaryDark);
+        }); */
     }
 
     @Override
     public int getItemCount() {
-        Log.d(TAG, "getItemCount: ");
-        Log.d(TAG, "getItemCount: mListRestauant size() = " + mListRestaurant.size());
-        return mListRestaurant.size();
+        return restaurantList.size();
     }
 
-    // Returns the Restaurant Identifier of the current position
-    public String getRestaurantIdentifier(int position) {
-        int positionInMap = 0;
-        String key = "not value";
-        for (String keyValue : mListRestaurant.keySet()) {
-            if (position == positionInMap) {
-                key = keyValue;
-                break;
-            }
-            positionInMap++;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView restaurantName;
+        public TextView restaurantAddress;
+        public TextView restaurantOpeningHours;
+        public TextView restaurantDistanceToUser;
+        public ImageView restaurantImage;
+        public LinearLayout linearLayout;
+
+
+        public ViewHolder(@NonNull final View itemView) {
+            super(itemView);
+
+            restaurantName = itemView.findViewById(R.id.fragment_list_restaurant_view_item_name);
+            restaurantAddress = itemView.findViewById(R.id.fragment_list_restaurant_view_item_address);
+            restaurantOpeningHours = itemView.findViewById(R.id.fragment_list_restaurant_view_item_opening_hours);
+            restaurantDistanceToUser = itemView.findViewById(R.id.fragment_list_restaurant_view_item_distance);
+            restaurantImage = itemView.findViewById(R.id.fragment_list_restaurant_view_item_image);
+            linearLayout = itemView.findViewById(R.id.linearLayout);
+
+            ButterKnife.bind(this, itemView);
+
+
+            itemView.setOnClickListener(view -> {
+                if (mListener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) ;
+                    {
+                        mListener.onItemClick(position);
+                    }
+                }
+            });
+
         }
-        return key;
     }
+
+
 }
 
 

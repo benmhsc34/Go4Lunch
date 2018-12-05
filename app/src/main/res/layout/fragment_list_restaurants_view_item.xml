@@ -1,37 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:padding="@dimen/recycler_padding">
 
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fragment_list_restaurant_view_item_card"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         card_view:cardCornerRadius="1dp">
 
-        <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/margin"
             android:layout_marginBottom="@dimen/margin"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <!-- FIRST COLUMN -->
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="@dimen/half_margin"
                 android:layout_weight="1.3"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <!-- First line -->
                 <!-- Restaurant Name -->
@@ -41,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="restaurant name"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <!-- Second line -->
                 <!-- Address of the Restaurant -->
@@ -50,9 +47,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:maxLines="1"
                     android:ellipsize="end"
-                    android:hint="address"/>
+                    android:hint="address"
+                    android:maxLines="1" />
 
                 <!-- Third line -->
                 <!-- Opening hours -->
@@ -62,53 +59,50 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="not opening hours"
-                    android:textStyle="italic"/>
+                    android:textStyle="italic" />
 
             </LinearLayout>
 
             <!-- SECOND COLUMN -->
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2.7"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <!-- First line -->
                 <!-- Distance -->
-                <LinearLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:orientation="horizontal"
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/fragment_list_restaurant_view_item_distance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="right"
-                        android:maxLines="1"
                         android:ellipsize="end"
-                        android:hint="800m"/>
+                        android:gravity="right"
+                        android:hint="800m"
+                        android:maxLines="1" />
 
                 </LinearLayout>
 
                 <!-- Second line -->
                 <!-- number of participants -->
-                <LinearLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:orientation="horizontal"
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
-                    <LinearLayout
-                        xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:orientation="horizontal"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="end">
+                        android:gravity="end"
+                        android:orientation="horizontal">
 
                         <!-- Smiley
                         <ImageView
@@ -121,22 +115,21 @@
                             android:id="@+id/fragment_list_restaurant_view_item_participants"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:maxLines="1"
                             android:ellipsize="end"
-                            android:hint="(0)"/>
+                            android:hint="(0)"
+                            android:maxLines="1" />
 
                     </LinearLayout>
                 </LinearLayout>
 
                 <!-- Third line -->
                 <!-- display Stars -->
-                <LinearLayout
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:orientation="horizontal"
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="end">
+                    android:gravity="end"
+                    android:orientation="horizontal">
 
                     <!-- Star 3
                     <ImageView
@@ -170,12 +163,12 @@
             <!-- Image of the Restaurant -->
             <ImageView
                 android:id="@+id/fragment_list_restaurant_view_item_image"
-                android:scaleType="centerCrop"
-                android:layout_marginTop="@dimen/margin"
-                android:layout_marginBottom="@dimen/margin"
                 android:layout_width="@dimen/recycler_image_width"
                 android:layout_height="@dimen/recycler_image_height"
-                android:layout_margin="@dimen/recycler_image_margin"/>
+                android:layout_margin="@dimen/recycler_image_margin"
+                android:layout_marginTop="@dimen/margin"
+                android:layout_marginBottom="@dimen/margin"
+                android:scaleType="centerCrop" />
 
         </LinearLayout>
 

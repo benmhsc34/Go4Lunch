@@ -172,7 +172,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         showCurrentLocation();
 
         // Display Restaurants Markers and activate Listen on the participants number
-        DisplayAndListensMarkers();
+      //  DisplayAndListensMarkers();
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
      * Creating restaurant markers on the map and activating for each of them
      * a listener to change the number of participants in order to change their color in real time
      */
-    protected void DisplayAndListensMarkers() {
+ /*   protected void DisplayAndListensMarkers() {
         Log.d(TAG, "fireStoreListener: ");
 
         Set<Map.Entry<String, Restaurant>> setListRestaurant = getRestaurantMapOfTheModel().entrySet();
@@ -248,7 +248,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     /**
      * Enables listening to the number of participants in each restaurant
      * to enable marker color change in real time
-     */
+     */ /*
     public void listenNbrParticipantsForUpdateMarkers(Restaurant restaurant, Marker marker) {
 
         RestaurantHelper
@@ -270,7 +270,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     }
                 });
     }
-
+*/
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */

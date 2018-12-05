@@ -19,7 +19,7 @@ public class RestaurantHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createRestaurant(Restaurant restaurant) {
+  /*  public static Task<Void> createRestaurant(Restaurant restaurant) {
 
         Restaurant restaurantToCreate = new Restaurant( restaurant.getIdentifier(), restaurant.getName(),
                 restaurant.getAddress(), restaurant.getOpeningTime(), restaurant.getDistance(),
@@ -29,7 +29,7 @@ public class RestaurantHelper {
 
         return RestaurantHelper.getRestaurantsCollection().document(restaurant.getIdentifier()).set(restaurantToCreate);
     }
-
+*/
     // --- GET ---
 
     public static Task<DocumentSnapshot> getRestaurant(String identifier){

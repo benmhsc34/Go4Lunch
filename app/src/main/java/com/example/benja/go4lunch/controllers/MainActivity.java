@@ -245,27 +245,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         addFragmentsInFragmentManager();
     }
 
-    // >> ACTIONS <-------
-    private Boolean updateMainFragment(Integer integer) {
-        switch (integer) {
-            case R.id.action_map_view:
-                // Hide the active fragment and activates the fragment mMapViewFragment
-                mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
-                mActiveFragment = mMapViewFragment;
-                break;
-            case R.id.action_list_view:
-                // Hide the active fragment and activates the fragment mListViewFragment
-                mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
-                mActiveFragment = mListRestaurantsViewFragment;
-                break;
-            case R.id.action_workmates:
-                // Hide the active fragment and activates the fragment mWorkmatesFragment
-                mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListWorkmatesViewFragment).commit();
-                mActiveFragment = mListWorkmatesViewFragment;
-                break;
-        }
-        return true;
-    }
+
 
 
     // >> ACTIONS <-------
@@ -343,5 +323,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 .commit();
     }
 
+    private Boolean updateMainFragment(Integer integer) {
+        switch (integer) {
+            case R.id.action_map_view:
+                // Hide the active fragment and activates the fragment mMapViewFragment
+                mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
+                mActiveFragment = mMapViewFragment;
+                break;
+            case R.id.action_list_view:
+                // Hide the active fragment and activates the fragment mListViewFragment
+                mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
+                mActiveFragment = mListRestaurantsViewFragment;
+                break;
+            case R.id.action_workmates:
+                // Hide the active fragment and activates the fragment mWorkmatesFragment
+                mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
+                mActiveFragment = mMapViewFragment;
+                break;
+        }
+        return true;
+    }
 
 }
