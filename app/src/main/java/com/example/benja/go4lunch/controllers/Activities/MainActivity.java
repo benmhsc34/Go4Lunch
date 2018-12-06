@@ -1,4 +1,4 @@
-package com.example.benja.go4lunch.controllers;
+package com.example.benja.go4lunch.controllers.Activities;
 
 import android.Manifest;
 import android.content.Context;

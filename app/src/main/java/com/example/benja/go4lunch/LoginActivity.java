@@ -1,18 +1,13 @@
 package com.example.benja.go4lunch;
 
 import android.content.Intent;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
-import com.example.benja.go4lunch.controllers.MainActivity;
+import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -22,8 +17,7 @@ import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
+
 public class LoginActivity extends BaseActivity {
 
 

@@ -9,7 +9,7 @@ public interface Api {
     String BASE_URL = "https://maps.googleapis.com/maps/api/place/";
 
     //Predefined parameters
-    String key      = "AIzaSyC8l-LPDTEqpJxWbJ-VbUgdUoj8TdXlcK4";
+    String key      = "AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4";
     String type     = "restaurant";
     String radius   = "1500";
     String maxWidth = "2304";
