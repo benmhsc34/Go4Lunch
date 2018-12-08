@@ -58,7 +58,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-
     // Declare three fragment for used with the Bottom Navigation view
     private Fragment mMapViewFragment;
     private Fragment mListRestaurantsViewFragment;
@@ -244,9 +243,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Add three fragments used by the FragmentManager and activates only the Fragment MapViewFragment
         addFragmentsInFragmentManager();
     }
-
-
-
+    
 
     // >> ACTIONS <-------
     @Override
