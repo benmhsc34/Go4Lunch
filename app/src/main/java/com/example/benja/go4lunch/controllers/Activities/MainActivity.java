@@ -243,7 +243,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // Add three fragments used by the FragmentManager and activates only the Fragment MapViewFragment
         addFragmentsInFragmentManager();
     }
-    
+
 
     // >> ACTIONS <-------
     @Override
@@ -339,6 +339,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 break;
         }
         return true;
+
     }
 
 }
