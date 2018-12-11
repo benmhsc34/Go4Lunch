@@ -76,7 +76,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
         Api api = retrofit.create(Api.class);
 
-
+/*
 
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
 
@@ -107,6 +107,9 @@ public class ListRestaurantsViewFragment extends BaseFragment {
             }
         });
 
+
+
+*/
         return rootView;
     }
 

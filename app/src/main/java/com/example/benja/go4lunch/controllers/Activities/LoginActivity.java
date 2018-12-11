@@ -1,10 +1,11 @@
-package com.example.benja.go4lunch;
+package com.example.benja.go4lunch.controllers.Activities;
 
 import android.content.Intent;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.Activities.MainActivity;
