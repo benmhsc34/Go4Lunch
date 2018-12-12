@@ -59,7 +59,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     Toolbar mToolbar;
 
 
-
     // Declare three fragment for used with the Bottom Navigation view
     private Fragment mMapViewFragment;
     private Fragment mListRestaurantsViewFragment;
@@ -104,8 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
                 mPreferences.edit().putString("locationLatitude", String.valueOf(location.getLatitude())).apply();
                 mPreferences.edit().putString("locationLongitude", String.valueOf(location.getLongitude())).apply();
-                
-                
+
 
                 Log.d("locationlocation", String.valueOf(location.getLatitude()));
             }
@@ -139,7 +137,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
 
@@ -154,7 +152,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                
+
             }
         }
     }
@@ -326,7 +324,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mFragmentManager = getSupportFragmentManager();
         // Add the three fragment in fragmentManager and leave active only the fragment MapViewFragment
 
-    /*    mFragmentManager.beginTransaction()
+      /*  mFragmentManager.beginTransaction()
                 .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mListRestaurantsViewFragment,"ListViewFragment")
                 .commit();
 */
@@ -339,17 +337,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         switch (integer) {
             case R.id.action_map_view:
                 // Hide the active fragment and activates the fragment mMapViewFragment
-               // mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
+                // mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
                 mActiveFragment = mMapViewFragment;
                 break;
             case R.id.action_list_view:
                 // Hide the active fragment and activates the fragment mListViewFragment
-             //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
+                //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
                 mActiveFragment = mListRestaurantsViewFragment;
                 break;
             case R.id.action_workmates:
                 // Hide the active fragment and activates the fragment mWorkmatesFragment
-             //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
+                //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
                 mActiveFragment = mMapViewFragment;
                 break;
         }
