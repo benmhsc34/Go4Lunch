@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -41,11 +42,15 @@ import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragm
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener {
+
 
     @BindView(R.id.activity_welcome_coordinator_layout)
     CoordinatorLayout mCoordinatorLayout;
@@ -86,11 +91,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ButterKnife.bind(this);
+
         this.configureDrawerLayout();
         this.configureToolBar();
         this.configureNavigationHeader();
         this.configureNavigationView();
         this.configureBottomView();
+/*
+        Circle drawCircle = mMapViewFragment.addCircle(new CircleOptions()
+                .center(new LatLng(mLastKnownLocation.getLatitude(),  mLastKnownLocation.Longi()))
+                .radius(1000)
+                .strokeColor(Color.RED)
+                .fillColor(Color.BLUE));
+*/
 
 
         setSupportActionBar(mToolbar);
@@ -140,8 +155,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (item.getItemId() == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -215,7 +228,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Configure NavigationHeader
     private void configureNavigationHeader() {
 
-        View navigationHeader = mNavigationView.inflateHeaderView(R.layout.activity_welcome_nav_header);
+        View navigationHeader = mNavigationView;
         ImageView userPhoto = navigationHeader.findViewById(R.id.navigation_header_user_photo);
         TextView userName = navigationHeader.findViewById(R.id.navigation_header_user_name);
         TextView userEmail = navigationHeader.findViewById(R.id.navigation_header_user_email);

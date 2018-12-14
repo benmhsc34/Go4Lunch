@@ -14,7 +14,7 @@ public class User {
     @Nullable private String mUrlPicture;
 
     // Blank constructor necessary for use with FireBase
-    public User() { }
+    public User(String uid, String userName, String urlPicture) { }
 
     public User(String uid, String userName, @Nullable String restaurantIdentifier, @Nullable String restaurantName,
                 @Nullable Map<String, String> listRestaurantLiked, @Nullable String urlPicture) {

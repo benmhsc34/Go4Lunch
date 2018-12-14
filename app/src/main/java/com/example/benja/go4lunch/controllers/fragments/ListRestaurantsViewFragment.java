@@ -76,7 +76,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
         Api api = retrofit.create(Api.class);
 
-/*
 
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
 
@@ -87,14 +86,23 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                 PlaceNearBySearch articles = response.body();
                 List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
 
+
                 for (int i = 0; i < theListOfResults.size(); i++) {
-                    Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
-                            theListOfResults.get(i).getPlaceId(),
-                    true,
-                    //        theListOfResults.get(i).getOpeningHours().getOpenNow(),
-                            theListOfResults.get(i).getAddress(),
-                            theListOfResults.get(i).getIcon());
-                    restaurantList.add(restaurantItem);
+                    if (theListOfResults.get(i).getOpeningHours() != null) {
+                        Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
+                                theListOfResults.get(i).getAddress(),
+                                theListOfResults.get(i).getOpeningHours().getOpenNow(),
+                                theListOfResults.get(i).getDistance(),
+                                theListOfResults.get(i).getIcon());
+                        restaurantList.add(restaurantItem);
+                    } else {
+                        Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
+                                theListOfResults.get(i).getAddress(),
+                                false,
+                                theListOfResults.get(i).getDistance(),
+                                theListOfResults.get(i).getIcon());
+                        restaurantList.add(restaurantItem);
+                    }
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -108,8 +116,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
         });
 
 
-
-*/
         return rootView;
     }
 

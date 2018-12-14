@@ -50,16 +50,16 @@ public class LoginActivity extends BaseActivity {
         this.startSignInActivity();
     }
 
-    @OnClick(R.id.main_activity_button_login)
+ /*   @OnClick(R.id.main_activity_button_login)
     public void onClickLoginButton() {
         // 4 - Start appropriate activity
-      //  if (this.isCurrentUserLogged()){
-      //      this.startProfileActivity();
-      //  } else {
-
-       // }
+        if (this.isCurrentUserLogged()){
+            this.startProfileActivity();
+        } else {
+            this.startSignInActivity();
+        }
     }
-
+*/
 
 
     // --------------------
@@ -154,7 +154,7 @@ public class LoginActivity extends BaseActivity {
             String username = this.getCurrentUser().getDisplayName();
             String uid = this.getCurrentUser().getUid();
 
-            UserHelper.createUser(uid, username,null, null, null, urlPicture).addOnFailureListener(this.onFailureListener());
+            UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(this.onFailureListener());
         }
     }
 

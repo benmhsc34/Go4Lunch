@@ -22,9 +22,8 @@ public class UserHelper {
 
     // --- CREATE ---
 
-    public static Task<Void> createUser(String uid, String userName, String restaurantIdentifier, String restaurantName,
-                                        Map<String, String> listRestaurantLiked, String urlPicture) {
-        com.example.benja.go4lunch.models.User userToCreate = new com.example.benja.go4lunch.models.User(uid, userName, restaurantIdentifier, restaurantName, listRestaurantLiked, urlPicture);
+    public static Task<Void> createUser(String uid, String userName, String urlPicture) {
+        com.example.benja.go4lunch.models.User userToCreate = new com.example.benja.go4lunch.models.User(uid, userName, urlPicture);
         return UserHelper.getUsersCollection().document(uid).set(userToCreate);
     }
 

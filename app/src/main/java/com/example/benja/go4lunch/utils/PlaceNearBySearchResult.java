@@ -10,7 +10,7 @@ public class PlaceNearBySearchResult {
     @SerializedName("icon")
     @Expose
     private String icon;
-    @SerializedName("formatted_address")
+    @SerializedName("vicinity")
     @Expose
     private String address;
     @SerializedName("id")

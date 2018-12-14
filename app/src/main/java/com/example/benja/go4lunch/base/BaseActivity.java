@@ -36,7 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    // Force developer implement those methods
+    // Force to implement those methods
     protected abstract View getCoordinatorLayout(); // Layout of the CoordinatorLayout of the Child Activity
     public abstract int getFragmentLayout();
 
