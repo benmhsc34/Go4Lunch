@@ -23,16 +23,17 @@
             android:value="AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4"/>
 
         <activity android:name=".controllers.Activities.LoginActivity">
-
-
-        </activity>
-        <activity android:name=".controllers.Activities.MainActivity">
             <intent-filter>
 
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+
+        </activity>
+        <activity android:name=".controllers.Activities.MainActivity">
+
         </activity>
         <activity android:name=".controllers.Activities.RestaurantCardActivity" />
     </application>

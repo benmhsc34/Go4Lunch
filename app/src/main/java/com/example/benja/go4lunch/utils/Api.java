@@ -12,7 +12,7 @@ public interface Api {
     String key      = "AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4";
     String type     = "restaurant";
     String radius   = "1500";
-    String maxWidth = "2304";
+   // String maxWidth = "2304";
 
     // Place NearBySearch
     @GET("nearbysearch/json?key="+key+"&radius="+radius+"&type="+type)

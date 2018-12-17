@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import com.example.benja.go4lunch.models.Go4LunchViewModel;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.RestaurantHelper;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -76,7 +78,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private Location mLastKnownLocation;
     double latitude;
     double longitude;
-
 
 
     // ==> CallBack
@@ -168,11 +169,47 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Activate OnMarkerClickListener
         mMap.setOnInfoWindowClickListener(this);
 
+        //Cute blue dot
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            Log.d("normallogstatment", "in");
+
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Log.d("normallogstatment", "out");
+
+        mMap.setMyLocationEnabled(true);
+
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+        mMap.getUiSettings().setRotateGesturesEnabled(true);
+        mMap.getUiSettings().setScrollGesturesEnabled(true);
+        mMap.getUiSettings().setTiltGesturesEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+
+        //ZOOM
+        CameraUpdate center =
+                CameraUpdateFactory.newLatLng(new LatLng(latitude,
+                        longitude));
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
+
         // Show current Location
         showCurrentLocation();
 
         // Display Restaurants Markers and activate Listen on the participants number
-      //  DisplayAndListensMarkers();
+        //  DisplayAndListensMarkers();
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -271,6 +308,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 });
     }
 */
+
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
@@ -295,9 +333,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         }
     }
 
+
     /**
      * Method use for CallBacks to the Welcome Activity
      */
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

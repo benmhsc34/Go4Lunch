@@ -41,6 +41,8 @@ import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -50,6 +52,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener {
+
 
 
     @BindView(R.id.activity_welcome_coordinator_layout)
@@ -106,6 +109,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 .strokeColor(Color.RED)
                 .fillColor(Color.BLUE));
 */
+
 
 
         setSupportActionBar(mToolbar);
@@ -228,10 +232,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Configure NavigationHeader
     private void configureNavigationHeader() {
 
-        View navigationHeader = mNavigationView;
-        ImageView userPhoto = navigationHeader.findViewById(R.id.navigation_header_user_photo);
-        TextView userName = navigationHeader.findViewById(R.id.navigation_header_user_name);
-        TextView userEmail = navigationHeader.findViewById(R.id.navigation_header_user_email);
+        ImageView userPhoto = mNavigationView.getHeaderView(0).findViewById(R.id.navigation_header_user_photo);
+   //     TextView userName = mNavigationView.findViewById(R.id.navigation_header_user_name);
+   //     TextView userEmail = mNavigationView.findViewById(R.id.navigation_header_user_email);
 
         if (this.getCurrentUser() != null) {
 
@@ -249,9 +252,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             String username = TextUtils.isEmpty(this.getCurrentUser().getDisplayName())
                     ? "Username" : this.getCurrentUser().getDisplayName();
 
+            Log.d("facebookemail", email);
+
             //Update views with data
-            userName.setText(username);
-            userEmail.setText(email);
+      //      userName.setText(username);
+      //      userEmail.setText(email);
         }
     }
 
