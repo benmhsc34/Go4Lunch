@@ -41,12 +41,14 @@ import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,6 +68,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
+
+    private static final int SIGN_OUT_TASK = 10;
+    private static final int DELETE_USER_TASK = 20;
 
     // Declare three fragment for used with the Bottom Navigation view
     private Fragment mMapViewFragment;
@@ -295,7 +300,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.activity_welcome_drawer_settings:
                 break;
             case R.id.activity_welcome_drawer_logout:
-                //       this.signOutUserFromFireBase();
+                       this.signOutUserFromFirebase();
                 break;
             default:
                 break;
@@ -304,6 +309,34 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.mDrawerLayout.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+
+
+    private void signOutUserFromFirebase() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+    }
+
+    // 3 - Create OnCompleteListener called after tasks ended
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin) {
+        return new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                switch (origin) {
+                    case SIGN_OUT_TASK:
+                        finish();
+                        break;
+                    case DELETE_USER_TASK:
+                        finish();
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        };
     }
 
 

@@ -5,6 +5,7 @@
     android:id="@+id/main_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/firstbgpic"
     tools:context=".controllers.Activities.LoginActivity">
 
     <!-- MAIN CONTAINER -->

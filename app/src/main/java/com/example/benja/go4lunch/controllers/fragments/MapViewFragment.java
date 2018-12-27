@@ -138,6 +138,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Configure the Maps Service of Google
         configurePlayServiceMaps();
 
+
         return rootView;
     }
 
@@ -186,7 +187,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         Log.d("normallogstatment", "out");
 
         mMap.setMyLocationEnabled(true);
-
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
