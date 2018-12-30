@@ -170,10 +170,22 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Activate OnMarkerClickListener
         mMap.setOnInfoWindowClickListener(this);
 
+
+
         //Cute blue dot
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             Log.d("normallogstatment", "in");
+
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.getUiSettings().setCompassEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+            mMap.getUiSettings().setRotateGesturesEnabled(true);
+            mMap.getUiSettings().setScrollGesturesEnabled(true);
+            mMap.getUiSettings().setTiltGesturesEnabled(true);
+            mMap.getUiSettings().setZoomGesturesEnabled(true);
 
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -242,7 +254,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         longitude), DEFAULT_ZOOM));
 
         // Update Location UI
-        updateLocationUI();
+      //  updateLocationUI();
     }
 
 
@@ -312,7 +324,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
-    public void updateLocationUI() {
+  /*  public void updateLocationUI() {
         Log.d(TAG, "updateLocationUI: ");
         if (mMap != null) {
             try {
@@ -333,7 +345,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         }
     }
 
-
+*/
     /**
      * Method use for CallBacks to the Welcome Activity
      */

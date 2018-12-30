@@ -71,9 +71,6 @@ public class LoginActivity extends BaseActivity {
 
 
 
-
-
-
     // --------------------
     // NAVIGATION
     // --------------------
