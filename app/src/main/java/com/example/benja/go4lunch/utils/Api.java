@@ -1,5 +1,7 @@
 package com.example.benja.go4lunch.utils;
 
+import android.database.Observable;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -17,5 +19,6 @@ public interface Api {
     // Place NearBySearch
     @GET("nearbysearch/json?key="+key+"&radius="+radius+"&type="+type)
     Call<PlaceNearBySearch> getPlaceNearBySearch(@Query("location") String location);
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.benja.go4lunch.utils;
 
+import com.google.firebase.firestore.ServerTimestamp;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -34,8 +35,11 @@ public class PlaceNearBySearchResult {
     @SerializedName("geometry")
     @Expose
     private Geometry geometry;
+    @SerializedName("photos")
+    @Expose
+    private List<Photo> photos;
 
-    public PlaceNearBySearchResult(String icon, String address, String id, String name, OpeningHours openingHours, String placeId, String reference, String distance, Geometry geometry) {
+    public PlaceNearBySearchResult(String icon, String address, String id, String name, OpeningHours openingHours, String placeId, String reference, String distance, Geometry geometry, List<Photo> photos) {
         this.icon = icon;
         this.address = address;
         this.id = id;
@@ -45,14 +49,15 @@ public class PlaceNearBySearchResult {
         this.reference = reference;
         this.distance = distance;
         this.geometry = geometry;
+        this.photos = photos;
     }
 
     public Geometry getGeometry() {
         return geometry;
     }
 
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
+    public List<Photo> getPhotos() {
+        return photos;
     }
 
     public String getIcon() {

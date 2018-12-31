@@ -42,6 +42,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     private RecyclerView.Adapter adapter;
     private List<Restaurant> restaurantList;
 
+    String photoReferences;
+
     // Declare Adapter of the RecyclerView
     private ListRestaurantsViewAdapter mAdapter;
 
@@ -89,7 +91,11 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
 
                 for (int i = 0; i < theListOfResults.size(); i++) {
-
+                    if (theListOfResults.get(i).getPhotos() != null) {
+                        photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
+                    } else {
+                        photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
+                    }
 
                     //DISTANCE BETWEEN RESTAURANT AND USER LOCATION USING SIMPLE MATHS:
                     double userLatitudeDegres = latitude;
@@ -104,7 +110,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
                     double reallyPreciseDistance = 6367445 * Math.acos(Math.sin(userLatitude) * (Math.sin(restaurantLatitude)) + Math.cos(userLatitude) * Math.cos(restaurantLatitude) * Math.cos(userLongitude - restaurantLongitude));
                     int distance = (int) reallyPreciseDistance;
-                    Log.d("distancetoreto", distance + "m");
 
 
                     if (theListOfResults.get(i).getOpeningHours() != null) {
@@ -112,14 +117,20 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                 theListOfResults.get(i).getAddress(),
                                 theListOfResults.get(i).getOpeningHours().getOpenNow(),
                                 distance + "m",
-                                theListOfResults.get(i).getIcon());
+                                "https://maps.googleapis.com/maps/api/place/photo?"
+                                        + "maxwidth=2304"
+                                        + "&photoreference=" + photoReferences
+                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4");
                         restaurantList.add(restaurantItem);
                     } else {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
                                 theListOfResults.get(i).getAddress(),
                                 false,
                                 distance + "m",
-                                theListOfResults.get(i).getIcon());
+                                "https://maps.googleapis.com/maps/api/place/photo?"
+                                        + "maxwidth=2304"
+                                        + "&photoreference=" + photoReferences
+                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4");
                         restaurantList.add(restaurantItem);
                     }
                     adapter.notifyDataSetChanged();
