@@ -10,17 +10,11 @@ public class OpeningHours {
     @SerializedName("open_now")
     @Expose
     private Boolean openNow;
-    @SerializedName("periods")
-    @Expose
-    private List<Period> periods;
-    @SerializedName("weekday_text")
-    @Expose
-    private List<String> weekdayText;
 
-    public OpeningHours(Boolean openNow, List<Period> periods, List<String> weekdayText) {
+
+    public OpeningHours(Boolean openNow) {
         this.openNow = openNow;
-        this.periods = periods;
-        this.weekdayText = weekdayText;
+
     }
 
     public Boolean getOpenNow() {
@@ -31,19 +25,5 @@ public class OpeningHours {
         this.openNow = openNow;
     }
 
-    public List<Period> getPeriods() {
-        return periods;
-    }
 
-    public void setPeriods(List<Period> periods) {
-        this.periods = periods;
-    }
-
-    public List<String> getWeekdayText() {
-        return weekdayText;
-    }
-
-    public void setWeekdayText(List<String> weekdayText) {
-        this.weekdayText = weekdayText;
-    }
 }

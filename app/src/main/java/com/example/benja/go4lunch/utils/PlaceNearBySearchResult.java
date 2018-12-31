@@ -31,8 +31,11 @@ public class PlaceNearBySearchResult {
     @SerializedName("distance")
     @Expose
     private String distance;
+    @SerializedName("geometry")
+    @Expose
+    private Geometry geometry;
 
-    public PlaceNearBySearchResult(String icon, String address, String id, String name, OpeningHours openingHours, String placeId, String reference, String distance) {
+    public PlaceNearBySearchResult(String icon, String address, String id, String name, OpeningHours openingHours, String placeId, String reference, String distance, Geometry geometry) {
         this.icon = icon;
         this.address = address;
         this.id = id;
@@ -41,6 +44,15 @@ public class PlaceNearBySearchResult {
         this.placeId = placeId;
         this.reference = reference;
         this.distance = distance;
+        this.geometry = geometry;
+    }
+
+    public Geometry getGeometry() {
+        return geometry;
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
     }
 
     public String getIcon() {

@@ -64,6 +64,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
         View rootView = inflater.inflate(R.layout.fragment_list_restaurants_view, container, false);
         recyclerView = rootView.findViewById(R.id.fragment_list_restaurant_view_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -88,18 +89,36 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
 
                 for (int i = 0; i < theListOfResults.size(); i++) {
+
+
+                    //DISTANCE BETWEEN RESTAURANT AND USER LOCATION USING SIMPLE MATHS:
+                    double userLatitudeDegres = latitude;
+                    double userLongitudeDegres = longitude;
+                    double restaurantLatitudeDegres = theListOfResults.get(i).getGeometry().getLocation().getLat();
+                    double restaurantLongitudeDegres = theListOfResults.get(i).getGeometry().getLocation().getLng();
+
+                    double userLatitude = userLatitudeDegres * (Math.PI / 180);
+                    double userLongitude = userLongitudeDegres * (Math.PI / 180);
+                    double restaurantLatitude = restaurantLatitudeDegres * (Math.PI / 180);
+                    double restaurantLongitude = restaurantLongitudeDegres * (Math.PI / 180);
+
+                    double reallyPreciseDistance = 6367445 * Math.acos(Math.sin(userLatitude) * (Math.sin(restaurantLatitude)) + Math.cos(userLatitude) * Math.cos(restaurantLatitude) * Math.cos(userLongitude - restaurantLongitude));
+                    int distance = (int) reallyPreciseDistance;
+                    Log.d("distancetoreto", distance + "m");
+
+
                     if (theListOfResults.get(i).getOpeningHours() != null) {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
                                 theListOfResults.get(i).getAddress(),
                                 theListOfResults.get(i).getOpeningHours().getOpenNow(),
-                                theListOfResults.get(i).getDistance(),
+                                distance + "m",
                                 theListOfResults.get(i).getIcon());
                         restaurantList.add(restaurantItem);
                     } else {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
                                 theListOfResults.get(i).getAddress(),
                                 false,
-                                theListOfResults.get(i).getDistance(),
+                                distance + "m",
                                 theListOfResults.get(i).getIcon());
                         restaurantList.add(restaurantItem);
                     }
