@@ -15,6 +15,8 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.base.BaseFragment;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.utils.PlaceDetails;
+import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ListRestaurantsViewAdapter;
@@ -43,6 +45,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     private List<Restaurant> restaurantList;
 
     String photoReferences;
+    String phoneNumber;
+    String website;
 
     // Declare Adapter of the RecyclerView
     private ListRestaurantsViewAdapter mAdapter;
@@ -80,6 +84,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
         Api api = retrofit.create(Api.class);
 
 
+
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
 
         recyclerView.setAdapter(adapter);
@@ -90,7 +95,30 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                 List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
 
 
+
                 for (int i = 0; i < theListOfResults.size(); i++) {
+
+                    Call<PlaceDetails> call1 = api.getPlaceDetails(theListOfResults.get(i).getPlaceId());
+                    call1.enqueue(new Callback<PlaceDetails>() {
+                        @Override
+                        public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> detailResponse) {
+                            PlaceDetails details = detailResponse.body();
+                            PlaceDetailsResults detailedListResults = details.getResults();
+
+
+                            if (detailedListResults.getPhoneNumber() != null) {
+                                phoneNumber = detailedListResults.getPhoneNumber();
+                            }
+                            website = detailedListResults.getWebsite();
+                        }
+
+                        @Override
+                        public void onFailure(Call<PlaceDetails> call, Throwable t) {
+
+                        }
+                    });
+
+
                     if (theListOfResults.get(i).getPhotos() != null) {
                         photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
                     } else {
@@ -120,7 +148,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                 "https://maps.googleapis.com/maps/api/place/photo?"
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
-                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4");
+                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
+                                website, phoneNumber);
                         restaurantList.add(restaurantItem);
                     } else {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
@@ -130,7 +159,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                 "https://maps.googleapis.com/maps/api/place/photo?"
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
-                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4");
+                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", website, phoneNumber);
                         restaurantList.add(restaurantItem);
                     }
                     adapter.notifyDataSetChanged();

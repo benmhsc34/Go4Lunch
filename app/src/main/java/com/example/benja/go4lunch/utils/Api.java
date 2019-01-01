@@ -20,5 +20,9 @@ public interface Api {
     @GET("nearbysearch/json?key="+key+"&radius="+radius+"&type="+type)
     Call<PlaceNearBySearch> getPlaceNearBySearch(@Query("location") String location);
 
+    // Place Details
+    @GET("details/json?key=" + key)
+    Call<PlaceDetails> getPlaceDetails(@Query("placeid") String placeId);
+
 
 }

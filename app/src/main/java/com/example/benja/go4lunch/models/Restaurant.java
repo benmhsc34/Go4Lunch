@@ -12,19 +12,21 @@ public class Restaurant {
 //    @Nullable private long mNbrParticipants;// Number of participants
 //    @Nullable private long mNbrLikes;        // Number of likes that the restaurant got
     @Nullable private String mPhotoUrl;     // URL of the Restaurant photo
-//    @Nullable private String mWebSiteUrl;   // URL of the Web site
+    @Nullable private String mWebSiteUrl;   // URL of the Web site
 //    @Nullable private String mType;         // Type of the Restaurant
 //    @Nullable private String mLat;          // Latitude  of the Restaurant on the Map
 //    @Nullable private String mLng;          // Longitude of the Restaurant on the Map
-//    @Nullable private String mPhone;        // Phone number to call the Restaurant
+    @Nullable private String mPhone;        // Phone number to call the Restaurant
 
 
-    public Restaurant(String name, @Nullable String address, @Nullable Boolean openingTime, @Nullable String distance, @Nullable String photoUrl) {
+    public Restaurant(String name, @Nullable String address, @Nullable Boolean openingTime, @Nullable String distance, @Nullable String photoUrl, @Nullable String webSiteUrl, @Nullable String phone) {
         mName = name;
         mAddress = address;
         mOpeningTime = openingTime;
         mDistance = distance;
         mPhotoUrl = photoUrl;
+        mWebSiteUrl = webSiteUrl;
+        mPhone = phone;
     }
 
     public String getName() {
@@ -49,5 +51,15 @@ public class Restaurant {
     @Nullable
     public String getPhotoUrl() {
         return mPhotoUrl;
+    }
+
+    @Nullable
+    public String getWebSiteUrl() {
+        return mWebSiteUrl;
+    }
+
+    @Nullable
+    public String getPhone() {
+        return mPhone;
     }
 }

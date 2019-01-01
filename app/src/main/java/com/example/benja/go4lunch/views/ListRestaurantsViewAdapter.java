@@ -2,6 +2,7 @@ package com.example.benja.go4lunch.views;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.benja.go4lunch.R;
+import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.squareup.picasso.Picasso;
 
@@ -20,6 +22,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
 
@@ -40,7 +43,6 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
     public ListRestaurantsViewAdapter(List<Restaurant> listItems, Context context) {
         this.restaurantList = listItems;
         this.context = context;
-
     }
 
     @NonNull
@@ -67,12 +69,22 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 
-    /*    viewHolder.linearLayout.setOnClickListener(view -> {
-            Intent myIntent = new Intent(context, WebviewActivity.class);
-            myIntent.putExtra("websiteUrl", restaurantItem.getUrlWebsite());
+        viewHolder.linearLayout.setOnClickListener(view -> {
+            Intent myIntent = new Intent(context, RestaurantActivity.class);
+            myIntent.putExtra("websiteUrl", restaurantItem.getWebSiteUrl());
+            myIntent.putExtra("phoneNumber", restaurantItem.getPhone());
+
+            SharedPreferences mPreferences = context.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+            mPreferences.edit().putString("image", restaurantItem.getPhotoUrl()).apply();
+            mPreferences.edit().putString("name", restaurantItem.getName()).apply();
+            mPreferences.edit().putString("address", restaurantItem.getAddress()).apply();
+            mPreferences.edit().putString("website", restaurantItem.getWebSiteUrl()).apply();
+            mPreferences.edit().putString("phoneNumber", restaurantItem.getPhone()).apply();
+
+
             context.startActivity(myIntent);
             //    viewHolder.relativeLayout.setBackgroundColor(R.color.colorPrimaryDark);
-        }); */
+        });
     }
 
     @Override
