@@ -3,6 +3,7 @@ package com.example.benja.go4lunch.views;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -60,7 +61,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         viewHolder.restaurantAddress.setText(restaurantItem.getAddress());
         if (restaurantItem.getOpeningTime()){
             viewHolder.restaurantOpeningHours.setText("OPEN");
-            viewHolder.restaurantOpeningHours.setTextColor(GREEN);
+            viewHolder.restaurantOpeningHours.setTextColor(Color.parseColor("#2b7f37"));
 
         } else {
             viewHolder.restaurantOpeningHours.setText("CLOSED");
@@ -71,15 +72,12 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
 
         viewHolder.linearLayout.setOnClickListener(view -> {
             Intent myIntent = new Intent(context, RestaurantActivity.class);
-            myIntent.putExtra("websiteUrl", restaurantItem.getWebSiteUrl());
-            myIntent.putExtra("phoneNumber", restaurantItem.getPhone());
 
             SharedPreferences mPreferences = context.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
             mPreferences.edit().putString("image", restaurantItem.getPhotoUrl()).apply();
             mPreferences.edit().putString("name", restaurantItem.getName()).apply();
             mPreferences.edit().putString("address", restaurantItem.getAddress()).apply();
-            mPreferences.edit().putString("website", restaurantItem.getWebSiteUrl()).apply();
-            mPreferences.edit().putString("phoneNumber", restaurantItem.getPhone()).apply();
+            mPreferences.edit().putString("placeId", restaurantItem.getPlaceId()).apply();
 
 
             context.startActivity(myIntent);

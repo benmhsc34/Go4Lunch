@@ -25,9 +25,9 @@
         <TextView
             android:id="@+id/name"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="15dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
             android:text="The Corben Restaurant"
             android:textColor="#FFF"
             android:textSize="20sp" />
@@ -37,7 +37,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
-            android:layout_weight="1"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:text="2290 Av. Albert Eisntein"
             android:textColor="#FFF"
             android:textSize="15sp" />
@@ -68,7 +69,7 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:src="@drawable/baseline_map_black_48" />
+                    android:src="@drawable/call" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -88,11 +89,13 @@
                 android:weightSum="2">
 
                 <ImageView
+                    android:id="@+id/likeImageButton"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:src="@drawable/baseline_people_black_48" />
+                    android:src="@drawable/like" />
 
                 <TextView
+                    android:id="@+id/likeText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -112,7 +115,7 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:src="@drawable/baseline_map_black_48" />
+                    android:src="@drawable/earth" />
 
                 <TextView
                     android:layout_width="match_parent"

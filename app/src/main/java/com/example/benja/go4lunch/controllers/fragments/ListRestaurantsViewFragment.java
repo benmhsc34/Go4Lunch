@@ -84,7 +84,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
         Api api = retrofit.create(Api.class);
 
 
-
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
 
         recyclerView.setAdapter(adapter);
@@ -95,28 +94,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                 List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
 
 
-
                 for (int i = 0; i < theListOfResults.size(); i++) {
-
-                    Call<PlaceDetails> call1 = api.getPlaceDetails(theListOfResults.get(i).getPlaceId());
-                    call1.enqueue(new Callback<PlaceDetails>() {
-                        @Override
-                        public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> detailResponse) {
-                            PlaceDetails details = detailResponse.body();
-                            PlaceDetailsResults detailedListResults = details.getResults();
-
-
-                            if (detailedListResults.getPhoneNumber() != null) {
-                                phoneNumber = detailedListResults.getPhoneNumber();
-                            }
-                            website = detailedListResults.getWebsite();
-                        }
-
-                        @Override
-                        public void onFailure(Call<PlaceDetails> call, Throwable t) {
-
-                        }
-                    });
 
 
                     if (theListOfResults.get(i).getPhotos() != null) {
@@ -149,7 +127,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
                                         + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
-                                website, phoneNumber);
+                                theListOfResults.get(i).getPlaceId());
                         restaurantList.add(restaurantItem);
                     } else {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
@@ -159,7 +137,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                 "https://maps.googleapis.com/maps/api/place/photo?"
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
-                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", website, phoneNumber);
+                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(i).getPlaceId());
                         restaurantList.add(restaurantItem);
                     }
                     adapter.notifyDataSetChanged();

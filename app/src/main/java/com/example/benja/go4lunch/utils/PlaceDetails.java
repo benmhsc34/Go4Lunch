@@ -5,15 +5,15 @@ import com.google.gson.annotations.SerializedName;
 
 public class PlaceDetails {
 
-    @SerializedName("results")
+    @SerializedName("result")
     @Expose
-    private PlaceDetailsResults results;
+    private PlaceDetailsResults result;
 
     public PlaceDetails(PlaceDetailsResults results) {
-        this.results = results;
+        this.result = results;
     }
 
     public PlaceDetailsResults getResults() {
-        return results;
+        return result;
     }
 }
