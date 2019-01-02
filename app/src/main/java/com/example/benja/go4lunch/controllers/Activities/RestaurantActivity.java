@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
@@ -27,7 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RestaurantActivity extends AppCompatActivity {
 
     String thephoneNumber;
-    String theWebsite;
+    String theWebsite = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +91,16 @@ public class RestaurantActivity extends AppCompatActivity {
                 PlaceDetails details = detailResponse.body();
                 PlaceDetailsResults detailedListResults = details.getResults();
 
-
                 thephoneNumber = detailedListResults.getPhoneNumber();
 
-                theWebsite = detailedListResults.getWebsite();
-                Log.d("wesbitephone", thephoneNumber + "   //   " + theWebsite);
+                if (detailedListResults.getWebsite() != null) {
 
+                    theWebsite = detailedListResults.getWebsite();
+                    Log.d("wesbitephone", thephoneNumber + "   //   " + theWebsite);
+                } else {
+
+                    theWebsite = "https://benjamincorben.com";
+                }
             }
 
             @Override
@@ -104,18 +109,25 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-
+        websiteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
 
         websiteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(RestaurantActivity.this, RestaurantWebViewActivity.class);
-                intent.putExtra("websiteUrl", theWebsite);
-                startActivity(intent);
+
+                if (theWebsite.equals("https://benjamincorben.com")) {
+                    Toast.makeText(RestaurantActivity.this, "No website for this restaurant", Toast.LENGTH_LONG).show();
+                } else {
+                    Intent intent = new Intent(RestaurantActivity.this, RestaurantWebViewActivity.class);
+                    intent.putExtra("websiteUrl", theWebsite);
+                    startActivity(intent);
+                }
             }
         });
-
-
 
 
     }

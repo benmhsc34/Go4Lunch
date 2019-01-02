@@ -23,14 +23,9 @@ public class RestaurantWebViewActivity extends AppCompatActivity {
         mWebView = findViewById(R.id.spiderWebview);
 
 
-        if (website.equals(null)){
-            mWebView.setVisibility(View.INVISIBLE);
-        } else {
-            mWebView.setVisibility(View.VISIBLE);
-            mWebView.setWebViewClient(new WebViewClient());
-            mWebView.loadUrl(website);
-        }
-
+        mWebView.setVisibility(View.VISIBLE);
+        mWebView.setWebViewClient(new WebViewClient());
+        mWebView.loadUrl(website);
 
 
         Log.d("website", website);
