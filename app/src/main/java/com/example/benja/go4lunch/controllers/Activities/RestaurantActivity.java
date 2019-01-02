@@ -1,9 +1,12 @@
 package com.example.benja.go4lunch.controllers.Activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -91,15 +94,17 @@ public class RestaurantActivity extends AppCompatActivity {
                 PlaceDetails details = detailResponse.body();
                 PlaceDetailsResults detailedListResults = details.getResults();
 
-                thephoneNumber = detailedListResults.getPhoneNumber();
 
                 if (detailedListResults.getWebsite() != null) {
 
                     theWebsite = detailedListResults.getWebsite();
                     Log.d("wesbitephone", thephoneNumber + "   //   " + theWebsite);
                 } else {
-
                     theWebsite = "https://benjamincorben.com";
+                } if (detailedListResults.getPhoneNumber() != null){
+                    thephoneNumber = detailedListResults.getPhoneNumber();
+                } else{
+                    thephoneNumber = "noPhoneNumber";
                 }
             }
 
@@ -125,6 +130,20 @@ public class RestaurantActivity extends AppCompatActivity {
                     Intent intent = new Intent(RestaurantActivity.this, RestaurantWebViewActivity.class);
                     intent.putExtra("websiteUrl", theWebsite);
                     startActivity(intent);
+                }
+            }
+        });
+
+        callButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (thephoneNumber.equals("noPhoneNumber")) {
+                    Toast.makeText(RestaurantActivity.this, "No phone number for this restaurant", Toast.LENGTH_LONG).show();
+                } else {
+                    Intent i = new Intent(Intent.ACTION_DIAL);
+                    String p = "tel:" + thephoneNumber;
+                    i.setData(Uri.parse(p));
+                    startActivity(i);
                 }
             }
         });
