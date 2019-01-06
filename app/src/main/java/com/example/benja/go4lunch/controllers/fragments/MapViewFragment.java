@@ -90,7 +90,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     ShowSnackBarListener mListener;
 
 
-    public MapViewFragment() {
+    private MapViewFragment() {
         // Required empty public constructor
     }
 

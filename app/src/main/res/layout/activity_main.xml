@@ -40,11 +40,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <FrameLayout
-                    android:id="@+id/activity_welcome_frame_layout_bottom_navigation"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_above="@id/activity_welcome_bottom_navigation" />
 
                 <android.support.design.widget.BottomNavigationView
                     android:id="@+id/activity_welcome_bottom_navigation"
@@ -66,6 +61,7 @@
                     app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
             </RelativeLayout>
+
 
         </LinearLayout>
 

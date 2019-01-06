@@ -51,7 +51,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     // Declare Adapter of the RecyclerView
     private ListRestaurantsViewAdapter mAdapter;
 
-    public ListRestaurantsViewFragment() {
+    private ListRestaurantsViewFragment() {
     }
 
     // ---------------------------------------------------------------------------------------------

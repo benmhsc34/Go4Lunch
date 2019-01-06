@@ -1,6 +1,7 @@
 package com.example.benja.go4lunch.controllers.Activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -32,12 +33,14 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.benja.go4lunch.PagerAdapter;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
@@ -56,7 +59,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener{
 
 
 
@@ -70,6 +73,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     NavigationView mNavigationView;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.viewpager)
+    ViewPager mViewPager;
 
 
     private static final int SIGN_OUT_TASK = 10;
@@ -98,6 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private LocationManager locationManager;
     private LocationListener locationListener;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,13 +116,16 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.configureNavigationHeader();
         this.configureNavigationView();
         this.configureBottomView();
-/*
-        Circle drawCircle = mMapViewFragment.addCircle(new CircleOptions()
-                .center(new LatLng(mLastKnownLocation.getLatitude(),  mLastKnownLocation.Longi()))
-                .radius(1000)
-                .strokeColor(Color.RED)
-                .fillColor(Color.BLUE));
-*/
+
+        PagerAdapter viewPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3, mLastKnownLocation);
+
+        mViewPager.setAdapter(viewPagerAdapter);
+
+        mViewPager.setOnTouchListener((view, motionEvent) -> {
+
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem());
+            return true;
+        });
 
 
 
@@ -382,10 +391,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
       /*  mFragmentManager.beginTransaction()
                 .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mListRestaurantsViewFragment,"ListViewFragment")
                 .commit();
-*/
+
         mFragmentManager.beginTransaction()
                 .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mMapViewFragment, "MapViewFragment")
-                .commit();
+                .commit(); */
     }
 
 
@@ -395,22 +404,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.action_map_view:
                 // Hide the active fragment and activates the fragment mMapViewFragment
                 // mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
-                mActiveFragment = mMapViewFragment;
+                mViewPager.setCurrentItem(0);
                 break;
             case R.id.action_list_view:
                 // Hide the active fragment and activates the fragment mListViewFragment
                 //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
-                mActiveFragment = mListRestaurantsViewFragment;
+             //   mActiveFragment = mListRestaurantsViewFragment;
+                mViewPager.setCurrentItem(1);
+
                 break;
             case R.id.action_workmates:
                 // Hide the active fragment and activates the fragment mWorkmatesFragment
                 //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
-                mActiveFragment = mMapViewFragment;
+               // mActiveFragment = mMapViewFragment;
+                mViewPager.setCurrentItem(2);
                 break;
         }
-        mFragmentManager.beginTransaction()
+   /*     mFragmentManager.beginTransaction()
                 .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mActiveFragment, "MapViewFragment")
-                .commit();
+                .commit(); */
         return true;
 
     }
