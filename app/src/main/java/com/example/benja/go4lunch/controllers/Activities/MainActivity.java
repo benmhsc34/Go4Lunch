@@ -47,6 +47,7 @@ import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
+import com.example.benja.go4lunch.views.ScrollableViewPager;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -74,7 +75,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.viewpager)
-    ViewPager mViewPager;
+    ScrollableViewPager mViewPager;
 
 
     private static final int SIGN_OUT_TASK = 10;
@@ -120,13 +121,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         PagerAdapter viewPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3, mLastKnownLocation);
 
         mViewPager.setAdapter(viewPagerAdapter);
-
-        mViewPager.setOnTouchListener((view, motionEvent) -> {
-
-            mViewPager.setCurrentItem(mViewPager.getCurrentItem());
-            return true;
-        });
-
+        mViewPager.setCanScroll(false);
 
 
         setSupportActionBar(mToolbar);
