@@ -20,10 +20,14 @@ import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -187,6 +191,17 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void startWelcomeActivity(){
+
+        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
+
+        Map<String, Object> dataToSave = new HashMap<>();
+        dataToSave.put("userName", currentFirebaseUser.getDisplayName());
+        dataToSave.put("email", currentFirebaseUser.getEmail());
+        mDocRef.set(dataToSave).addOnSuccessListener(aVoid -> Log.d("sucess", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
+
+
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

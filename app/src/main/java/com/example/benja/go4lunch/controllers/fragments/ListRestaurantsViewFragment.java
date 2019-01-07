@@ -114,7 +114,9 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     double restaurantLatitude = restaurantLatitudeDegres * (Math.PI / 180);
                     double restaurantLongitude = restaurantLongitudeDegres * (Math.PI / 180);
 
-                    double reallyPreciseDistance = 6367445 * Math.acos(Math.sin(userLatitude) * (Math.sin(restaurantLatitude)) + Math.cos(userLatitude) * Math.cos(restaurantLatitude) * Math.cos(userLongitude - restaurantLongitude));
+                    int radiusOfTheEarth = 6367445;
+
+                    double reallyPreciseDistance = radiusOfTheEarth * Math.acos(Math.sin(userLatitude) * (Math.sin(restaurantLatitude)) + Math.cos(userLatitude) * Math.cos(restaurantLatitude) * Math.cos(userLongitude - restaurantLongitude));
                     int distance = (int) reallyPreciseDistance;
 
 
@@ -168,4 +170,5 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
         super.onAttach(context);
     }
+
 }

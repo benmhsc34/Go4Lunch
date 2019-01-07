@@ -3,6 +3,7 @@ package com.example.benja.go4lunch.controllers.Activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -45,6 +46,7 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
+import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
 import com.example.benja.go4lunch.views.ScrollableViewPager;
@@ -56,6 +58,8 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -297,18 +301,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         switch (id) {
             case R.id.activity_welcome_drawer_your_lunch:
-                // Get additional data from FireStore : restaurantIdentifier of the User choice
-                UserHelper.getUser(this.getCurrentUser().getUid()).addOnSuccessListener(documentSnapshot -> {
-                    User currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser.getRestaurantIdentifier() != null) {
-                        // Go to restaurant card
-                        //   goToRestaurantActivity(currentUser);
-                    }
-                });
+                 break;
+
             case R.id.activity_welcome_drawer_settings:
+                Intent myIntent = new Intent(this, SettingsActivity.class);
+                startActivity(myIntent);
                 break;
             case R.id.activity_welcome_drawer_logout:
-                       this.signOutUserFromFirebase();
+                this.signOutUserFromFirebase();
                 break;
             default:
                 break;
@@ -374,6 +374,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         //Instantiate fragment used by BottomNavigationView
         mMapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
         mListRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
+        mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance();
         //   mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance(null);
 
         // Save the active Fragment

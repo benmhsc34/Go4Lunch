@@ -6,8 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -36,7 +35,8 @@
             android:required="false" />
 
         <activity android:name=".controllers.Activities.RestaurantActivity" />
-        <activity android:name=".controllers.Activities.RestaurantWebViewActivity"></activity>
+        <activity android:name=".controllers.Activities.RestaurantWebViewActivity" />
+        <activity android:name=".controllers.Activities.SettingsActivity"></activity>
     </application>
 
 </manifest>

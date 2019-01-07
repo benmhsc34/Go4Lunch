@@ -6,8 +6,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.View;
 
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
+import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.utils.Location;
+
+import java.util.List;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
@@ -26,8 +29,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 return MapViewFragment.newInstance(lastKnownLocation);
             case 1:
                 return ListRestaurantsViewFragment.newInstance();
+            case 2:
+                return ListWorkmatesViewFragment.newInstance();
             default:
-                return ListRestaurantsViewFragment.newInstance();
+                return MapViewFragment.newInstance(lastKnownLocation);
 
         }
     }
