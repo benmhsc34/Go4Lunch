@@ -95,7 +95,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 PlaceDetailsResults detailedListResults = details.getResults();
 
 
-                if (detailedListResults.getWebsite() != null) {
+                if (detailedListResults != null) {
 
                     theWebsite = detailedListResults.getWebsite();
                     Log.d("wesbitephone", thephoneNumber + "   //   " + theWebsite);

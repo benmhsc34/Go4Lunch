@@ -1,29 +1,25 @@
 package com.example.benja.go4lunch.controllers.fragments;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.benja.go4lunch.base.BaseFragment;
-import com.example.benja.go4lunch.models.Go4LunchViewModel;
+import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.R;
-import com.example.benja.go4lunch.api.RestaurantHelper;
+import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.utils.PlaceNearBySearch;
+import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,16 +29,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import static android.content.Context.MODE_PRIVATE;
-import static java.lang.reflect.Modifier.PRIVATE;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**************************************************************************************************
@@ -79,6 +76,13 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     double latitude;
     double longitude;
 
+    String photoReferences;
+    String placeIdReferences;
+    String nameReferences;
+    String addressReferences;
+    String imageReferences;
+
+    Marker marker;
 
     // ==> CallBack
     // Interface for ShowSnakeBar
@@ -171,6 +175,68 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         mMap.setOnInfoWindowClickListener(this);
 
 
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+
+        Api api = retrofit.create(Api.class);
+
+
+        Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
+        call.enqueue(new Callback<PlaceNearBySearch>() {
+            @Override
+            public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
+                PlaceNearBySearch articles = response.body();
+                List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
+
+
+                for (int i = 0; i < theListOfResults.size(); i++) {
+
+
+                    if (theListOfResults.get(i).getPhotos() != null) {
+                        photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
+                    } else {
+                        photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
+                    }
+
+                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(theListOfResults.get(i).getGeometry().getLocation().getLat(), theListOfResults.get(i).getGeometry().getLocation().getLng()))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange))
+                            .snippet(i + ""));
+
+                }
+
+                int i = Integer.parseInt(marker.getSnippet());
+
+                placeIdReferences = theListOfResults.get(i).getPlaceId();
+                addressReferences = theListOfResults.get(i).getAddress();
+                nameReferences = theListOfResults.get(i).getName();
+
+            }
+
+            @Override
+            public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
+
+            }
+        });
+/*
+        mMap.setOnMarkerClickListener(marker1 -> {
+
+            Log.d("snippets", marker.getSnippet());
+
+
+            SharedPreferences preferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", 0);
+            preferences.edit().putString("image", "https://maps.googleapis.com/maps/api/place/photo?"
+                    + "maxwidth=2304"
+                    + "&photoreference=" + photoReferences
+                    + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4" + placeIdReferences).apply();
+            preferences.edit().putString("name", nameReferences).apply();
+            preferences.edit().putString("address", addressReferences).apply();
+            preferences.edit().putString("placeId", placeIdReferences).apply();
+
+
+            Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
+            startActivity(myIntent);
+            return false;
+        });
+*/
 
         //Cute blue dot
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -254,7 +320,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         longitude), DEFAULT_ZOOM));
 
         // Update Location UI
-      //  updateLocationUI();
+        //  updateLocationUI();
     }
 
 
@@ -346,6 +412,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     }
 
 */
+
     /**
      * Method use for CallBacks to the Welcome Activity
      */

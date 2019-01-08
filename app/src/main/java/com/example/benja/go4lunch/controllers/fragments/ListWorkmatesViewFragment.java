@@ -21,7 +21,7 @@ import com.google.firebase.firestore.Query;
 
 public class ListWorkmatesViewFragment extends Fragment {
 
-    private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
+ //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
 
     public ListWorkmatesViewFragment() {
         // Required empty public constructor
@@ -32,7 +32,6 @@ public class ListWorkmatesViewFragment extends Fragment {
         return fragment;
     }
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
@@ -84,7 +83,6 @@ public class ListWorkmatesViewFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(@NonNull ListWorkmatesViewFragment.UsersViewHolder holder, int position, @NonNull UsersModel model) {
-
 
                 holder.setUserName(model.getUserName());
 
