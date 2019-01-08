@@ -14,6 +14,7 @@ import android.widget.Button;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
+import com.example.benja.go4lunch.models.UsersModel;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -204,6 +205,7 @@ public class LoginActivity extends BaseActivity {
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+
     }
 
 }
