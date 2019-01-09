@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,6 +44,9 @@ public class RestaurantActivity extends AppCompatActivity {
     String restaurantName = "initial";
     FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
+    ArrayList arrayList = new ArrayList<>();
+    Boolean like;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +80,72 @@ public class RestaurantActivity extends AppCompatActivity {
         addressTV.setText(address);
         Picasso.get().load(image).into(photoRestaurant);
 
+
+        mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+            like = false;
+            if (documentSnapshot.exists()) {
+                Object restosLiked = documentSnapshot.get("listTesting");
+                arrayList = (ArrayList) restosLiked;
+                if (arrayList != null) {
+                    for (int i = 0; i < arrayList.size(); i++) {
+                        if (arrayList.get(i).equals(name)) {
+                            likePhotoIV.setImageResource(R.drawable.liked);
+                            likeTV.setText("LIKED");
+                            like = true;
+
+                        }
+                    }
+                }
+
+            }
+        });
+
+
         likeButton.setOnClickListener(view -> {
-            SharedPreferences mPreferences1 = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-            Boolean like = mPreferences1.getBoolean("like", false);
 
             if (!like) {
                 like = true;
-                likePhotoIV.setImageResource(R.drawable.liked);
-                likeTV.setText("LIKED");
-            } else {
-                like = false;
                 likePhotoIV.setImageResource(R.drawable.like);
                 likeTV.setText("LIKE");
-            }
 
-            mPreferences1.edit().putBoolean("like", like).apply();
+                mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+
+                    if (documentSnapshot.exists()) {
+                        Object restosLiked = documentSnapshot.get("listTesting");
+                        arrayList = (ArrayList) restosLiked;
+                        if (arrayList != null) {
+                            arrayList.add(name);
+                        }
+
+                    }
+                });
+                Map<String, Object> arrayMapList = new HashMap<>();
+                arrayMapList.put("listTesting", arrayList);
+                mDocRef.update(arrayMapList);
+
+            } else {
+                like = false;
+                likePhotoIV.setImageResource(R.drawable.liked);
+                likeTV.setText("LIKED");
+                mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+
+                    if (documentSnapshot.exists()) {
+                        Object restosLiked = documentSnapshot.get("listTesting");
+                        arrayList = (ArrayList) restosLiked;
+                        if (arrayList != null) {
+                            for (int i = 0; i < arrayList.size(); i++) {
+                                if (arrayList.get(i).equals(name)) {
+                                    arrayList.remove(i);
+                                }
+                            }
+                        }
+
+                    }
+                });
+                Map<String, Object> arrayMapList = new HashMap<>();
+                arrayMapList.put("listTesting", arrayList);
+                mDocRef.update(arrayMapList);
+            }
         });
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
@@ -161,7 +215,7 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-        if (!(alreadyGoing.get() == 0 ) && restaurantName.equals(name)) {
+        if (!(alreadyGoing.get() == 0) && restaurantName.equals(name)) {
             goingButton.setText("✔");
             goingButton.setTextColor(GREEN);
             goingButton.setTextSize(25);
@@ -185,6 +239,7 @@ public class RestaurantActivity extends AppCompatActivity {
                         goingButton.setText("Going?");
                         goingButton.setTextColor(BLACK);
                         goingButton.setTextSize(15);
+
 
                         Map<String, Object> updates = new HashMap<>();
                         updates.put("restaurantName", FieldValue.delete());
