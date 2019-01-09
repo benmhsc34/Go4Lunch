@@ -1,16 +1,12 @@
 package com.example.benja.go4lunch.controllers.Activities;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,7 +16,17 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,10 +34,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.GREEN;
+
 public class RestaurantActivity extends AppCompatActivity {
 
     String thephoneNumber;
     String theWebsite = "";
+    String restaurantName = "initial";
+    FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +62,9 @@ public class RestaurantActivity extends AppCompatActivity {
         ImageView photoRestaurant = findViewById(R.id.picture);
         ImageView likePhotoIV = findViewById(R.id.likeImageButton);
 
+        Button goingButton = findViewById(R.id.goingButton);
+
+
         //Fetching data from SP
         SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
         String image = mPreferences.getString("image", "A PICTURE OBVIOUSLY");
@@ -62,24 +77,21 @@ public class RestaurantActivity extends AppCompatActivity {
         addressTV.setText(address);
         Picasso.get().load(image).into(photoRestaurant);
 
-        likeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-                Boolean like = mPreferences.getBoolean("like", false);
+        likeButton.setOnClickListener(view -> {
+            SharedPreferences mPreferences1 = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+            Boolean like = mPreferences1.getBoolean("like", false);
 
-                if (!like) {
-                    like = true;
-                    likePhotoIV.setImageResource(R.drawable.liked);
-                    likeTV.setText("LIKED");
-                } else {
-                    like = false;
-                    likePhotoIV.setImageResource(R.drawable.like);
-                    likeTV.setText("LIKE");
-                }
-
-                mPreferences.edit().putBoolean("like", like).apply();
+            if (!like) {
+                like = true;
+                likePhotoIV.setImageResource(R.drawable.liked);
+                likeTV.setText("LIKED");
+            } else {
+                like = false;
+                likePhotoIV.setImageResource(R.drawable.like);
+                likeTV.setText("LIKE");
             }
+
+            mPreferences1.edit().putBoolean("like", like).apply();
         });
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
@@ -98,12 +110,12 @@ public class RestaurantActivity extends AppCompatActivity {
                 if (detailedListResults != null) {
 
                     theWebsite = detailedListResults.getWebsite();
-                    Log.d("wesbitephone", thephoneNumber + "   //   " + theWebsite);
                 } else {
                     theWebsite = "https://benjamincorben.com";
-                } if (detailedListResults.getPhoneNumber() != null){
+                }
+                if (detailedListResults.getPhoneNumber() != null) {
                     thephoneNumber = detailedListResults.getPhoneNumber();
-                } else{
+                } else {
                     thephoneNumber = "noPhoneNumber";
                 }
             }
@@ -114,40 +126,75 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-        websiteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        websiteButton.setOnClickListener(view -> {
+        });
+
+        websiteButton.setOnClickListener(view -> {
+
+            if (theWebsite.equals("https://benjamincorben.com")) {
+                Toast.makeText(RestaurantActivity.this, "No website for this restaurant", Toast.LENGTH_LONG).show();
+            } else {
+                Intent intent = new Intent(RestaurantActivity.this, RestaurantWebViewActivity.class);
+                intent.putExtra("websiteUrl", theWebsite);
+                startActivity(intent);
             }
         });
 
-        websiteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        callButton.setOnClickListener(view -> {
+            if (thephoneNumber.equals("noPhoneNumber")) {
+                Toast.makeText(RestaurantActivity.this, "No phone number for this restaurant", Toast.LENGTH_LONG).show();
+            } else {
+                Intent i = new Intent(Intent.ACTION_DIAL);
+                String p = "tel:" + thephoneNumber;
+                i.setData(Uri.parse(p));
+                startActivity(i);
+            }
+        });
 
-                if (theWebsite.equals("https://benjamincorben.com")) {
-                    Toast.makeText(RestaurantActivity.this, "No website for this restaurant", Toast.LENGTH_LONG).show();
-                } else {
-                    Intent intent = new Intent(RestaurantActivity.this, RestaurantWebViewActivity.class);
-                    intent.putExtra("websiteUrl", theWebsite);
-                    startActivity(intent);
+        AtomicInteger alreadyGoing = new AtomicInteger(mPreferences.getInt("alreadyGoing", 0));
+
+        mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+
+            if (documentSnapshot.exists()) {
+                restaurantName = documentSnapshot.getString("restaurantName");
+
+            }
+        });
+
+        if (!(alreadyGoing.get() == 0 ) && restaurantName.equals(name)) {
+            goingButton.setText("✔");
+            goingButton.setTextColor(GREEN);
+            goingButton.setTextSize(25);
+        }
+
+        goingButton.setOnClickListener(view -> {
+                    alreadyGoing.set(mPreferences.getInt("alreadyGoing", 0));
+
+
+                    if (alreadyGoing.get() == 0) {
+                        goingButton.setText("✔");
+                        goingButton.setTextColor(GREEN);
+                        goingButton.setTextSize(25);
+
+                        Map<String, Object> dataToSave = new HashMap<>();
+                        dataToSave.put("restaurantName", name);
+                        mDocRef.set(dataToSave, SetOptions.merge());
+
+                        mPreferences.edit().putInt("alreadyGoing", 1).apply();
+                    } else if (alreadyGoing.get() == 1) {
+                        goingButton.setText("Going?");
+                        goingButton.setTextColor(BLACK);
+                        goingButton.setTextSize(15);
+
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("restaurantName", FieldValue.delete());
+
+                        mDocRef.update(updates);
+                        mPreferences.edit().putInt("alreadyGoing", 0).apply();
+                    }
+
                 }
-            }
-        });
-
-        callButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (thephoneNumber.equals("noPhoneNumber")) {
-                    Toast.makeText(RestaurantActivity.this, "No phone number for this restaurant", Toast.LENGTH_LONG).show();
-                } else {
-                    Intent i = new Intent(Intent.ACTION_DIAL);
-                    String p = "tel:" + thephoneNumber;
-                    i.setData(Uri.parse(p));
-                    startActivity(i);
-                }
-            }
-        });
-
+        );
 
     }
 }

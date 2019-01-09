@@ -30,17 +30,14 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mDocRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                TextView display = findViewById(R.id.TV);
+        mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+            TextView display = findViewById(R.id.TV);
 
-                if (documentSnapshot.exists()) {
-                    String quote = documentSnapshot.getString("quote");
-                    String author = documentSnapshot.getString("author");
+            if (documentSnapshot.exists()) {
+                String quote = documentSnapshot.getString("quote");
+                String author = documentSnapshot.getString("author");
 
-                    display.setText(quote + " -- " + author);
-                }
+                display.setText(quote + " -- " + author);
             }
         });
     }

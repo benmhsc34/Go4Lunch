@@ -262,7 +262,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Log.d("normallogstatment", "out");
 
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);

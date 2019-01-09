@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -200,7 +201,7 @@ public class LoginActivity extends BaseActivity {
         Map<String, Object> dataToSave = new HashMap<>();
         dataToSave.put("userName", currentFirebaseUser.getDisplayName());
         dataToSave.put("email", currentFirebaseUser.getEmail());
-        mDocRef.set(dataToSave).addOnSuccessListener(aVoid -> Log.d("sucess", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
+        mDocRef.set(dataToSave, SetOptions.merge()).addOnSuccessListener(aVoid -> Log.d("sucess", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
 
 
         Intent intent = new Intent(this, MainActivity.class);
