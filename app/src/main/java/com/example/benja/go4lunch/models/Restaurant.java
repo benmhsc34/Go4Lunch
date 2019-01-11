@@ -10,7 +10,7 @@ public class Restaurant {
     @Nullable private Boolean mOpeningTime;  // Opening time of Restaurant
     @Nullable private String mDistance;     // Distance where the restaurant is from the current position
 //    @Nullable private long mNbrParticipants;// Number of participants
-//    @Nullable private long mNbrLikes;        // Number of likes that the restaurant got
+    private float mNbrLikes;        // Number of likes that the restaurant got
     @Nullable private String mPhotoUrl;     // URL of the Restaurant photo
     @Nullable private String mPlaceId;
 //    @Nullable private String mWebSiteUrl;   // URL of the Web site
@@ -20,11 +20,12 @@ public class Restaurant {
 //    @Nullable private String mPhone;        // Phone number to call the Restaurant
 
 
-    public Restaurant(String name, @Nullable String address, @Nullable Boolean openingTime, @Nullable String distance, @Nullable String photoUrl, @Nullable String placeId) {
+    public Restaurant(String name, @Nullable String address, @Nullable Boolean openingTime, @Nullable String distance, @Nullable String photoUrl, @Nullable String placeId, float nbrLikes) {
         mName = name;
         mAddress = address;
         mOpeningTime = openingTime;
         mDistance = distance;
+        mNbrLikes = nbrLikes;
         mPhotoUrl = photoUrl;
         mPlaceId = placeId;
     }
@@ -46,6 +47,10 @@ public class Restaurant {
     @Nullable
     public String getDistance() {
         return mDistance;
+    }
+
+    public float getNbrLikes() {
+        return mNbrLikes;
     }
 
     @Nullable

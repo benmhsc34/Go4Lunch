@@ -124,38 +124,35 @@
 
                 <!-- Third line -->
                 <!-- display Stars -->
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:orientation="horizontal">
+                    android:layout_weight="1">
 
-                    <!-- Star 3
                     <ImageView
                         android:id="@+id/fragment_list_restaurant_view_item_star_three"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/stars"
-                        android:background="@drawable/baseline_star_black_18"/>
--->
-                    <!-- Star 2
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_margin="1dp"
+                        android:background="@drawable/star_white" />
+
                     <ImageView
                         android:id="@+id/fragment_list_restaurant_view_item_star_two"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/stars"
-                        android:background="@drawable/baseline_star_black_18"/>
--->
-                    <!-- Star 1
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_margin="1dp"
+                        android:layout_toEndOf="@+id/fragment_list_restaurant_view_item_star_three"
+                        android:background="@drawable/star_white" />
+
                     <ImageView
                         android:id="@+id/fragment_list_restaurant_view_item_star_one"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/stars"
-                        android:background="@drawable/baseline_star_black_18"/>
-                    -->
-                </LinearLayout>
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_margin="1dp"
+                        android:layout_toEndOf="@+id/fragment_list_restaurant_view_item_star_two"
+                        android:background="@drawable/star_white" />
+
+                </RelativeLayout>
 
             </LinearLayout>
 

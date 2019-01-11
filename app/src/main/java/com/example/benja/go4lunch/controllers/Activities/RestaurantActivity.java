@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,10 +20,15 @@ import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
 
@@ -30,6 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,12 +52,17 @@ public class RestaurantActivity extends AppCompatActivity {
 
     String thephoneNumber;
     String theWebsite = "";
- //   String restaurantName = "initial";
+    //   String restaurantName = "initial";
     FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
+    private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
     ArrayList arrayList = new ArrayList<>();
+    ArrayList likeAverage = new ArrayList<>();
     Boolean like = false;
     Boolean alreadyGoing = false;
+    float numberOfLikes = 0;
+    float numberOfPeople = 0;
+    float averageLikes;
 
 
     @Override
@@ -68,6 +81,9 @@ public class RestaurantActivity extends AppCompatActivity {
 
         ImageView photoRestaurant = findViewById(R.id.picture);
         ImageView likePhotoIV = findViewById(R.id.likeImageButton);
+        ImageView starOne = findViewById(R.id.starOne);
+        ImageView starTwo = findViewById(R.id.starTwo);
+        ImageView starThree = findViewById(R.id.starThree);
 
         Button goingButton = findViewById(R.id.goingButton);
 
@@ -85,7 +101,10 @@ public class RestaurantActivity extends AppCompatActivity {
         addressTV.setText(address);
         Picasso.get().load(image).into(photoRestaurant);
 
-
+        //Setting the stars invisible by default
+        starOne.setVisibility(View.INVISIBLE);
+        starTwo.setVisibility(View.INVISIBLE);
+        starThree.setVisibility(View.INVISIBLE);
 
 
         if (restaurantName.equals(name)) {
@@ -196,6 +215,51 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
+
+        notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+
+                Object listTesting = documentSnapshot.get("listTesting");
+                likeAverage = (ArrayList) listTesting;
+
+                if (likeAverage != null) {
+                    for (int i = 0; i < likeAverage.size(); i++) {
+                        if (likeAverage.get(i).equals(name)) {
+                            numberOfLikes++;
+                        }
+                    }
+                }
+                numberOfPeople++;
+
+            }
+            averageLikes = numberOfLikes  /  numberOfPeople;
+            Log.d("whatisitworth", averageLikes + "");
+            if (averageLikes == 0.0){
+                starOne.setVisibility(View.INVISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            }
+            if (0.1 >= averageLikes){
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            }
+            else if (0.4 >= averageLikes){
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.VISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            }
+            else {
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.VISIBLE);
+                starThree.setVisibility(View.VISIBLE);
+
+            }
+
+        });
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
         Api api = retrofit.create(Api.class);

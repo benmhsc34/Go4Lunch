@@ -20,6 +20,9 @@ import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ListRestaurantsViewAdapter;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +46,14 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private List<Restaurant> restaurantList;
+    float numberOfLikes = 0;
+    float numberOfPeople = 0;
+    float averageLikes;
+    ArrayList likeAverage = new ArrayList<>();
+    int number;
+
+
+    private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
 
     String photoReferences;
     String phoneNumber;
@@ -84,6 +95,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
         Api api = retrofit.create(Api.class);
 
 
+
+
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
 
         recyclerView.setAdapter(adapter);
@@ -93,9 +106,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                 PlaceNearBySearch articles = response.body();
                 List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
 
-
                 for (int i = 0; i < theListOfResults.size(); i++) {
-
+                    number = i;
 
                     if (theListOfResults.get(i).getPhotos() != null) {
                         photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
@@ -114,10 +126,32 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     double restaurantLatitude = restaurantLatitudeDegres * (Math.PI / 180);
                     double restaurantLongitude = restaurantLongitudeDegres * (Math.PI / 180);
 
+                    //Radius of the Earth in meters
                     int radiusOfTheEarth = 6367445;
 
                     double reallyPreciseDistance = radiusOfTheEarth * Math.acos(Math.sin(userLatitude) * (Math.sin(restaurantLatitude)) + Math.cos(userLatitude) * Math.cos(restaurantLatitude) * Math.cos(userLongitude - restaurantLongitude));
                     int distance = (int) reallyPreciseDistance;
+
+                    notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+
+                            Object listTesting = documentSnapshot.get("listTesting");
+                            likeAverage = (ArrayList) listTesting;
+
+                            if (likeAverage != null) {
+                                for (int j = 0; j < likeAverage.size(); j++) {
+                                    if (likeAverage.get(j).equals(theListOfResults.get(number).getName())) {
+                                        numberOfLikes++;
+                                    }
+                                }
+                            }
+                            numberOfPeople++;
+
+                        }
+                        averageLikes = numberOfLikes  /  numberOfPeople;
+                        Log.d("isitequal", averageLikes + theListOfResults.get(number).getName());
+
+                    });
 
 
                     if (theListOfResults.get(i).getOpeningHours() != null) {
@@ -129,7 +163,9 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
                                         + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
-                                theListOfResults.get(i).getPlaceId());
+                                theListOfResults.get(i).getPlaceId(),
+                                averageLikes);
+
                         restaurantList.add(restaurantItem);
                     } else {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
@@ -139,7 +175,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                 "https://maps.googleapis.com/maps/api/place/photo?"
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
-                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(i).getPlaceId());
+                                        + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(i).getPlaceId(),
+                                averageLikes);
                         restaurantList.add(restaurantItem);
                     }
                     adapter.notifyDataSetChanged();

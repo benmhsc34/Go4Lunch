@@ -59,7 +59,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
 
         viewHolder.restaurantName.setText(restaurantItem.getName());
         viewHolder.restaurantAddress.setText(restaurantItem.getAddress());
-        if (restaurantItem.getOpeningTime()){
+        if (restaurantItem.getOpeningTime()) {
             viewHolder.restaurantOpeningHours.setText("OPEN");
             viewHolder.restaurantOpeningHours.setTextColor(Color.parseColor("#2b7f37"));
 
@@ -68,6 +68,31 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             viewHolder.restaurantOpeningHours.setTextColor(RED);
         }
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
+
+        if (restaurantItem.getNbrLikes() == 0.0){
+            viewHolder.starOne.setVisibility(View.INVISIBLE);
+            viewHolder.starTwo.setVisibility(View.INVISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
+        }
+        if (0.1 >= restaurantItem.getNbrLikes()){
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.INVISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
+        }
+        else if (0.4 >= restaurantItem.getNbrLikes()){
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.VISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
+        }
+        else {
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.VISIBLE);
+            viewHolder.starThree.setVisibility(View.VISIBLE);
+
+        }
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 
         viewHolder.linearLayout.setOnClickListener(view -> {
@@ -97,6 +122,9 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         public TextView restaurantDistanceToUser;
         public ImageView restaurantImage;
         public LinearLayout linearLayout;
+        public ImageView starOne;
+        public ImageView starTwo;
+        public ImageView starThree;
 
 
         public ViewHolder(@NonNull final View itemView) {
@@ -108,6 +136,10 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             restaurantDistanceToUser = itemView.findViewById(R.id.fragment_list_restaurant_view_item_distance);
             restaurantImage = itemView.findViewById(R.id.fragment_list_restaurant_view_item_image);
             linearLayout = itemView.findViewById(R.id.linearLayout);
+            starThree = itemView.findViewById(R.id.fragment_list_restaurant_view_item_star_three);
+            starTwo = itemView.findViewById(R.id.fragment_list_restaurant_view_item_star_two);
+            starOne = itemView.findViewById(R.id.fragment_list_restaurant_view_item_star_one);
+
 
             ButterKnife.bind(this, itemView);
 

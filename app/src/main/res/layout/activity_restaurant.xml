@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/picture"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="-20dp"
+        android:layout_marginTop="-22dp"
         android:layout_marginEnd="7dp"
         android:background="@drawable/roundedbutton"
         android:text="Going?" />
@@ -29,29 +29,66 @@
     <LinearLayout
         android:id="@+id/LL1"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="125dp"
         android:layout_below="@+id/picture"
         android:background="#ff471a"
         android:orientation="vertical"
         android:weightSum="2">
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="25dp"
-            android:text="The Corben Restaurant"
-            android:textColor="#FFF"
-            android:textSize="20sp" />
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="25dp"
+                android:maxWidth="250dp"
+                android:text="The Corben Restaurant"
+                android:textColor="#FFF"
+                android:textSize="20sp" />
+
+            <ImageView
+                android:id="@+id/starOne"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignTop="@+id/name"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/name"
+                android:background="#ff471a"
+                android:src="@drawable/star" />
+
+            <ImageView
+                android:id="@+id/starTwo"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignTop="@+id/name"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/starOne"
+                android:background="#ff471a"
+                android:src="@drawable/star" />
+
+            <ImageView
+                android:id="@+id/starThree"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignTop="@+id/name"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/starTwo"
+                android:background="#ff471a"
+                android:src="@drawable/star" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/address"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="25dp"
             android:text="2290 Av. Albert Eisntein"
             android:textColor="#FFF"
             android:textSize="11sp" />
