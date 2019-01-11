@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,9 +16,11 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -41,11 +44,12 @@ public class RestaurantActivity extends AppCompatActivity {
 
     String thephoneNumber;
     String theWebsite = "";
-    String restaurantName = "initial";
+ //   String restaurantName = "initial";
     FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
     ArrayList arrayList = new ArrayList<>();
-    Boolean like;
+    Boolean like = false;
+    Boolean alreadyGoing = false;
 
 
     @Override
@@ -74,6 +78,7 @@ public class RestaurantActivity extends AppCompatActivity {
         String name = mPreferences.getString("name", "Corben House");
         String address = mPreferences.getString("address", "2290 Av.ALbert Einstein");
         String placeId = mPreferences.getString("placeId", "A PLACE ID IDRK");
+        String restaurantName = mPreferences.getString("goingRestaurant", "something");
 
         //Setting data to respective Views
         restaurantNameTV.setText(name);
@@ -81,8 +86,49 @@ public class RestaurantActivity extends AppCompatActivity {
         Picasso.get().load(image).into(photoRestaurant);
 
 
+
+
+        if (restaurantName.equals(name)) {
+            goingButton.setText("✔");
+            goingButton.setTextColor(GREEN);
+            goingButton.setTextSize(25);
+            alreadyGoing = true;
+        }
+
+        goingButton.setOnClickListener(view -> {
+
+                    if (!(alreadyGoing)) {
+                        goingButton.setText("✔");
+                        goingButton.setTextColor(GREEN);
+                        goingButton.setTextSize(25);
+
+                        Map<String, Object> dataToSave = new HashMap<>();
+                        dataToSave.put("restaurantName", name);
+                        mDocRef.set(dataToSave, SetOptions.merge());
+                        mPreferences.edit().putInt("alreadyGoing", 1).apply();
+                        mPreferences.edit().putString("goingRestaurant", name).apply();
+                        alreadyGoing = true;
+
+                    } else {
+                        goingButton.setText("Going?");
+                        goingButton.setTextColor(BLACK);
+                        goingButton.setTextSize(15);
+
+                        alreadyGoing = false;
+
+
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("restaurantName", FieldValue.delete());
+
+                        mDocRef.update(updates);
+                        mPreferences.edit().putInt("alreadyGoing", 0).apply();
+                    }
+
+                }
+        );
+
+
         mDocRef.addSnapshotListener((documentSnapshot, e) -> {
-            like = false;
             if (documentSnapshot.exists()) {
                 Object restosLiked = documentSnapshot.get("listTesting");
                 arrayList = (ArrayList) restosLiked;
@@ -96,17 +142,14 @@ public class RestaurantActivity extends AppCompatActivity {
                         }
                     }
                 }
-
             }
         });
-
 
         likeButton.setOnClickListener(view -> {
 
             if (!like) {
-                like = true;
-                likePhotoIV.setImageResource(R.drawable.like);
-                likeTV.setText("LIKE");
+                likePhotoIV.setImageResource(R.drawable.liked);
+                likeTV.setText("LIKED");
 
                 mDocRef.addSnapshotListener((documentSnapshot, e) -> {
 
@@ -117,20 +160,23 @@ public class RestaurantActivity extends AppCompatActivity {
                             arrayList.add(name);
                         }
 
+                    } else {
+                        arrayList.add(name);
                     }
                 });
                 Map<String, Object> arrayMapList = new HashMap<>();
                 arrayMapList.put("listTesting", arrayList);
                 mDocRef.update(arrayMapList);
-
+                like = true;
             } else {
-                like = false;
-                likePhotoIV.setImageResource(R.drawable.liked);
-                likeTV.setText("LIKED");
+                likePhotoIV.setImageResource(R.drawable.like);
+                likeTV.setText("LIKE");
                 mDocRef.addSnapshotListener((documentSnapshot, e) -> {
 
+                    Object restosLiked;
                     if (documentSnapshot.exists()) {
-                        Object restosLiked = documentSnapshot.get("listTesting");
+                        restosLiked = documentSnapshot.get("listTesting");
+
                         arrayList = (ArrayList) restosLiked;
                         if (arrayList != null) {
                             for (int i = 0; i < arrayList.size(); i++) {
@@ -139,12 +185,14 @@ public class RestaurantActivity extends AppCompatActivity {
                                 }
                             }
                         }
-
                     }
+
                 });
                 Map<String, Object> arrayMapList = new HashMap<>();
                 arrayMapList.put("listTesting", arrayList);
                 mDocRef.update(arrayMapList);
+                like = false;
+
             }
         });
 
@@ -205,51 +253,6 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-        AtomicInteger alreadyGoing = new AtomicInteger(mPreferences.getInt("alreadyGoing", 0));
-
-        mDocRef.addSnapshotListener((documentSnapshot, e) -> {
-
-            if (documentSnapshot.exists()) {
-                restaurantName = documentSnapshot.getString("restaurantName");
-
-            }
-        });
-
-        if (!(alreadyGoing.get() == 0) && restaurantName.equals(name)) {
-            goingButton.setText("✔");
-            goingButton.setTextColor(GREEN);
-            goingButton.setTextSize(25);
-        }
-
-        goingButton.setOnClickListener(view -> {
-                    alreadyGoing.set(mPreferences.getInt("alreadyGoing", 0));
-
-
-                    if (alreadyGoing.get() == 0) {
-                        goingButton.setText("✔");
-                        goingButton.setTextColor(GREEN);
-                        goingButton.setTextSize(25);
-
-                        Map<String, Object> dataToSave = new HashMap<>();
-                        dataToSave.put("restaurantName", name);
-                        mDocRef.set(dataToSave, SetOptions.merge());
-
-                        mPreferences.edit().putInt("alreadyGoing", 1).apply();
-                    } else if (alreadyGoing.get() == 1) {
-                        goingButton.setText("Going?");
-                        goingButton.setTextColor(BLACK);
-                        goingButton.setTextSize(15);
-
-
-                        Map<String, Object> updates = new HashMap<>();
-                        updates.put("restaurantName", FieldValue.delete());
-
-                        mDocRef.update(updates);
-                        mPreferences.edit().putInt("alreadyGoing", 0).apply();
-                    }
-
-                }
-        );
 
     }
 }

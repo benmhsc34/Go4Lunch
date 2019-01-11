@@ -59,8 +59,9 @@
     <LinearLayout
         android:id="@+id/L2"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:layout_below="@+id/LL1"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -79,7 +80,7 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="40dp"
                     android:src="@drawable/call" />
 
                 <TextView
@@ -102,7 +103,7 @@
                 <ImageView
                     android:id="@+id/likeImageButton"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="40dp"
                     android:src="@drawable/like" />
 
                 <TextView
@@ -125,7 +126,7 @@
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="40dp"
                     android:src="@drawable/earth" />
 
                 <TextView

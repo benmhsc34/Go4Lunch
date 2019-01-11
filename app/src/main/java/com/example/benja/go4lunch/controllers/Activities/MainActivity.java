@@ -250,8 +250,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void configureNavigationHeader() {
 
         ImageView userPhoto = mNavigationView.getHeaderView(0).findViewById(R.id.navigation_header_user_photo);
-   //     TextView userName = mNavigationView.findViewById(R.id.navigation_header_user_name);
-   //     TextView userEmail = mNavigationView.findViewById(R.id.navigation_header_user_email);
+        TextView userName = mNavigationView.getHeaderView(0).findViewById(R.id.navigation_header_user_name);
+        TextView userEmail = mNavigationView.getHeaderView(0).findViewById(R.id.navigation_header_user_email);
 
         if (this.getCurrentUser() != null) {
 
@@ -269,11 +269,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             String username = TextUtils.isEmpty(this.getCurrentUser().getDisplayName())
                     ? "Username" : this.getCurrentUser().getDisplayName();
 
-            Log.d("facebookemail", email);
 
             //Update views with data
-      //      userName.setText(username);
-      //      userEmail.setText(email);
+            userName.setText(username);
+            userEmail.setText(email);
         }
     }
 
