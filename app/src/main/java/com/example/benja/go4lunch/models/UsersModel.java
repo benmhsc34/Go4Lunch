@@ -11,4 +11,7 @@ public class UsersModel {
     public String getUserName() {
         return userName;
     }
+
+    public UsersModel() {
+    }
 }

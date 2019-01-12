@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.models.UsersModel;
@@ -21,7 +22,7 @@ import com.google.firebase.firestore.Query;
 
 public class ListWorkmatesViewFragment extends Fragment {
 
- //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
+    //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
 
     public ListWorkmatesViewFragment() {
         // Required empty public constructor
@@ -31,7 +32,6 @@ public class ListWorkmatesViewFragment extends Fragment {
         ListWorkmatesViewFragment fragment = new ListWorkmatesViewFragment();
         return fragment;
     }
-
 
 
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
@@ -62,14 +62,11 @@ public class ListWorkmatesViewFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
-        Query query = rootRef.collection("utilisateurs")
-                .orderBy("userName", Query.Direction.ASCENDING);
+        Query query = rootRef.collection("users");
 
         FirestoreRecyclerOptions<UsersModel> options = new FirestoreRecyclerOptions.Builder<UsersModel>()
                 .setQuery(query, UsersModel.class)
                 .build();
-
-
 
         adapter = new FirestoreRecyclerAdapter<UsersModel, ListWorkmatesViewFragment.UsersViewHolder>(options) {
 
@@ -93,6 +90,29 @@ public class ListWorkmatesViewFragment extends Fragment {
 
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            Toast.makeText(getActivity(), "IFF statement", Toast.LENGTH_SHORT).show();
+            adapter.startListening();
+
+        } else {
+            Toast.makeText(getActivity(), "else statement", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (adapter != null) {
+            adapter.stopListening();
+        }
     }
 
 
