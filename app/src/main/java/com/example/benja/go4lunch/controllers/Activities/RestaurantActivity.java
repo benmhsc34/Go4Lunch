@@ -28,6 +28,7 @@ import com.example.benja.go4lunch.models.UsersModel;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,6 +77,7 @@ public class RestaurantActivity extends AppCompatActivity {
     float numberOfLikes = 0;
     float numberOfPeople = 0;
     float averageLikes;
+    private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
 
 
     @Override
@@ -182,8 +184,6 @@ public class RestaurantActivity extends AppCompatActivity {
                         Map<String, Object> addressMap = new HashMap<>();
                         addressMap.put("address", address);
                         mDocRef.set(addressMap, SetOptions.merge());
-
-
 
 
                         mPreferences.edit().putInt("alreadyGoing", 1).apply();
@@ -294,27 +294,25 @@ public class RestaurantActivity extends AppCompatActivity {
                 numberOfPeople++;
 
             }
-            averageLikes = numberOfLikes  /  numberOfPeople;
+            averageLikes = numberOfLikes / numberOfPeople;
             Log.d("whatisitworth", averageLikes + "");
-            if (averageLikes == 0.0){
+            if (averageLikes == 0.0) {
                 starOne.setVisibility(View.INVISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
             }
-            if (0.1 >= averageLikes){
+            if (0.1 >= averageLikes) {
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
-            }
-            else if (0.4 >= averageLikes){
+            } else if (0.4 >= averageLikes) {
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.VISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
-            }
-            else {
+            } else {
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.VISIBLE);
                 starThree.setVisibility(View.VISIBLE);
@@ -349,8 +347,116 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
+        Query query = rootRef.collection("utilisateurs");
+
+        FirestoreRecyclerOptions<UsersModel> options = new FirestoreRecyclerOptions.Builder<UsersModel>()
+                .setQuery(query, UsersModel.class)
+                .build();
+
+        adapter = new FirestoreRecyclerAdapter<UsersModel, UsersViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
+
+                //Avoid crash
+                if (model.getRestaurantName() != null) {
+
+                    //Check if user should be added to this Restaurant
+                    if (model.getRestaurantName().equals(name)) {
+
+                        //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all about the details)
+                        if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+
+                            if (model.getPicture() != null) {
+                                if (model.getRestaurantName() != null) {
+                                    holder.setUserName("You are eating here!");
+                                    holder.setPicture(model.getPicture());
+                                }
+                            } else {
+                                if (model.getRestaurantName() != null) {
+                                    holder.setUserName("You have decided to eat here!");
+                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                                } else {
+                                    holder.setUserName(model.getUserName() + " hasn't decided yet");
+                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                                }
+                            }
+                        } else {
+
+                            if (model.getPicture() != null) {
+                                if (model.getRestaurantName() != null) {
+                                    holder.setUserName(model.getUserName() + " is eating here!");
+                                    holder.setPicture(model.getPicture());
+                                }
+                            } else {
+                                if (model.getRestaurantName() != null) {
+                                    holder.setUserName(model.getUserName() + " is eating here!");
+                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                                } else {
+                                    holder.setUserName(model.getUserName() + " hasn't decided yet");
+                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                                }
+                            }
+                        }
+                    } else {
+                        holder.setPicture(null);
+                        holder.setUserName("");
+                    }
+                }
+            }
+
+
+            @NonNull
+            @Override
+            public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_layout, viewGroup, false);
+
+                return new UsersViewHolder(view);
+            }
+        };
+        recyclerView.setAdapter(adapter);
+    }
+
+    private class UsersViewHolder extends RecyclerView.ViewHolder {
+        private View view;
+
+        UsersViewHolder(View itemView) {
+            super(itemView);
+            view = itemView;
+        }
+
+        void setUserName(String userName) {
+            TextView textView = view.findViewById(R.id.userNameTV);
+            textView.setText(userName);
+        }
+
+        void setPicture(String picture) {
+            ImageView imageView = view.findViewById(R.id.pictureIV);
+            Glide.with(RestaurantActivity.this)
+                    .load(picture)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageView);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            adapter.startListening();
+        }
     }
 
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (adapter != null) {
+            adapter.stopListening();
+        }
+    }
 }
