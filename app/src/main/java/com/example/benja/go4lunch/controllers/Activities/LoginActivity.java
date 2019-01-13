@@ -203,6 +203,9 @@ public class LoginActivity extends BaseActivity {
         dataToSave.put("email", currentFirebaseUser.getEmail());
         mDocRef.set(dataToSave, SetOptions.merge()).addOnSuccessListener(aVoid -> Log.d("sucess", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
 
+        Map<String, Object> imageToSave = new HashMap<>();
+        imageToSave.put("picture", currentFirebaseUser.getPhotoUrl().toString());
+        mDocRef.set(imageToSave, SetOptions.merge());
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

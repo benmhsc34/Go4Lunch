@@ -261,6 +261,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         .load(this.getCurrentUser().getPhotoUrl())
                         .apply(RequestOptions.circleCropTransform())
                         .into(userPhoto);
+
             }
 
             //Get email & username from FireBase

@@ -1,22 +1,34 @@
 package com.example.benja.go4lunch.controllers.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
+import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
+import com.example.benja.go4lunch.models.UsersModel;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,6 +39,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -106,6 +119,38 @@ public class RestaurantActivity extends AppCompatActivity {
         starTwo.setVisibility(View.INVISIBLE);
         starThree.setVisibility(View.INVISIBLE);
 
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+
+        Api api = retrofit.create(Api.class);
+
+
+        Call<PlaceDetails> call1 = api.getPlaceDetails(placeId);
+        call1.enqueue(new Callback<PlaceDetails>() {
+            @Override
+            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> detailResponse) {
+                PlaceDetails details = detailResponse.body();
+                PlaceDetailsResults detailedListResults = details.getResults();
+
+
+                if (detailedListResults != null) {
+
+                    theWebsite = detailedListResults.getWebsite();
+                } else {
+                    theWebsite = "https://benjamincorben.com";
+                }
+                if (detailedListResults.getPhoneNumber() != null) {
+                    thephoneNumber = detailedListResults.getPhoneNumber();
+                } else {
+                    thephoneNumber = "noPhoneNumber";
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PlaceDetails> call, Throwable t) {
+
+            }
+        });
+
 
         if (restaurantName.equals(name)) {
             goingButton.setText("✔");
@@ -124,6 +169,23 @@ public class RestaurantActivity extends AppCompatActivity {
                         Map<String, Object> dataToSave = new HashMap<>();
                         dataToSave.put("restaurantName", name);
                         mDocRef.set(dataToSave, SetOptions.merge());
+
+                        Map<String, Object> placeIdMap = new HashMap<>();
+                        placeIdMap.put("placeId", placeId);
+                        mDocRef.set(placeIdMap, SetOptions.merge());
+
+
+                        Map<String, Object> pictureMap = new HashMap<>();
+                        pictureMap.put("pictureRestaurant", image);
+                        mDocRef.set(pictureMap, SetOptions.merge());
+
+                        Map<String, Object> addressMap = new HashMap<>();
+                        addressMap.put("address", address);
+                        mDocRef.set(addressMap, SetOptions.merge());
+
+
+
+
                         mPreferences.edit().putInt("alreadyGoing", 1).apply();
                         mPreferences.edit().putString("goingRestaurant", name).apply();
                         alreadyGoing = true;
@@ -260,37 +322,7 @@ public class RestaurantActivity extends AppCompatActivity {
             }
 
         });
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
-        Api api = retrofit.create(Api.class);
-
-
-        Call<PlaceDetails> call1 = api.getPlaceDetails(placeId);
-        call1.enqueue(new Callback<PlaceDetails>() {
-            @Override
-            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> detailResponse) {
-                PlaceDetails details = detailResponse.body();
-                PlaceDetailsResults detailedListResults = details.getResults();
-
-
-                if (detailedListResults != null) {
-
-                    theWebsite = detailedListResults.getWebsite();
-                } else {
-                    theWebsite = "https://benjamincorben.com";
-                }
-                if (detailedListResults.getPhoneNumber() != null) {
-                    thephoneNumber = detailedListResults.getPhoneNumber();
-                } else {
-                    thephoneNumber = "noPhoneNumber";
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PlaceDetails> call, Throwable t) {
-
-            }
-        });
 
         websiteButton.setOnClickListener(view -> {
         });
@@ -319,4 +351,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
 
     }
+
+
 }

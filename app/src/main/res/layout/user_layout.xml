@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/pictureIV"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_margin="15dp" />
 
     <TextView
         android:id="@+id/userNameTV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:text="We r here"
-        android:textSize="20sp" />
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="10dp"
+        android:text=""
+        android:textSize="15sp" />
 
 </RelativeLayout>

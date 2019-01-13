@@ -1,26 +1,40 @@
 package com.example.benja.go4lunch.controllers.fragments;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
+import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.UsersModel;
+import com.facebook.share.Share;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
+
 
 public class ListWorkmatesViewFragment extends Fragment {
+
+    Context mContext;
 
     //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
 
@@ -48,6 +62,29 @@ public class ListWorkmatesViewFragment extends Fragment {
             TextView textView = view.findViewById(R.id.userNameTV);
             textView.setText(userName);
         }
+
+        void setPicture(String picture) {
+            ImageView imageView = view.findViewById(R.id.pictureIV);
+            Glide.with(getContext())
+                    .load(picture)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(imageView);
+        }
+
+        void openRestaurant(String restaurantName, String placeId, String restaurantPicture, String address) {
+
+            RelativeLayout relativeLayout = view.findViewById(R.id.relativeLayout);
+            relativeLayout.setOnClickListener(view -> {
+                SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
+                mPreferences.edit().putString("image", restaurantPicture).apply();
+                mPreferences.edit().putString("name", restaurantName).apply();
+                mPreferences.edit().putString("placeId", placeId).apply();
+                mPreferences.edit().putString("address", address).apply();
+
+                Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
+                startActivity(myIntent);
+            });
+        }
     }
 
 
@@ -62,7 +99,7 @@ public class ListWorkmatesViewFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
-        Query query = rootRef.collection("users");
+        Query query = rootRef.collection("utilisateurs");
 
         FirestoreRecyclerOptions<UsersModel> options = new FirestoreRecyclerOptions.Builder<UsersModel>()
                 .setQuery(query, UsersModel.class)
@@ -79,9 +116,28 @@ public class ListWorkmatesViewFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(@NonNull ListWorkmatesViewFragment.UsersViewHolder holder, int position, @NonNull UsersModel model) {
+            protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
 
-                holder.setUserName(model.getUserName());
+
+                if (model.getPicture() != null) {
+                    if (model.getRestaurantName() != null) {
+                        holder.setUserName(model.getUserName() + " is eating at the " + model.getRestaurantName());
+                        holder.setPicture(model.getPicture());
+                    } else {
+                        holder.setUserName(model.getUserName() + " hasn't decided yet");
+                        holder.setPicture(model.getPicture());
+                    }
+                } else {
+                    if (model.getRestaurantName() != null) {
+                        holder.setUserName(model.getUserName() + " is eating at: " + model.getRestaurantName());
+                        holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                    } else {
+                        holder.setUserName(model.getUserName() + " hasn't decided yet");
+                        holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                    }
+                }
+
+                holder.openRestaurant(model.getRestaurantName(), model.getPlaceId(), model.getPictureRestaurant(), model.getAddress());
 
             }
 
@@ -96,14 +152,9 @@ public class ListWorkmatesViewFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if (adapter != null) {
-            Toast.makeText(getActivity(), "IFF statement", Toast.LENGTH_SHORT).show();
             adapter.startListening();
-
-        } else {
-            Toast.makeText(getActivity(), "else statement", Toast.LENGTH_SHORT).show();
         }
     }
-
 
 
     @Override

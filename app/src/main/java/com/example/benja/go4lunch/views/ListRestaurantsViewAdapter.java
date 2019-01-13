@@ -105,6 +105,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             mPreferences.edit().putString("placeId", restaurantItem.getPlaceId()).apply();
 
 
+
             context.startActivity(myIntent);
             //    viewHolder.relativeLayout.setBackgroundColor(R.color.colorPrimaryDark);
         });
