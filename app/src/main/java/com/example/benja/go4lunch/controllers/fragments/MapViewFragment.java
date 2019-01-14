@@ -2,7 +2,6 @@ package com.example.benja.go4lunch.controllers.fragments;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.benja.go4lunch.base.BaseFragment;
-import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
@@ -29,6 +27,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -81,6 +82,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     String nameReferences;
     String addressReferences;
     String imageReferences;
+    private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
+    String restaurantNameFirebaseString;
+
 
     Marker marker;
 
@@ -197,18 +201,27 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
                     }
 
-                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(theListOfResults.get(i).getGeometry().getLocation().getLat(), theListOfResults.get(i).getGeometry().getLocation().getLng()))
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange))
-                            .snippet(i + ""));
 
+                    int finalI = i;
+                    notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            restaurantNameFirebaseString = documentSnapshot.getString("restaurantName");
+                            if (restaurantNameFirebaseString != null) {
+                                if (restaurantNameFirebaseString.equals(theListOfResults.get(finalI).getName())) {
+
+                                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(theListOfResults.get(finalI).getGeometry().getLocation().getLat(), theListOfResults.get(finalI).getGeometry().getLocation().getLng()))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_green)));
+                                } else {
+                                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(theListOfResults.get(finalI).getGeometry().getLocation().getLat(), theListOfResults.get(finalI).getGeometry().getLocation().getLng()))
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
+                                }
+                            } else {
+                                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(theListOfResults.get(finalI).getGeometry().getLocation().getLat(), theListOfResults.get(finalI).getGeometry().getLocation().getLng()))
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
+                            }
+                        }
+                    });
                 }
-
-                int i = Integer.parseInt(marker.getSnippet());
-
-                placeIdReferences = theListOfResults.get(i).getPlaceId();
-                addressReferences = theListOfResults.get(i).getAddress();
-                nameReferences = theListOfResults.get(i).getName();
-
             }
 
             @Override
@@ -285,7 +298,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Show current Location
         showCurrentLocation();
 
-        // Display Restaurants Markers and activate Listen on the participants number
+        // Display Restaurants Markers and activate Listen on the participants finalI
         //  DisplayAndListensMarkers();
     }
 
@@ -325,7 +338,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
     /**
      * Creating restaurant markers on the map and activating for each of them
-     * a listener to change the number of participants in order to change their color in real time
+     * a listener to change the finalI of participants in order to change their color in real time
      */
  /*   protected void DisplayAndListensMarkers() {
         Log.d(TAG, "fireStoreListener: ");
@@ -360,7 +373,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     }
 
     /**
-     * Enables listening to the number of participants in each restaurant
+     * Enables listening to the finalI of participants in each restaurant
      * to enable marker color change in real time
      */ /*
     public void listenNbrParticipantsForUpdateMarkers(Restaurant restaurant, Marker marker) {

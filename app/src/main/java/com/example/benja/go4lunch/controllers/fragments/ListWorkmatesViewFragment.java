@@ -34,8 +34,6 @@ import java.util.ArrayList;
 
 public class ListWorkmatesViewFragment extends Fragment {
 
-    Context mContext;
-
     //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
 
     public ListWorkmatesViewFragment() {
