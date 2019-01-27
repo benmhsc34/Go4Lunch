@@ -83,7 +83,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     String addressReferences;
     String imageReferences;
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
-    String restaurantNameFirebaseString;
+    String userSelectedRestaurant;
     int finalI;
 
 
@@ -200,46 +200,39 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             @Override
             public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
                 PlaceNearBySearch articles = response.body();
-                List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
+                List<PlaceNearBySearchResult> nearbyPlacesList = articles.getResults();
 
-
-                for (int i = 0; i < theListOfResults.size(); i++) {
-
-
-                    if (theListOfResults.get(i).getPhotos() != null) {
-                        photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
+                for (int i = 0; i < nearbyPlacesList.size(); i++) {
+                    if (nearbyPlacesList.get(i).getPhotos() != null) {
+                        photoReferences = nearbyPlacesList.get(i).getPhotos().get(0).getPhotoReference();
                     } else {
                         photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
                     }
                 }
 
                 notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
-                    for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
-                        for (PlaceNearBySearchResult result : theListOfResults) {
 
-                            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
-                            marker.setTag(result.getName());
+                    for (PlaceNearBySearchResult nearbyPlace : nearbyPlacesList) {
 
-                            restaurantNameFirebaseString = userSnapshot.getString("restaurantName");
-                            if (restaurantNameFirebaseString != null) {
-                                Log.d("restaurantNameFirebase", restaurantNameFirebaseString);
-                                Log.d("restaurantName", result.getName());
-                                if (restaurantNameFirebaseString.equals(result.getName())) {
+                        marker = mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
 
-                                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_green)));
-                                    marker.setTag(result.getName());
+                        for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
 
+                            userSelectedRestaurant = userSnapshot.getString("restaurantName");
+                            Log.d("randomrandomnearby", nearbyPlace.getName());
+                            Log.d("randomrandomfirebase", userSelectedRestaurant + "");
+
+                            if (userSelectedRestaurant != null) {
+                                if (userSelectedRestaurant.equals(nearbyPlace.getName())) {
+                                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_green)));
                                     break;
                                 }
-                            } else {
-                                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
-                                marker.setTag(result.getName());
-
-
                             }
+
+                            marker.setTag(nearbyPlace.getName());
                         }
                     }
 
