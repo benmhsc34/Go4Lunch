@@ -1,7 +1,9 @@
 package com.example.benja.go4lunch.controllers.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.benja.go4lunch.MarkerObject;
 import com.example.benja.go4lunch.base.BaseFragment;
+import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
@@ -41,6 +45,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 /**************************************************************************************************
@@ -83,7 +89,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     String addressReferences;
     String imageReferences;
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
-    String restaurantNameFirebaseString;
+    String userSelectedRestaurant;
     int finalI;
 
 
@@ -91,7 +97,18 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Log.d("logloglog", marker.getTag().toString());
+        MarkerObject markerObject = (MarkerObject) marker.getTag();
+        Log.d("logloglog", markerObject.getName());
+
+        Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
+
+        SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+        mPreferences.edit().putString("image", markerObject.getPhotos()).apply();
+        mPreferences.edit().putString("name", markerObject.getName()).apply();
+        mPreferences.edit().putString("address", markerObject.getAddress()).apply();
+        mPreferences.edit().putString("placeId", markerObject.getPlaceId()).apply();
+
+        getContext().startActivity(myIntent);
         return true;
     }
 
@@ -105,6 +122,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     ShowSnackBarListener mListener;
 
 
+    @SuppressLint("ValidFragment")
     private MapViewFragment() {
         // Required empty public constructor
     }
@@ -200,46 +218,42 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             @Override
             public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
                 PlaceNearBySearch articles = response.body();
-                List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
+                List<PlaceNearBySearchResult> nearbyPlacesList = articles.getResults();
 
 
-                for (int i = 0; i < theListOfResults.size(); i++) {
-
-
-                    if (theListOfResults.get(i).getPhotos() != null) {
-                        photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
-                    } else {
-                        photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
-                    }
-                }
 
                 notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
-                    for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
-                        for (PlaceNearBySearchResult result : theListOfResults) {
 
-                            marker = mMap.addMarker(new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
-                            marker.setTag(result.getName());
+                    for (PlaceNearBySearchResult nearbyPlace : nearbyPlacesList) {
 
-                            restaurantNameFirebaseString = userSnapshot.getString("restaurantName");
-                            if (restaurantNameFirebaseString != null) {
-                                Log.d("restaurantNameFirebase", restaurantNameFirebaseString);
-                                Log.d("restaurantName", result.getName());
-                                if (restaurantNameFirebaseString.equals(result.getName())) {
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
 
-                                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
+                        for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
+
+                            userSelectedRestaurant = userSnapshot.getString("restaurantName");
+                            Log.d("randomrandomnearby", nearbyPlace.getName());
+                            Log.d("randomrandomfirebase", userSelectedRestaurant + "");
+
+                            if (userSelectedRestaurant != null) {
+                                if (userSelectedRestaurant.equals(nearbyPlace.getName())) {
+                                    marker = mMap.addMarker(new MarkerOptions().position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_green)));
-                                    marker.setTag(result.getName());
-
                                     break;
                                 }
-                            } else {
-                                marker = mMap.addMarker(new MarkerOptions().position(new LatLng(result.getGeometry().getLocation().getLat(), result.getGeometry().getLocation().getLng()))
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
-                                marker.setTag(result.getName());
-
-
                             }
+
+                            for (int i = 0; i < nearbyPlacesList.size(); i++) {
+                                if (nearbyPlacesList.get(i).getName().equals(nearbyPlace.getName())) {
+                                    photoReferences = nearbyPlacesList.get(i).getPhotos().get(0).getPhotoReference();
+                                }
+                            }
+
+                            marker.setTag(new MarkerObject(nearbyPlace.getAddress(), nearbyPlace.getName(),"https://maps.googleapis.com/maps/api/place/photo?"
+                                            + "maxwidth=2304"
+                                            + "&photoreference=" + photoReferences
+                                            + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", nearbyPlace.getPlaceId()));
                         }
                     }
 
@@ -254,10 +268,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         });
 /*
         mMap.setOnMarkerClickListener(marker1 -> {
-
             Log.d("snippets", marker.getSnippet());
-
-
             SharedPreferences preferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", 0);
             preferences.edit().putString("image", "https://maps.googleapis.com/maps/api/place/photo?"
                     + "maxwidth=2304"
@@ -266,8 +277,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             preferences.edit().putString("name", nameReferences).apply();
             preferences.edit().putString("address", addressReferences).apply();
             preferences.edit().putString("placeId", placeIdReferences).apply();
-
-
             Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
             startActivity(myIntent);
             return false;
@@ -365,14 +374,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
      */
  /*   protected void DisplayAndListensMarkers() {
         Log.d(TAG, "fireStoreListener: ");
-
         Set<Map.Entry<String, Restaurant>> setListRestaurant = getRestaurantMapOfTheModel().entrySet();
         Iterator<Map.Entry<String, Restaurant>> it = setListRestaurant.iterator();
         while (it.hasNext()) {
             Map.Entry<String, Restaurant> restaurant = it.next();
-
             Log.d(TAG, "fireStoreListener: identifier Restaurant = " + restaurant.getValue().getIdentifier());
-
             // Declare a Marker for current Restaurant
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(Double.parseDouble(restaurant.getValue().getLat()),
@@ -383,24 +389,19 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     .title(restaurant.getValue().getName())
             );
             marker.setTag(restaurant.getValue().getIdentifier());
-
             listenNbrParticipantsForUpdateMarkers(restaurant.getValue(), marker);
         }
-
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(latitude,
                         longitude), DEFAULT_ZOOM));
-
         // Update Location UI
         MapViewFragment.this.updateLocationUI();
     }
-
     /**
      * Enables listening to the finalI of participants in each restaurant
      * to enable marker color change in real time
      */ /*
     public void listenNbrParticipantsForUpdateMarkers(Restaurant restaurant, Marker marker) {
-
         RestaurantHelper
                 .getRestaurantsCollection()
                 .document(restaurant.getIdentifier())
@@ -445,7 +446,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             }
         }
     }
-
 */
 
     /**

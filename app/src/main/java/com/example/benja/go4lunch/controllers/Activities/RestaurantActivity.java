@@ -137,14 +137,16 @@ public class RestaurantActivity extends AppCompatActivity {
                 if (detailedListResults != null) {
 
                     theWebsite = detailedListResults.getWebsite();
+                    if (detailedListResults.getPhoneNumber() != null) {
+                        thephoneNumber = detailedListResults.getPhoneNumber();
+                    } else {
+                        thephoneNumber = "noPhoneNumber";
+                    }
                 } else {
                     theWebsite = "https://benjamincorben.com";
-                }
-                if (detailedListResults.getPhoneNumber() != null) {
-                    thephoneNumber = detailedListResults.getPhoneNumber();
-                } else {
                     thephoneNumber = "noPhoneNumber";
                 }
+
             }
 
             @Override
