@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.CollectionReference;
@@ -214,6 +216,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
 
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
+        Log.d("latlong", latitude + " - " + longitude);
         call.enqueue(new Callback<PlaceNearBySearch>() {
             @Override
             public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {

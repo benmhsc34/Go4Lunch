@@ -29,19 +29,26 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.PagerAdapter;
+import com.example.benja.go4lunch.PlaceAutocompleteAdapter;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
@@ -49,23 +56,39 @@ import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragm
 import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.User;
+import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.utils.PlaceNearBySearch;
+import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ScrollableViewPager;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener{
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, MapViewFragment.ShowSnackBarListener, GoogleApiClient.OnConnectionFailedListener {
 
 
     @BindView(R.id.activity_welcome_coordinator_layout)
@@ -85,6 +108,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
 
+    static double latMin;
+    static double latMax;
+    static double longMin;
+    static double longMax;
+
     // Declare three fragment for used with the Bottom Navigation view
     private Fragment mMapViewFragment;
     private Fragment mListRestaurantsViewFragment;
@@ -94,16 +122,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     // Declare an object fragment Manager
     private FragmentManager mFragmentManager;
 
-    // For determinate Location
-    // -------------------------
-    // Default location if not permission granted ( Paris )
-    private final LatLng mDefaultLocation = new LatLng(48.844304, 2.374377);
-    // The geographical location where the device is currently located.
-    // That is, the last-known location retrieved by the Fused Location Provider.
-    // OR the default Location if permission not Granted
+    private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
+    private GoogleApiClient mGoogleApiClient;
+
+    protected GeoDataClient mGeoDataClient;
+
+
     Location mLastKnownLocation;
-    // The entry point to the Fused Location Provider.
-    //private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -119,6 +144,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.configureDrawerLayout();
         this.configureToolBar();
         this.configureNavigationHeader();
+        this.configureNavigationHeader();
         this.configureNavigationView();
         this.configureBottomView();
 
@@ -127,9 +153,86 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mViewPager.setAdapter(viewPagerAdapter);
         mViewPager.setCanScroll(false);
 
+        SharedPreferences mPreferences = this.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+        String locationLatitude = mPreferences.getString("locationLatitude", "43.61076833333333");
+        String locationLongitude = mPreferences.getString("locationLongitude", "3.8767149999999995");
+
+        latMin = Double.parseDouble(locationLatitude) - 0.0012753;
+        latMax = Double.parseDouble(locationLatitude) + 0.0012753;
+        longMin = Double.parseDouble(locationLongitude) - 0.05174298;
+        longMax = Double.parseDouble(locationLongitude) + 0.05174298;
+
+        LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(latMin, longMin), new LatLng(latMax, longMax));
+
+
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, this)
+                .build();
+
+        //Declaring search edit text
+        Toolbar theToolbar = findViewById(R.id.toolbar);
+        AutoCompleteTextView searchEditText = theToolbar.findViewById(R.id.myEditText);
+        mGeoDataClient = Places.getGeoDataClient(this, null);
+        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient, LAT_LNG_BOUNDS, null);
+        searchEditText.setVisibility(View.INVISIBLE);
+
+        searchEditText.setAdapter(mPlaceAutocompleteAdapter);
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+
+                Api api = retrofit.create(Api.class);
+
+                SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                String locationLatitude = mPreferences.getString("locationLatitude", "43.61076833333333");
+                String locationLongitude = mPreferences.getString("locationLongitude", "3.8767149999999995");
+
+
+                Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(locationLatitude + "," + locationLongitude);
+
+                call.enqueue(new Callback<PlaceNearBySearch>() {
+                    @Override
+                    public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
+                        PlaceNearBySearch articles = response.body();
+                        List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
+
+                        for (int i = 0; i < theListOfResults.size(); i++) {
+                            if (theListOfResults.get(i).getName().contains(searchEditText.getText().toString())) {
+                              //  mPreferences.edit().putString("", theListOfResults.get(i).getName()).apply();
+                                
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
+
+                    }
+                });
+
+
+            }
+
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -139,8 +242,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 mPreferences.edit().putString("locationLatitude", String.valueOf(location.getLatitude())).apply();
                 mPreferences.edit().putString("locationLongitude", String.valueOf(location.getLongitude())).apply();
 
-
-                Log.d("locationlocation", String.valueOf(location.getLatitude()));
             }
 
             @Override
@@ -175,6 +276,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             mDrawerLayout.openDrawer(GravityCompat.START);
+        } else if (item.getItemId() == R.id.activity_main_menu_toolbar_search) {
+
+            //Declaring search edit text
+            Toolbar theToolbar = findViewById(R.id.toolbar);
+            AutoCompleteTextView searchEditText = theToolbar.findViewById(R.id.myEditText);
+            if (searchEditText.getVisibility() == View.INVISIBLE) {
+                searchEditText.setVisibility(VISIBLE);
+            } else {
+                searchEditText.setVisibility(INVISIBLE);
+                InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                mgr.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -301,7 +414,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         switch (id) {
             case R.id.activity_welcome_drawer_your_lunch:
-                 break;
+                break;
 
             case R.id.activity_welcome_drawer_settings:
                 Intent myIntent = new Intent(this, SettingsActivity.class);
@@ -318,7 +431,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         return true;
     }
-
 
 
     private void signOutUserFromFirebase() {
@@ -394,7 +506,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
-
     private Boolean updateMainFragment(Integer integer) {
         switch (integer) {
             case R.id.action_map_view:
@@ -405,14 +516,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             case R.id.action_list_view:
                 // Hide the active fragment and activates the fragment mListViewFragment
                 //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
-             //   mActiveFragment = mListRestaurantsViewFragment;
+                //   mActiveFragment = mListRestaurantsViewFragment;
                 mViewPager.setCurrentItem(1);
 
                 break;
             case R.id.action_workmates:
                 // Hide the active fragment and activates the fragment mWorkmatesFragment
                 //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
-               // mActiveFragment = mMapViewFragment;
+                // mActiveFragment = mMapViewFragment;
                 mViewPager.setCurrentItem(2);
                 break;
         }
@@ -423,4 +534,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

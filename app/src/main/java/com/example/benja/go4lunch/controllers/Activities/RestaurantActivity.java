@@ -209,9 +209,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
                 }
         );
-
-
-        mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+        mDocRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 Object restosLiked = documentSnapshot.get("listTesting");
                 arrayList = (ArrayList) restosLiked;
@@ -228,33 +226,40 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
+
         likeButton.setOnClickListener(view -> {
+            Log.d("whatshappening", "we click");
 
             if (!like) {
-                likePhotoIV.setImageResource(R.drawable.liked);
-                likeTV.setText("LIKED");
+                likePhotoIV.setImageResource(R.drawable.like);
+                likeTV.setText("LIKE");
 
-                mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+                mDocRef.get().addOnSuccessListener(documentSnapshot -> {
 
                     if (documentSnapshot.exists()) {
                         Object restosLiked = documentSnapshot.get("listTesting");
                         arrayList = (ArrayList) restosLiked;
-                        if (arrayList != null) {
-                            arrayList.add(name);
-                        }
+                        arrayList.add(name);
+                        like = true;
 
                     } else {
                         arrayList.add(name);
+                        Log.d("whatshappening", "ADD");
+
+                        like = true;
                     }
                 });
                 Map<String, Object> arrayMapList = new HashMap<>();
                 arrayMapList.put("listTesting", arrayList);
                 mDocRef.update(arrayMapList);
-                like = true;
+
+
             } else {
-                likePhotoIV.setImageResource(R.drawable.like);
-                likeTV.setText("LIKE");
-                mDocRef.addSnapshotListener((documentSnapshot, e) -> {
+                Log.d("whatshappening", "ELSE");
+
+                likePhotoIV.setImageResource(R.drawable.liked);
+                likeTV.setText("LIKED");
+                mDocRef.get().addOnSuccessListener(documentSnapshot -> {
 
                     Object restosLiked;
                     if (documentSnapshot.exists()) {
@@ -265,16 +270,25 @@ public class RestaurantActivity extends AppCompatActivity {
                             for (int i = 0; i < arrayList.size(); i++) {
                                 if (arrayList.get(i).equals(name)) {
                                     arrayList.remove(i);
+                                    Log.d("whatshappening", "remove");
+
+                                    like = false;
+
                                 }
+                                like = false;
+
                             }
+                            like = false;
+
                         }
+                        like = false;
+
                     }
 
                 });
                 Map<String, Object> arrayMapList = new HashMap<>();
                 arrayMapList.put("listTesting", arrayList);
                 mDocRef.update(arrayMapList);
-                like = false;
 
             }
         });
@@ -369,7 +383,7 @@ public class RestaurantActivity extends AppCompatActivity {
                     //Check if user should be added to this Restaurant
                     if (model.getRestaurantName().equals(name)) {
 
-                        //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all about the details)
+                        //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all about the details))
                         if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
 
                             if (model.getPicture() != null) {
@@ -405,7 +419,9 @@ public class RestaurantActivity extends AppCompatActivity {
                         }
                     } else {
                         holder.setPicture(null);
-                        holder.setUserName("");
+                        holder.setUserName("You know I ain't broke ahh");
+                        holder.setHeight(0);
+
                     }
                 }
             }
@@ -433,6 +449,11 @@ public class RestaurantActivity extends AppCompatActivity {
         void setUserName(String userName) {
             TextView textView = view.findViewById(R.id.userNameTV);
             textView.setText(userName);
+        }
+
+        void setHeight(int height) {
+            RelativeLayout relativeLayout = view.findViewById(R.id.relativeLayout);
+            relativeLayout.getLayoutParams().height = height;
         }
 
         void setPicture(String picture) {

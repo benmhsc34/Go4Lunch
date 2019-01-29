@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".controllers.Activities.MainActivity"
-    tools:openDrawer="start">
+    tools:context=".controllers.Activities.MainActivity">
+    <!--tools:openDrawer="start"-->
 
     <!-- WelcomeActivity RootView -->
     <android.support.design.widget.CoordinatorLayout
@@ -33,7 +33,18 @@
                 android:minHeight="?attr/actionBarSize"
 
                 android:theme="@style/ToolbarTheme"
-                app:titleTextAppearance="@style/Toolbar.TitleText" />
+                app:titleTextAppearance="@style/Toolbar.TitleText">
+
+                <AutoCompleteTextView
+                    android:id="@+id/myEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:imeOptions="actionDone"
+                    android:textCursorDrawable="@null"
+                    android:inputType="text"
+                    android:hint="Search"
+                    />
+            </android.support.v7.widget.Toolbar>
 
             <!-- Body layout -->
             <RelativeLayout
