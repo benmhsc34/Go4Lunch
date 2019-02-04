@@ -39,6 +39,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -55,6 +56,7 @@ import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
+import com.example.benja.go4lunch.models.PlaceInfo;
 import com.example.benja.go4lunch.models.User;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
@@ -63,16 +65,26 @@ import com.example.benja.go4lunch.views.ScrollableViewPager;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 import java.util.Set;
@@ -126,6 +138,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private GoogleApiClient mGoogleApiClient;
 
     protected GeoDataClient mGeoDataClient;
+    private PlaceInfo mPlace;
 
 
     Location mLastKnownLocation;
@@ -172,14 +185,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 .enableAutoManage(this, this)
                 .build();
 
+
+
         //Declaring search edit text
-        Toolbar theToolbar = findViewById(R.id.toolbar);
-        AutoCompleteTextView searchEditText = theToolbar.findViewById(R.id.myEditText);
+        AutoCompleteTextView searchEditText = mToolbar.findViewById(R.id.myEditText);
         mGeoDataClient = Places.getGeoDataClient(this, null);
         mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient, LAT_LNG_BOUNDS, null);
         searchEditText.setVisibility(View.INVISIBLE);
-
+        searchEditText.setOnItemClickListener(mAutoCompleteClickListener);
         searchEditText.setAdapter(mPlaceAutocompleteAdapter);
+
+
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -212,8 +228,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                         for (int i = 0; i < theListOfResults.size(); i++) {
                             if (theListOfResults.get(i).getName().contains(searchEditText.getText().toString())) {
-                              //  mPreferences.edit().putString("", theListOfResults.get(i).getName()).apply();
-                                
+                                //  mPreferences.edit().putString("", theListOfResults.get(i).getName()).apply();
+
                             }
                         }
                     }
@@ -414,6 +430,26 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         switch (id) {
             case R.id.activity_welcome_drawer_your_lunch:
+
+                DocumentReference documentReference = FirebaseFirestore.getInstance().document("utilisateurs/" + this.getCurrentUser().getUid());
+                documentReference.get().addOnSuccessListener(documentSnapshot -> {
+                    String name = documentSnapshot.getString("restaurantName");
+                    String picture = documentSnapshot.getString("pictureRestaurant");
+                    String placeId = documentSnapshot.getString("placeId");
+                    String address = documentSnapshot.getString("address");
+
+                    SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                    mPreferences.edit().putString("name", name).apply();
+                    mPreferences.edit().putString("image", picture).apply();
+                    mPreferences.edit().putString("placeId", placeId).apply();
+                    mPreferences.edit().putString("address", address).apply();
+
+
+                    Intent myRestaurantIntent = new Intent(this, RestaurantActivity.class);
+                    startActivity(myRestaurantIntent);
+                });
+
+
                 break;
 
             case R.id.activity_welcome_drawer_settings:
@@ -538,4 +574,63 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    /*
+     -------------------------------------  google places autocomplete API suggestions ------------------------------------
+   */
+
+    MapViewFragment.UpdateFrag updatfrag ;
+    public void updateApi(MapViewFragment.UpdateFrag listener) {
+        updatfrag = listener;
+    }
+
+
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = places -> {
+        if (!places.getStatus().isSuccess()) {
+            Log.d("TAG", "Place didn't complete successfully" + places.getStatus().toString());
+            places.release();
+            return;
+        } else {
+            final Place place = places.get(0);
+
+            try {
+
+                mPlace = new PlaceInfo();
+                mPlace.setName(place.getName().toString());
+                mPlace.setAddress(place.getAddress().toString());
+                mPlace.setAttributions(place.getAttributions().toString());
+                mPlace.setLatlng(place.getLatLng());
+                mPlace.setRating(place.getRating());
+                mPlace.setPhoneNumber(place.getPhoneNumber().toString());
+                mPlace.setWebsite(place.getWebsiteUri());
+
+                Log.d("TAG", mPlace.toString());
+            } catch (NullPointerException e) {
+                Log.e("Error", e.getMessage());
+            }
+
+            SharedPreferences mPreferences = this.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+            mPreferences.edit().putString("viewportLatitude", place.getViewport().getCenter().latitude + "").apply();
+            mPreferences.edit().putString("viewportLongitude", place.getViewport().getCenter().longitude + "").apply();
+            mPreferences.edit().putString("theRestaurantClicked", place.getName() + "").apply();
+            updatfrag.updatefrag();
+
+            places.release();
+        }
+    };
+
+    private AdapterView.OnItemClickListener mAutoCompleteClickListener = (parent, view, position, id) -> {
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+        final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(position);
+        final String placeId = item.getPlaceId();
+
+        PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
+        placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+    };
+
+
+
 }

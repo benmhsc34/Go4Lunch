@@ -2,27 +2,41 @@ package com.example.benja.go4lunch.controllers.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
+import android.net.wifi.hotspot2.pps.HomeSp;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.example.benja.go4lunch.MarkerObject;
+import com.example.benja.go4lunch.PlaceAutocompleteAdapter;
 import com.example.benja.go4lunch.base.BaseFragment;
+import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -93,6 +107,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
     String userSelectedRestaurant;
     int finalI;
+    int j = 0;
+
 
 
     Marker marker;
@@ -120,12 +136,16 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         void showSnackBar(String message);
     }
 
+    public interface UpdateFrag {
+        public void updatefrag();
+    }
+
     // Interface Object for use CallBack
     ShowSnackBarListener mListener;
 
 
     @SuppressLint("ValidFragment")
-    private MapViewFragment() {
+    public MapViewFragment() {
         // Required empty public constructor
     }
 
@@ -172,6 +192,54 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
         // Configure the Maps Service of Google
         configurePlayServiceMaps();
+
+        ((MainActivity) getActivity()).updateApi(new UpdateFrag() {
+            @Override
+            public void updatefrag() {
+
+                SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                double latitude = Double.parseDouble(mPreferences.getString("viewportLatitude", "12"));
+                double longitude = Double.parseDouble(mPreferences.getString("viewportLongitude", "12"));
+                String restaurantClicked = mPreferences.getString("theRestaurantClicked", "Corben House");
+
+                //Defining api call
+                Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+                Api api = retrofit.create(Api.class);
+                Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
+
+                call.enqueue(new Callback<PlaceNearBySearch>() {
+                    @Override
+                    public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
+                        PlaceNearBySearch articles = response.body();
+                        List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
+                        for (int i = 0; i < theListOfResults.size(); i++) {
+                            if (theListOfResults.get(i).getName().equals(restaurantClicked)) {
+                                j++;
+                            }
+                        }
+                        if (j == 1) {
+                            CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
+                            mMap.moveCamera(center);
+                            j = 0;
+                        } else{
+                            AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                            alertDialog.setTitle("This restaurant is far from you");
+                            alertDialog.setMessage("We recommend you choose another restaurant");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    (dialog, which) -> dialog.dismiss());
+                            alertDialog.show();
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
+
+                    }
+                });
+
+            }
+        });
 
 
         return rootView;
@@ -224,7 +292,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 List<PlaceNearBySearchResult> nearbyPlacesList = articles.getResults();
 
 
-
                 notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
 
                     for (PlaceNearBySearchResult nearbyPlace : nearbyPlacesList) {
@@ -253,10 +320,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                                 }
                             }
 
-                            marker.setTag(new MarkerObject(nearbyPlace.getAddress(), nearbyPlace.getName(),"https://maps.googleapis.com/maps/api/place/photo?"
-                                            + "maxwidth=2304"
-                                            + "&photoreference=" + photoReferences
-                                            + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", nearbyPlace.getPlaceId()));
+                            marker.setTag(new MarkerObject(nearbyPlace.getAddress(), nearbyPlace.getName(), "https://maps.googleapis.com/maps/api/place/photo?"
+                                    + "maxwidth=2304"
+                                    + "&photoreference=" + photoReferences
+                                    + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", nearbyPlace.getPlaceId()));
                         }
                     }
 
@@ -332,6 +399,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
         // Show current Location
         showCurrentLocation();
+
 
         // Display Restaurants Markers and activate Listen on the participants finalI
         //  DisplayAndListensMarkers();
@@ -470,4 +538,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                     + " must implement showSnackBarListener");
         }
     }
+
+
 }

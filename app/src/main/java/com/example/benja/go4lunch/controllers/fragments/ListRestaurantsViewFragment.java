@@ -1,5 +1,6 @@
 package com.example.benja.go4lunch.controllers.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.benja.go4lunch.R;
@@ -21,6 +23,7 @@ import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ListRestaurantsViewAdapter;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -46,9 +49,9 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private List<Restaurant> restaurantList;
-    float numberOfLikes = 0;
+    long numberOfLikes = 0;
     float numberOfPeople = 0;
-    float averageLikes;
+    double averageLikes;
     ArrayList likeAverage = new ArrayList<>();
     int number;
 
@@ -62,6 +65,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     // Declare Adapter of the RecyclerView
     private ListRestaurantsViewAdapter mAdapter;
 
+    @SuppressLint("ValidFragment")
     private ListRestaurantsViewFragment() {
     }
 
@@ -95,8 +99,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
         Api api = retrofit.create(Api.class);
 
 
-
-
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
 
         recyclerView.setAdapter(adapter);
@@ -108,7 +110,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
                 for (int i = 0; i < theListOfResults.size(); i++) {
                     number = i;
-
                     if (theListOfResults.get(i).getPhotos() != null) {
                         photoReferences = theListOfResults.get(i).getPhotos().get(0).getPhotoReference();
                     } else {
@@ -132,27 +133,14 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     double reallyPreciseDistance = radiusOfTheEarth * Math.acos(Math.sin(userLatitude) * (Math.sin(restaurantLatitude)) + Math.cos(userLatitude) * Math.cos(restaurantLatitude) * Math.cos(userLongitude - restaurantLongitude));
                     int distance = (int) reallyPreciseDistance;
 
-                    notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    DocumentReference mDocRef = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(i).getName());
 
-                            Object listTesting = documentSnapshot.get("listTesting");
-                            likeAverage = (ArrayList) listTesting;
-
-                            if (likeAverage != null) {
-                                for (int j = 0; j < likeAverage.size(); j++) {
-                                    if (likeAverage.get(j).equals(theListOfResults.get(number).getName())) {
-                                        numberOfLikes++;
-                                    }
-                                }
-                            }
-                            numberOfPeople++;
-
+                    mDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+//                            numberOfLikes = (long) documentSnapshot.get("likes");
+                            Log.d("restooo", theListOfResults.get(number).getName() + "got " + numberOfLikes + " likes");
                         }
-                        averageLikes = numberOfLikes  /  numberOfPeople;
-                        Log.d("isitequal", averageLikes + theListOfResults.get(number).getName());
-
                     });
-
 
                     if (theListOfResults.get(i).getOpeningHours() != null) {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
@@ -164,7 +152,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                         + "&photoreference=" + photoReferences
                                         + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
                                 theListOfResults.get(i).getPlaceId(),
-                                averageLikes);
+                                numberOfLikes);
 
                         restaurantList.add(restaurantItem);
                     } else {
@@ -176,7 +164,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
                                         + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(i).getPlaceId(),
-                                averageLikes);
+                                numberOfLikes);
                         restaurantList.add(restaurantItem);
                     }
                     adapter.notifyDataSetChanged();

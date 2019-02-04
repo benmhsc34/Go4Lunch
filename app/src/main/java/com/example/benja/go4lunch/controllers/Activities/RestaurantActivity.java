@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
+import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -75,15 +77,20 @@ public class RestaurantActivity extends AppCompatActivity {
     Boolean like = false;
     Boolean alreadyGoing = false;
     float numberOfLikes = 0;
+    long likes = 0;
     float numberOfPeople = 0;
     float averageLikes;
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
+
+
+
 
         //Declaring different Views
         LinearLayout callButton = findViewById(R.id.callButton);
@@ -230,9 +237,24 @@ public class RestaurantActivity extends AppCompatActivity {
         likeButton.setOnClickListener(view -> {
             Log.d("whatshappening", "we click");
 
+            DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
+
+
             if (!like) {
-                likePhotoIV.setImageResource(R.drawable.like);
-                likeTV.setText("LIKE");
+                likePhotoIV.setImageResource(R.drawable.liked);
+                likeTV.setText("LIKED");
+
+                mDocReference.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        likes = (long) documentSnapshot.get("likes");
+                    }
+                });
+
+                Map<String, Object> dataToSave = new HashMap<>();
+
+                dataToSave.put("likes", likes + 1);
+                mDocReference.set(dataToSave, SetOptions.merge());
+
 
                 mDocRef.get().addOnSuccessListener(documentSnapshot -> {
 
@@ -248,17 +270,29 @@ public class RestaurantActivity extends AppCompatActivity {
 
                         like = true;
                     }
+                    Map<String, Object> arrayMapList = new HashMap<>();
+                    arrayMapList.put("listTesting", arrayList);
+                    mDocRef.update(arrayMapList);
                 });
-                Map<String, Object> arrayMapList = new HashMap<>();
-                arrayMapList.put("listTesting", arrayList);
-                mDocRef.update(arrayMapList);
 
 
             } else {
                 Log.d("whatshappening", "ELSE");
 
-                likePhotoIV.setImageResource(R.drawable.liked);
-                likeTV.setText("LIKED");
+                likePhotoIV.setImageResource(R.drawable.like);
+                likeTV.setText("LIKE");
+
+
+                mDocReference.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        likes = (long) documentSnapshot.get("likes");
+                    }
+                });
+
+                Map<String, Object> dataToSave = new HashMap<>();
+                dataToSave.put("likes", likes - 1);
+                mDocReference.set(dataToSave, SetOptions.merge());
+
                 mDocRef.get().addOnSuccessListener(documentSnapshot -> {
 
                     Object restosLiked;
@@ -284,11 +318,11 @@ public class RestaurantActivity extends AppCompatActivity {
                         like = false;
 
                     }
-
+                    Map<String, Object> arrayMapList = new HashMap<>();
+                    arrayMapList.put("listTesting", arrayList);
+                    mDocRef.update(arrayMapList);
                 });
-                Map<String, Object> arrayMapList = new HashMap<>();
-                arrayMapList.put("listTesting", arrayList);
-                mDocRef.update(arrayMapList);
+
 
             }
         });
@@ -436,6 +470,13 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         };
         recyclerView.setAdapter(adapter);
+    }
+
+    private void configureToolBar() {
+        // Change the toolbar Title
+        setTitle("I'm Hungry!");
+        // Sets the Toolbar
+        setSupportActionBar(mToolbar);
     }
 
     private class UsersViewHolder extends RecyclerView.ViewHolder {

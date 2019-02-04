@@ -201,7 +201,7 @@ public class LoginActivity extends BaseActivity {
         Map<String, Object> dataToSave = new HashMap<>();
         dataToSave.put("userName", currentFirebaseUser.getDisplayName());
         dataToSave.put("email", currentFirebaseUser.getEmail());
-        mDocRef.set(dataToSave, SetOptions.merge()).addOnSuccessListener(aVoid -> Log.d("sucess", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
+        mDocRef.set(dataToSave, SetOptions.merge()).addOnSuccessListener(aVoid -> Log.d("success", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
 
         Map<String, Object> imageToSave = new HashMap<>();
         imageToSave.put("picture", currentFirebaseUser.getPhotoUrl().toString());

@@ -1,8 +1,10 @@
 package com.example.benja.go4lunch.controllers.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -59,6 +61,7 @@ public class ListWorkmatesViewFragment extends Fragment {
         void setUserName(String userName) {
             TextView textView = view.findViewById(R.id.userNameTV);
             textView.setText(userName);
+            textView.setTextColor(Color.parseColor("#000000"));
         }
 
         void setPicture(String picture) {
@@ -113,6 +116,7 @@ public class ListWorkmatesViewFragment extends Fragment {
                 return new ListWorkmatesViewFragment.UsersViewHolder(view);
             }
 
+            @SuppressLint("NewApi")
             @Override
             protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
 
@@ -120,6 +124,7 @@ public class ListWorkmatesViewFragment extends Fragment {
                 if (model.getPicture() != null) {
                     if (model.getRestaurantName() != null) {
                         holder.setUserName(model.getUserName() + " is eating at the " + model.getRestaurantName());
+
                         holder.setPicture(model.getPicture());
                     } else {
                         holder.setUserName(model.getUserName() + " hasn't decided yet");

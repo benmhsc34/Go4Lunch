@@ -104,13 +104,13 @@
                         android:gravity="end"
                         android:orientation="horizontal">
 
-                        <!-- Smiley
+
                         <ImageView
                             android:id="@+id/fragment_list_restaurant_view_item_participants_smiley"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/baseline_perm_identity_black_24"/>
--->
+                            android:background="@drawable/ic_person_black_24dp"/>
+
                         <TextView
                             android:id="@+id/fragment_list_restaurant_view_item_participants"
                             android:layout_width="wrap_content"

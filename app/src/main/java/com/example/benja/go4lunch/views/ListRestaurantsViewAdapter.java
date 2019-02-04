@@ -17,6 +17,9 @@ import android.widget.TextView;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -32,6 +35,8 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
     private List<Restaurant> restaurantList;
     private Context context;
     private OnItemClickListener mListener;
+    private float numberOfPeople = 0;
+    private float averageLikes;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -59,6 +64,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
 
         viewHolder.restaurantName.setText(restaurantItem.getName());
         viewHolder.restaurantAddress.setText(restaurantItem.getAddress());
+
         if (restaurantItem.getOpeningTime()) {
             viewHolder.restaurantOpeningHours.setText("OPEN");
             viewHolder.restaurantOpeningHours.setTextColor(Color.parseColor("#2b7f37"));
@@ -69,30 +75,35 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         }
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
 
-        if (restaurantItem.getNbrLikes() == 0.0){
+        float goldenState = (float) restaurantItem.getNbrLikes();
+        averageLikes = goldenState / numberOfPeople;
+
+        if (averageLikes == 0.0) {
             viewHolder.starOne.setVisibility(View.INVISIBLE);
             viewHolder.starTwo.setVisibility(View.INVISIBLE);
             viewHolder.starThree.setVisibility(View.INVISIBLE);
 
         }
-        if (0.1 >= restaurantItem.getNbrLikes()){
+        if (0.1 >= averageLikes) {
             viewHolder.starOne.setVisibility(View.VISIBLE);
             viewHolder.starTwo.setVisibility(View.INVISIBLE);
             viewHolder.starThree.setVisibility(View.INVISIBLE);
 
-        }
-        else if (0.4 >= restaurantItem.getNbrLikes()){
+        } else if (0.4 >= averageLikes) {
             viewHolder.starOne.setVisibility(View.VISIBLE);
             viewHolder.starTwo.setVisibility(View.VISIBLE);
             viewHolder.starThree.setVisibility(View.INVISIBLE);
 
-        }
-        else {
+        } else {
             viewHolder.starOne.setVisibility(View.VISIBLE);
             viewHolder.starTwo.setVisibility(View.VISIBLE);
             viewHolder.starThree.setVisibility(View.VISIBLE);
 
         }
+        int numberOfPeople = (int) restaurantItem.getNbrLikes();
+
+        viewHolder.numberOfPeople.setText("(" + numberOfPeople + ")");
+
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 
         viewHolder.linearLayout.setOnClickListener(view -> {
@@ -103,7 +114,6 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             mPreferences.edit().putString("name", restaurantItem.getName()).apply();
             mPreferences.edit().putString("address", restaurantItem.getAddress()).apply();
             mPreferences.edit().putString("placeId", restaurantItem.getPlaceId()).apply();
-
 
 
             context.startActivity(myIntent);
@@ -126,6 +136,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         public ImageView starOne;
         public ImageView starTwo;
         public ImageView starThree;
+        public TextView numberOfPeople;
 
 
         public ViewHolder(@NonNull final View itemView) {
@@ -140,6 +151,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             starThree = itemView.findViewById(R.id.fragment_list_restaurant_view_item_star_three);
             starTwo = itemView.findViewById(R.id.fragment_list_restaurant_view_item_star_two);
             starOne = itemView.findViewById(R.id.fragment_list_restaurant_view_item_star_one);
+            numberOfPeople = itemView.findViewById(R.id.fragment_list_restaurant_view_item_participants);
 
 
             ButterKnife.bind(this, itemView);
