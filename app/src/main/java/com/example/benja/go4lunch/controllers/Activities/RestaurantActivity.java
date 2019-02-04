@@ -233,6 +233,50 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
+        notebookRef.get().addOnSuccessListener((queryDocumentSnapshots) -> {
+            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+
+                Object listTesting = documentSnapshot.get("listTesting");
+                likeAverage = (ArrayList) listTesting;
+
+                if (likeAverage != null) {
+                    for (int i = 0; i < likeAverage.size(); i++) {
+                        if (likeAverage.get(i).equals(name)) {
+                            numberOfLikes++;
+                        }
+                    }
+                }
+                numberOfPeople++;
+
+            }
+            averageLikes = numberOfLikes / numberOfPeople;
+            Log.d("whatisitworth", averageLikes + "");
+            if (averageLikes == 0.0) {
+                starOne.setVisibility(View.INVISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            }
+            if (0.1 >= averageLikes) {
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            } else if (0.4 >= averageLikes) {
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.VISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            } else {
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.VISIBLE);
+                starThree.setVisibility(View.VISIBLE);
+
+            }
+
+        });
+
+
 
         likeButton.setOnClickListener(view -> {
             Log.d("whatshappening", "we click");
@@ -289,9 +333,11 @@ public class RestaurantActivity extends AppCompatActivity {
                     }
                 });
 
+
                 Map<String, Object> dataToSave = new HashMap<>();
                 dataToSave.put("likes", likes - 1);
                 mDocReference.set(dataToSave, SetOptions.merge());
+
 
                 mDocRef.get().addOnSuccessListener(documentSnapshot -> {
 
@@ -325,54 +371,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
 
             }
-        });
-
-
-        notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
-            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-
-                Object listTesting = documentSnapshot.get("listTesting");
-                likeAverage = (ArrayList) listTesting;
-
-                if (likeAverage != null) {
-                    for (int i = 0; i < likeAverage.size(); i++) {
-                        if (likeAverage.get(i).equals(name)) {
-                            numberOfLikes++;
-                        }
-                    }
-                }
-                numberOfPeople++;
-
-            }
-            averageLikes = numberOfLikes / numberOfPeople;
-            Log.d("whatisitworth", averageLikes + "");
-            if (averageLikes == 0.0) {
-                starOne.setVisibility(View.INVISIBLE);
-                starTwo.setVisibility(View.INVISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            }
-            if (0.1 >= averageLikes) {
-                starOne.setVisibility(View.VISIBLE);
-                starTwo.setVisibility(View.INVISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            } else if (0.4 >= averageLikes) {
-                starOne.setVisibility(View.VISIBLE);
-                starTwo.setVisibility(View.VISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            } else {
-                starOne.setVisibility(View.VISIBLE);
-                starTwo.setVisibility(View.VISIBLE);
-                starThree.setVisibility(View.VISIBLE);
-
-            }
-
-        });
-
-
-        websiteButton.setOnClickListener(view -> {
         });
 
         websiteButton.setOnClickListener(view -> {
@@ -472,12 +470,6 @@ public class RestaurantActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void configureToolBar() {
-        // Change the toolbar Title
-        setTitle("I'm Hungry!");
-        // Sets the Toolbar
-        setSupportActionBar(mToolbar);
-    }
 
     private class UsersViewHolder extends RecyclerView.ViewHolder {
         private View view;
