@@ -27,6 +27,7 @@ import com.example.benja.go4lunch.models.UsersModel;
 import com.facebook.share.Share;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -120,26 +121,46 @@ public class ListWorkmatesViewFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
 
+                if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                    if (model.getPicture() != null) {
+                        if (model.getRestaurantName() != null) {
+                            holder.setUserName(getText(R.string.you_eating_at) + model.getRestaurantName());
 
-                if (model.getPicture() != null) {
-                    if (model.getRestaurantName() != null) {
-                        holder.setUserName(model.getUserName() + " is eating at the " + model.getRestaurantName());
-
-                        holder.setPicture(model.getPicture());
+                            holder.setPicture(model.getPicture());
+                        } else {
+                            holder.setUserName((String) getText(R.string.you_havent));
+                            holder.setPicture(model.getPicture());
+                        }
                     } else {
-                        holder.setUserName(model.getUserName() + " hasn't decided yet");
-                        holder.setPicture(model.getPicture());
+                        if (model.getRestaurantName() != null) {
+                            holder.setUserName(getText(R.string.you_eating_at) + model.getRestaurantName());
+                            holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                        } else {
+                            holder.setUserName((String) getText(R.string.you_havent));
+                            holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                        }
                     }
+
                 } else {
-                    if (model.getRestaurantName() != null) {
-                        holder.setUserName(model.getUserName() + " is eating at: " + model.getRestaurantName());
-                        holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                    if (model.getPicture() != null) {
+                        if (model.getRestaurantName() != null) {
+                            holder.setUserName(model.getUserName() + " " + getText(R.string.eating_at) + model.getRestaurantName());
+
+                            holder.setPicture(model.getPicture());
+                        } else {
+                            holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
+                            holder.setPicture(model.getPicture());
+                        }
                     } else {
-                        holder.setUserName(model.getUserName() + " hasn't decided yet");
-                        holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                        if (model.getRestaurantName() != null) {
+                            holder.setUserName(model.getUserName() + " " + getText(R.string.eating_at) + model.getRestaurantName());
+                            holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                        } else {
+                            holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
+                            holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
+                        }
                     }
                 }
-
                 holder.openRestaurant(model.getRestaurantName(), model.getPlaceId(), model.getPictureRestaurant(), model.getAddress());
 
             }

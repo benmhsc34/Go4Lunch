@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <string name="main_activity_description">no hagas una comida de eso.</string>
+    <string name="login">conexión</string>
+    <string name="bottom_navigation_menu_map_view">Mapa</string>
+    <string name="bottom_navigation_menu_list_view">Restaurante</string>
+    <string name="bottom_navigation_menu_workmates">Compañeros</string>
+    <string name="your_lunch">TU ALMUERZO</string>
+    <string name="settings">AJUSTES</string>
+    <string name="logout">"CERRAR SESIÓN "</string>
+    <string name="eating_at">" está comiendo en el "</string>
+    <string name="hasnt_decided">" aún no ha decidido "</string>
+    <string name="going">"¿yendo? "</string>
+    <string name="call">LLAMADA</string>
+    <string name="website">"SITIO WEB"</string>
+    <string name="like">"ME GUSTA"</string>
+    <string name="liked">GUSTÓ</string>
+    <string name="you_eating_here">"Usted está comiendo aquí! "</string>
+    <string name="eating_here">" está comiendo aquí! "</string>
+    <string name="no_website">"  no hay sitio web para este restaurante"</string>
+    <string name="no_phone">" no hay número de teléfono para este restaurante"</string>
+    <string name="you_eating_at">"Estas comiendo en "</string>
+    <string name="you_havent">"aún no has decidido "</string>
+</resources>

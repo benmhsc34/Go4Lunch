@@ -386,7 +386,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
         callButton.setOnClickListener(view -> {
             if (thephoneNumber.equals("noPhoneNumber")) {
-                Toast.makeText(RestaurantActivity.this, "No phone number for this restaurant", Toast.LENGTH_LONG).show();
+                Toast.makeText(RestaurantActivity.this, R.string.no_phone, Toast.LENGTH_LONG).show();
             } else {
                 Intent i = new Intent(Intent.ACTION_DIAL);
                 String p = "tel:" + thephoneNumber;
@@ -420,15 +420,15 @@ public class RestaurantActivity extends AppCompatActivity {
 
                             if (model.getPicture() != null) {
                                 if (model.getRestaurantName() != null) {
-                                    holder.setUserName("You are eating here!");
+                                    holder.setUserName((String) getText(R.string.you_eating_here));
                                     holder.setPicture(model.getPicture());
                                 }
                             } else {
                                 if (model.getRestaurantName() != null) {
-                                    holder.setUserName("You have decided to eat here!");
+                                    holder.setUserName((String) getText(R.string.you_eating_here));
                                     holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
                                 } else {
-                                    holder.setUserName(model.getUserName() + " hasn't decided yet");
+                                    holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
                                     holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
                                 }
                             }
@@ -436,15 +436,15 @@ public class RestaurantActivity extends AppCompatActivity {
 
                             if (model.getPicture() != null) {
                                 if (model.getRestaurantName() != null) {
-                                    holder.setUserName(model.getUserName() + " is eating here!");
+                                    holder.setUserName(model.getUserName() + " " + getText(R.string.eating_here));
                                     holder.setPicture(model.getPicture());
                                 }
                             } else {
                                 if (model.getRestaurantName() != null) {
-                                    holder.setUserName(model.getUserName() + " is eating here!");
+                                    holder.setUserName(model.getUserName()  + " " + getText(R.string.eating_here));
                                     holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
                                 } else {
-                                    holder.setUserName(model.getUserName() + " hasn't decided yet");
+                                    holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
                                     holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
                                 }
                             }

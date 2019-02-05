@@ -8,6 +8,7 @@ public class UsersModel {
     private String pictureRestaurant;
     private String address;
     private String placeId;
+
     public UsersModel() {
     }
 

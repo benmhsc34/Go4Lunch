@@ -3,49 +3,73 @@
     <string name="main_activity_description">Don\'t make a meal of it.</string>
 
     <string name="login">Connexion</string>
-    <string name="chat_with_mentor">Discute avec un mentor</string>
+    <string name="chat_with_mentor" translatable="false">Discute avec un mentor</string>
 
     <!-- NOTIFICATION SERVICE -->
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
-    <string name="notification_title">"Vous avez reçu une notification"</string>
+    <string name="notification_title" translatable="false">"Vous avez reçu une notification"</string>
 
     <!-- MAIN ACTIVITY -->
-    <string name="error_not_connected">Vous devez vous connecter !</string>
-    <string name="error_authentication_canceled">Authentification annulée&#8230;</string>
-    <string name="error_no_internet">Aucune connexion internet !</string>
-    <string name="error_unknown_error">Une erreur inconnue s\'est produite&#8230;</string>
-    <string name="connection_succeed">Authentification réussie !</string>
-    <string name="button_login_text_logged">Afficher le profil</string>
-    <string name="button_login_text_not_logged">Connexion</string>
+    <string name="error_not_connected" translatable="false">Vous devez vous connecter !</string>
+    <string name="error_authentication_canceled" translatable="false">Authentification annulée&#8230;</string>
+    <string name="error_no_internet" translatable="false">Aucune connexion internet !</string>
+    <string name="error_unknown_error" translatable="false">Une erreur inconnue s\'est produite&#8230;</string>
+    <string name="connection_succeed" translatable="false">Authentification réussie !</string>
+    <string name="button_login_text_logged" translatable="false">Afficher le profil</string>
+    <string name="button_login_text_not_logged" translatable="false">Connexion</string>
 
     <!-- LOGIN ACTIVITY -->
-    <string name="toolbar_title_login_activity">Votre Profil</string>
-    <string name="text_input_username">Nom d\'utilisateur</string>
-    <string name="text_view_email">Adresse email :</string>
-    <string name="button_update_account">Mettre à jour le nom d\'utilisateur</string>
-    <string name="button_delete_account">Supprimer mon compte</string>
-    <string name="button_sign_out_account">Déconnexion</string>
-    <string name="info_no_email_found">Auncune adresse email</string>
-    <string name="info_no_username_found">Aucun nom d\'utilisateur</string>
-    <string name="popup_message_confirmation_delete_account">Es-tu sûr(e) de vouloir supprimer ton compte ?</string>
-    <string name="popup_message_choice_yes">Oui !</string>
-    <string name="popup_message_choice_no">Non</string>
-    <string name="check_box_is_mentor">Etes-vous un mentor ?</string>
+    <string name="toolbar_title_login_activity" translatable="false">Votre Profil</string>
+    <string name="text_input_username" translatable="false">Nom d\'utilisateur</string>
+    <string name="text_view_email" translatable="false">Adresse email :</string>
+    <string name="button_update_account" translatable="false">Mettre à jour le nom d\'utilisateur</string>
+    <string name="button_delete_account" translatable="false">Supprimer mon compte</string>
+    <string name="button_sign_out_account" translatable="false">Déconnexion</string>
+    <string name="info_no_email_found" translatable="false">Auncune adresse email</string>
+    <string name="info_no_username_found" translatable="false">Aucun nom d\'utilisateur</string>
+    <string name="popup_message_confirmation_delete_account" translatable="false">Es-tu sûr(e) de vouloir supprimer ton compte ?</string>
+    <string name="popup_message_choice_yes" translatable="false">Oui !</string>
+    <string name="popup_message_choice_no" translatable="false">Non</string>
+    <string name="check_box_is_mentor" translatable="false">Etes-vous un mentor ?</string>
 
-    <string name="facebook_application_id">311621429564012</string>
-    <string name="fb_login_protocol_scheme">fb311621429564012</string>
+    <string name="facebook_application_id" translatable="false">311621429564012</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb311621429564012</string>
 
     <!-- BOTTOM NAVIGATION VIEW -->
-    <string name="bottom_navigation_menu_map_view">Map View</string>
-    <string name="bottom_navigation_menu_list_view">List View</string>
+    <string name="bottom_navigation_menu_map_view">Map</string>
+    <string name="bottom_navigation_menu_list_view">Restaurants</string>
     <string name="bottom_navigation_menu_workmates">Workmates</string>
 
     <!-- Used in NavigationDrawer -->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+
+    <!-- Navigation drawer -->
+    <string name="your_lunch">YOUR LUNCH</string>
+    <string name="settings">SETTINGS</string>
+    <string name="logout">LOGOUT</string>
+
+    <!-- Wormates fragment -->
+    <string name="eating_at"> is eating at the </string>
+    <string name="hasnt_decided"> hasn\'t decided yet</string>
+
+    <!-- Restaurant Activity -->
+    <string name="going">GOING?</string>
+    <string name="call">CALL</string>
+    <string name="website">WEBSITE</string>
+    <string name="like">LIKE</string>
+    <string name="liked">LIKED</string>
+    <string name="you_eating_here">You are eating here!</string>
+    <string name="eating_here"> is eating here!</string>
+    <string name="no_website"> no website for this restaurant</string>
+    <string name="no_phone"> no phone number for this restaurant</string>
+    <string name="you_eating_at">You are eating at</string>
+    <string name="you_havent">You haven\'t decided yet</string>
+
+
 
 </resources>
 

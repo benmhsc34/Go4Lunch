@@ -2,6 +2,7 @@ package com.example.benja.go4lunch.controllers.Activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,10 +35,12 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -146,6 +149,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private LocationManager locationManager;
     private LocationListener locationListener;
 
+    ListRestaurantsViewFragment.UpdateList mUpdateList;
+
+    public void updateList(ListRestaurantsViewFragment.UpdateList listener) {
+        mUpdateList = listener;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,7 +195,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 .build();
 
 
-
         //Declaring search edit text
         AutoCompleteTextView searchEditText = mToolbar.findViewById(R.id.myEditText);
         mGeoDataClient = Places.getGeoDataClient(this, null);
@@ -195,7 +203,18 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         searchEditText.setOnItemClickListener(mAutoCompleteClickListener);
         searchEditText.setAdapter(mPlaceAutocompleteAdapter);
 
+        //Make auto-suggestions and keyboard disapear when DONE button clicked
+        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                searchEditText.dismissDropDown();
+                mPreferences.edit().putString("searchInput", searchEditText.getText().toString()).apply();
+                mUpdateList.updateList();
 
+            }
+            return true;
+        });
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -286,6 +305,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         }
     }
+
+
 
 
     @Override
@@ -444,7 +465,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     mPreferences.edit().putString("placeId", placeId).apply();
                     mPreferences.edit().putString("address", address).apply();
 
-
                     Intent myRestaurantIntent = new Intent(this, RestaurantActivity.class);
                     startActivity(myRestaurantIntent);
                 });
@@ -579,7 +599,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
      -------------------------------------  google places autocomplete API suggestions ------------------------------------
    */
 
-    MapViewFragment.UpdateFrag updatfrag ;
+    MapViewFragment.UpdateFrag updatfrag;
+
     public void updateApi(MapViewFragment.UpdateFrag listener) {
         updatfrag = listener;
     }
@@ -614,6 +635,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             mPreferences.edit().putString("viewportLongitude", place.getViewport().getCenter().longitude + "").apply();
             mPreferences.edit().putString("theRestaurantClicked", place.getName() + "").apply();
             updatfrag.updatefrag();
+            mPreferences.edit().putString("searchInput", place.getName() + "").apply();
+            mUpdateList.updateList();
 
             places.release();
         }
@@ -630,7 +653,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
         placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
     };
-
 
 
 }

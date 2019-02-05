@@ -72,7 +72,7 @@ import static android.content.Context.MODE_PRIVATE;
  *  IN = Last Know Location : Location
  *
  **************************************************************************************************/
-public class MapViewFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
+public class MapViewFragment extends BaseFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     // For debug
     private static final String TAG = MapViewFragment.class.getSimpleName();
@@ -193,52 +193,50 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Configure the Maps Service of Google
         configurePlayServiceMaps();
 
-        ((MainActivity) getActivity()).updateApi(new UpdateFrag() {
-            @Override
-            public void updatefrag() {
 
-                SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-                double latitude = Double.parseDouble(mPreferences.getString("viewportLatitude", "12"));
-                double longitude = Double.parseDouble(mPreferences.getString("viewportLongitude", "12"));
-                String restaurantClicked = mPreferences.getString("theRestaurantClicked", "Corben House");
+        ((MainActivity) getActivity()).updateApi(() -> {
 
-                //Defining api call
-                Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
-                Api api = retrofit.create(Api.class);
-                Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
+            SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+            double latitude = Double.parseDouble(mPreferences.getString("viewportLatitude", "12"));
+            double longitude = Double.parseDouble(mPreferences.getString("viewportLongitude", "12"));
+            String restaurantClicked = mPreferences.getString("theRestaurantClicked", "Corben House");
 
-                call.enqueue(new Callback<PlaceNearBySearch>() {
-                    @Override
-                    public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
-                        PlaceNearBySearch articles = response.body();
-                        List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
-                        for (int i = 0; i < theListOfResults.size(); i++) {
-                            if (theListOfResults.get(i).getName().equals(restaurantClicked)) {
-                                j++;
-                            }
+            //Defining api call
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+            Api api = retrofit.create(Api.class);
+            Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
+
+            call.enqueue(new Callback<PlaceNearBySearch>() {
+                @Override
+                public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
+                    PlaceNearBySearch articles = response.body();
+                    List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
+                    for (int i = 0; i < theListOfResults.size(); i++) {
+                        if (theListOfResults.get(i).getName().equals(restaurantClicked)) {
+                            j++;
                         }
-                        if (j == 1) {
-                            CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
-                            mMap.moveCamera(center);
-                            j = 0;
-                        } else{
-                            AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
-                            alertDialog.setTitle("This restaurant is far from you");
-                            alertDialog.setMessage("We recommend you choose another restaurant");
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                    (dialog, which) -> dialog.dismiss());
-                            alertDialog.show();
-                        }
-
+                    }
+                    if (j == 1) {
+                        CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
+                        mMap.moveCamera(center);
+                        j = 0;
+                    } else{
+                        AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                        alertDialog.setTitle("This restaurant is far from you");
+                        alertDialog.setMessage("We recommend you choose another restaurant");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                (dialog, which) -> dialog.dismiss());
+                        alertDialog.show();
                     }
 
-                    @Override
-                    public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
+                }
 
-                    }
-                });
+                @Override
+                public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
 
-            }
+                }
+            });
+
         });
 
 
@@ -259,6 +257,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         getChildFragmentManager().beginTransaction().replace(R.id.fragment_map_view, mMapFragment).commit();
     }
 
+
+
+
     /**
      * Manipulates the map when it's available
      **/
@@ -270,10 +271,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Disable 3D Building
         mMap.setBuildingsEnabled(false);
 
-        // Activate OnMarkerClickListener
-        mMap.setOnInfoWindowClickListener(this);
-
-
         //
         mMap.setOnMarkerClickListener(this);
 
@@ -284,7 +281,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
 
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
-        Log.d("latlong", latitude + " - " + longitude);
         call.enqueue(new Callback<PlaceNearBySearch>() {
             @Override
             public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
@@ -336,22 +332,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
             }
         });
-/*
-        mMap.setOnMarkerClickListener(marker1 -> {
-            Log.d("snippets", marker.getSnippet());
-            SharedPreferences preferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", 0);
-            preferences.edit().putString("image", "https://maps.googleapis.com/maps/api/place/photo?"
-                    + "maxwidth=2304"
-                    + "&photoreference=" + photoReferences
-                    + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4" + placeIdReferences).apply();
-            preferences.edit().putString("name", nameReferences).apply();
-            preferences.edit().putString("address", addressReferences).apply();
-            preferences.edit().putString("placeId", placeIdReferences).apply();
-            Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
-            startActivity(myIntent);
-            return false;
-        });
-*/
+
 
         //Cute blue dot
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -400,24 +381,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Show current Location
         showCurrentLocation();
 
-
-        // Display Restaurants Markers and activate Listen on the participants finalI
-        //  DisplayAndListensMarkers();
     }
 
-    // ---------------------------------------------------------------------------------------------
-    //                                       ACTIONS
-    // ---------------------------------------------------------------------------------------------
-    // Click on Restaurants Map Marker
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        Log.d(TAG, "onMarkerClick: ");
 
-        //Launch Restaurant Card Activity with restaurantIdentifier
-   /*     Toolbox.startActivity(getActivity(),RestaurantCardActivity.class,
-                RestaurantCardActivity.KEY_DETAILS_RESTAURANT_CARD,
-                marker.getTag().toString()); */
-    }
     // ---------------------------------------------------------------------------------------------
     //                                       METHODS
     // ---------------------------------------------------------------------------------------------
@@ -439,85 +405,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     }
 
 
-    /**
-     * Creating restaurant markers on the map and activating for each of them
-     * a listener to change the finalI of participants in order to change their color in real time
-     */
- /*   protected void DisplayAndListensMarkers() {
-        Log.d(TAG, "fireStoreListener: ");
-        Set<Map.Entry<String, Restaurant>> setListRestaurant = getRestaurantMapOfTheModel().entrySet();
-        Iterator<Map.Entry<String, Restaurant>> it = setListRestaurant.iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Restaurant> restaurant = it.next();
-            Log.d(TAG, "fireStoreListener: identifier Restaurant = " + restaurant.getValue().getIdentifier());
-            // Declare a Marker for current Restaurant
-            Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(Double.parseDouble(restaurant.getValue().getLat()),
-                                    Double.parseDouble(restaurant.getValue().getLng())
-                            )
-                    )
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange))
-                    .title(restaurant.getValue().getName())
-            );
-            marker.setTag(restaurant.getValue().getIdentifier());
-            listenNbrParticipantsForUpdateMarkers(restaurant.getValue(), marker);
-        }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(latitude,
-                        longitude), DEFAULT_ZOOM));
-        // Update Location UI
-        MapViewFragment.this.updateLocationUI();
-    }
-    /**
-     * Enables listening to the finalI of participants in each restaurant
-     * to enable marker color change in real time
-     */ /*
-    public void listenNbrParticipantsForUpdateMarkers(Restaurant restaurant, Marker marker) {
-        RestaurantHelper
-                .getRestaurantsCollection()
-                .document(restaurant.getIdentifier())
-                .addSnapshotListener((restaurant1, e) -> {
-                    if (e != null) {
-                        Log.d(TAG, "fireStoreListener.onEvent: Listen failed: " + e);
-                        return;
-                    }
-                    if (restaurant1 != null) {
-                        Log.d(TAG, "fireStoreListener.onEvent: identifier Restaurant = " + restaurant1.get("identifier"));
-                        Log.d(TAG, "fireStoreListener.onEvent: nbrParticipants = " + restaurant1.get("nbrParticipants"));
-                        if (Integer.parseInt(restaurant1.get("nbrParticipants").toString()) == 0) {
-                            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange));
-                        } else {
-                            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_green));
-                        }
-                    }
-                });
-    }
-*/
-
-    /**
-     * Updates the map's UI settings based on whether the user has granted location permission.
-     */
-  /*  public void updateLocationUI() {
-        Log.d(TAG, "updateLocationUI: ");
-        if (mMap != null) {
-            try {
-                Go4LunchViewModel model = ViewModelProviders.of(getActivity()).get(Go4LunchViewModel.class);
-                Log.d(TAG, "updateLocationUI: isLocationPermissionGranted = " + model.isLocationPermissionGranted());
-                if (model.isLocationPermissionGranted()) {
-                    Log.d(TAG, "updateLocationUI: Permission Granted");
-                    mMap.setMyLocationEnabled(true);
-                    mMap.getUiSettings().setMyLocationButtonEnabled(true);
-                } else {
-                    Log.d(TAG, "updateLocationUI: Permission not Granted");
-                    mMap.setMyLocationEnabled(false);
-                    mMap.getUiSettings().setMyLocationButtonEnabled(false);
-                }
-            } catch (SecurityException e) {
-                Log.e("updateLocationUI %s", e.getMessage());
-            }
-        }
-    }
-*/
 
     /**
      * Method use for CallBacks to the Welcome Activity
