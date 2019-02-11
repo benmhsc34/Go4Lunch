@@ -419,10 +419,9 @@ public class RestaurantActivity extends AppCompatActivity {
                         if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
 
                             if (model.getPicture() != null) {
-                                if (model.getRestaurantName() != null) {
                                     holder.setUserName((String) getText(R.string.you_eating_here));
                                     holder.setPicture(model.getPicture());
-                                }
+
                             } else {
                                 if (model.getRestaurantName() != null) {
                                     holder.setUserName((String) getText(R.string.you_eating_here));

@@ -110,7 +110,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     int j = 0;
 
 
-
     Marker marker;
 
     @Override
@@ -220,7 +219,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
                         mMap.moveCamera(center);
                         j = 0;
-                    } else{
+                    } else {
                         AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
                         alertDialog.setTitle("This restaurant is far from you");
                         alertDialog.setMessage("We recommend you choose another restaurant");
@@ -256,8 +255,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Build the map
         getChildFragmentManager().beginTransaction().replace(R.id.fragment_map_view, mMapFragment).commit();
     }
-
-
 
 
     /**
@@ -312,7 +309,9 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
                             for (int i = 0; i < nearbyPlacesList.size(); i++) {
                                 if (nearbyPlacesList.get(i).getName().equals(nearbyPlace.getName())) {
-                                    photoReferences = nearbyPlacesList.get(i).getPhotos().get(0).getPhotoReference();
+                                    if (nearbyPlacesList.get(i).getPhotos() != null) {
+                                        photoReferences = nearbyPlacesList.get(i).getPhotos().get(0).getPhotoReference();
+                                    }
                                 }
                             }
 
@@ -403,7 +402,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Update Location UI
         //  updateLocationUI();
     }
-
 
 
     /**

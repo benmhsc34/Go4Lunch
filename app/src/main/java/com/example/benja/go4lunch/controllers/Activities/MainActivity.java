@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -309,6 +310,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -318,15 +320,36 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             //Declaring search edit text
             Toolbar theToolbar = findViewById(R.id.toolbar);
             AutoCompleteTextView searchEditText = theToolbar.findViewById(R.id.myEditText);
+
+            searchEditText.setOnTouchListener((v, event) -> {
+                final int DRAWABLE_RIGHT = 2;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (searchEditText.getRight() - searchEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        searchEditText.setText("");
+
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+
             if (searchEditText.getVisibility() == View.INVISIBLE) {
                 searchEditText.setVisibility(VISIBLE);
             } else {
                 searchEditText.setVisibility(INVISIBLE);
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 mgr.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
+                SharedPreferences mPrefs = this.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                mPrefs.edit().putString("searchInput", "").apply();
+                searchEditText.clearComposingText();
+                mUpdateList.updateList();
+
             }
         }
         return super.onOptionsItemSelected(item);
+        
     }
 
     @Override
@@ -380,6 +403,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
+        toggle.getDrawerArrowDrawable().setColor(Color.parseColor("#FFFFFF"));
         toggle.syncState();
     }
 

@@ -42,6 +42,7 @@
                     android:imeOptions="actionDone"
                     android:textCursorDrawable="@null"
                     android:inputType="text"
+                    android:drawableRight="@drawable/ic_clear_black_24dp"
                     android:hint="Search"
                     />
             </android.support.v7.widget.Toolbar>
