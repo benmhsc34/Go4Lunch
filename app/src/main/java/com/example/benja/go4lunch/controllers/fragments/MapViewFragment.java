@@ -32,6 +32,7 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
+import com.facebook.share.Share;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.Place;
@@ -137,6 +138,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
     public interface UpdateFrag {
         public void updatefrag();
+    }
+
+
+    public interface UpdateMapView {
+        public void updateMapView();
     }
 
     // Interface Object for use CallBack
@@ -278,7 +284,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
 
         Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(latitude + "," + longitude);
-        call.enqueue(new Callback<PlaceNearBySearch>() {
+       call.enqueue(new Callback<PlaceNearBySearch>() {
             @Override
             public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
                 PlaceNearBySearch articles = response.body();
@@ -296,8 +302,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                         for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
 
                             userSelectedRestaurant = userSnapshot.getString("restaurantName");
-                            Log.d("randomrandomnearby", nearbyPlace.getName());
-                            Log.d("randomrandomfirebase", userSelectedRestaurant + "");
 
                             if (userSelectedRestaurant != null) {
                                 if (userSelectedRestaurant.equals(nearbyPlace.getName())) {
@@ -332,11 +336,68 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             }
         });
 
+        ((MainActivity) getActivity()).updateMap(() -> call.clone().enqueue(new Callback<PlaceNearBySearch>() {
+            @Override
+            public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
+                PlaceNearBySearch articles = response.body();
+                List<PlaceNearBySearchResult> nearbyPlacesList = articles.getResults();
+
+                mMap.clear();
+                notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
+
+                    for (PlaceNearBySearchResult nearbyPlace : nearbyPlacesList) {
+
+                        SharedPreferences mPrefs = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                        String searchInput = mPrefs.getString("searchInput", "");
+
+                        if (nearbyPlace.getName().contains(searchInput)) {
+
+                            marker = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
+                        }
+                        for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
+
+                            userSelectedRestaurant = userSnapshot.getString("restaurantName");
+                            if (nearbyPlace.getName().contains(searchInput)) {
+
+                                if (userSelectedRestaurant != null) {
+                                    if (userSelectedRestaurant.equals(nearbyPlace.getName())) {
+                                        marker = mMap.addMarker(new MarkerOptions().position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
+                                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_green)));
+                                        break;
+                                    }
+                                }
+                            }
+
+                            for (int i = 0; i < nearbyPlacesList.size(); i++) {
+                                if (nearbyPlacesList.get(i).getName().equals(nearbyPlace.getName())) {
+                                    if (nearbyPlacesList.get(i).getPhotos() != null) {
+                                        photoReferences = nearbyPlacesList.get(i).getPhotos().get(0).getPhotoReference();
+                                    }
+                                }
+                            }
+
+                            marker.setTag(new MarkerObject(nearbyPlace.getAddress(), nearbyPlace.getName(), "https://maps.googleapis.com/maps/api/place/photo?"
+                                    + "maxwidth=2304"
+                                    + "&photoreference=" + photoReferences
+                                    + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", nearbyPlace.getPlaceId()));
+                        }
+                    }
+
+                });
+            }
+
+
+            @Override
+            public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
+
+            }
+        }));
+
 
         //Cute blue dot
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            Log.d("normallogstatment", "in");
 
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);

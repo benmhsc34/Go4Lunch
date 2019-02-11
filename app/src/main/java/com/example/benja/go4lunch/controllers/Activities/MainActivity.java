@@ -8,12 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
@@ -21,22 +19,16 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -45,23 +37,19 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.PagerAdapter;
 import com.example.benja.go4lunch.PlaceAutocompleteAdapter;
 import com.example.benja.go4lunch.R;
-import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
 import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.PlaceInfo;
-import com.example.benja.go4lunch.models.User;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
@@ -76,22 +64,13 @@ import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -156,6 +135,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mUpdateList = listener;
     }
 
+    MapViewFragment.UpdateMapView mUpdateMapView ;
+    public void updateMap(MapViewFragment.UpdateMapView listener) {
+        mUpdateMapView = listener;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,7 +188,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         searchEditText.setOnItemClickListener(mAutoCompleteClickListener);
         searchEditText.setAdapter(mPlaceAutocompleteAdapter);
 
-        //Make auto-suggestions and keyboard disapear when DONE button clicked
+        //Make auto-suggestions and keyboard disappear when DONE button clicked
         searchEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -212,6 +196,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 searchEditText.dismissDropDown();
                 mPreferences.edit().putString("searchInput", searchEditText.getText().toString()).apply();
                 mUpdateList.updateList();
+                mUpdateMapView.updateMapView();
 
             }
             return true;
@@ -307,9 +292,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-
-
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -320,14 +302,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             //Declaring search edit text
             Toolbar theToolbar = findViewById(R.id.toolbar);
             AutoCompleteTextView searchEditText = theToolbar.findViewById(R.id.myEditText);
-
+            searchEditText.getBackground().mutate().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
             searchEditText.setOnTouchListener((v, event) -> {
                 final int DRAWABLE_RIGHT = 2;
-
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (searchEditText.getRight() - searchEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
                         searchEditText.setText("");
-
                         return true;
                     }
                 }
@@ -335,16 +315,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             });
 
 
+
             if (searchEditText.getVisibility() == View.INVISIBLE) {
                 searchEditText.setVisibility(VISIBLE);
+                item.setIcon(R.drawable.ic_clear_white_24dp);
             } else {
                 searchEditText.setVisibility(INVISIBLE);
+                searchEditText.setText("");
                 InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 mgr.hideSoftInputFromWindow(searchEditText.getWindowToken(), 0);
                 SharedPreferences mPrefs = this.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
                 mPrefs.edit().putString("searchInput", "").apply();
                 searchEditText.clearComposingText();
+                item.setIcon(R.drawable.search_white);
                 mUpdateList.updateList();
+                mUpdateMapView.updateMapView();
 
             }
         }
@@ -661,6 +646,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             updatfrag.updatefrag();
             mPreferences.edit().putString("searchInput", place.getName() + "").apply();
             mUpdateList.updateList();
+            mUpdateMapView.updateMapView();
 
             places.release();
         }

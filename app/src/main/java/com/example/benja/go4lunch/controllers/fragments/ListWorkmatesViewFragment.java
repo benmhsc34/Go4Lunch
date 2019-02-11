@@ -124,7 +124,7 @@ public class ListWorkmatesViewFragment extends Fragment {
                 if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
                     if (model.getPicture() != null) {
                         if (model.getRestaurantName() != null) {
-                            holder.setUserName(getText(R.string.you_eating_at) + model.getRestaurantName());
+                            holder.setUserName(getText(R.string.you_eating_at)+ " " + model.getRestaurantName());
 
                             holder.setPicture(model.getPicture());
                         } else {
@@ -133,7 +133,7 @@ public class ListWorkmatesViewFragment extends Fragment {
                         }
                     } else {
                         if (model.getRestaurantName() != null) {
-                            holder.setUserName(getText(R.string.you_eating_at) + model.getRestaurantName());
+                            holder.setUserName(getText(R.string.you_eating_at) + " " + model.getRestaurantName());
                             holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
                         } else {
                             holder.setUserName((String) getText(R.string.you_havent));
@@ -144,11 +144,11 @@ public class ListWorkmatesViewFragment extends Fragment {
                 } else {
                     if (model.getPicture() != null) {
                         if (model.getRestaurantName() != null) {
-                            holder.setUserName(model.getUserName() + " " + getText(R.string.eating_at) + model.getRestaurantName());
+                            holder.setUserName(model.getUserName() + " " + getText(R.string.eating_at)+ " " + model.getRestaurantName());
 
                             holder.setPicture(model.getPicture());
                         } else {
-                            holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
+                            holder.setUserName(model.getUserName() + " " +getText(R.string.hasnt_decided));
                             holder.setPicture(model.getPicture());
                         }
                     } else {
