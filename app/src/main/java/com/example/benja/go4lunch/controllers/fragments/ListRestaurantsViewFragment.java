@@ -50,7 +50,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private List<Restaurant> restaurantList;
-    long numberOfLikes = 0;
+    Object numberOfLikes = 0;
     float numberOfPeople = 0;
     double averageLikes;
     ArrayList likeAverage = new ArrayList<>();
@@ -142,14 +142,14 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
                     mDocRef.get().addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-//                            numberOfLikes = (long) documentSnapshot.get("likes");
-                            Log.d("restooo", theListOfResults.get(number).getName() + "got " + numberOfLikes + " likes");
+                            numberOfLikes = documentSnapshot.get("likes");
+
                         }
                     });
 
                     SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
                     String searchInput = mPreferences.getString("searchInput", "");
-
+                    int yo = (int) numberOfLikes;
                     if (theListOfResults.get(i).getName().contains(searchInput)) {
                         if (theListOfResults.get(i).getOpeningHours() != null) {
                             Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
@@ -161,7 +161,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                             + "&photoreference=" + photoReferences
                                             + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
                                     theListOfResults.get(i).getPlaceId(),
-                                    numberOfLikes);
+                                    yo);
+                            Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
 
                             restaurantList.add(restaurantItem);
                         } else {
@@ -173,8 +174,10 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                             + "maxwidth=2304"
                                             + "&photoreference=" + photoReferences
                                             + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(i).getPlaceId(),
-                                    numberOfLikes);
+                                    yo);
                             restaurantList.add(restaurantItem);
+                            Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
+
                         }
                         adapter.notifyDataSetChanged();
                     }
@@ -223,12 +226,12 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(i).getName());
 
                     mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-//                            numberOfLikes = (long) documentSnapshot.get("likes");
-                            Log.d("restooo", theListOfResults.get(number).getName() + "got " + numberOfLikes + " likes");
+                        if (documentSnapshot != null) {
+                            numberOfLikes = documentSnapshot.get("likes");
+                          //  Log.d("restooo", theListOfResults.get(number).getName() + " got " + numberOfLikes + " likes");
                         }
                     });
-
+                    int yo = (int) numberOfLikes;
                     if (theListOfResults.get(i).getOpeningHours() != null) {
                         Restaurant restaurantItem = new Restaurant(theListOfResults.get(i).getName(),
                                 theListOfResults.get(i).getAddress(),
@@ -239,7 +242,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                         + "&photoreference=" + photoReferences
                                         + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
                                 theListOfResults.get(i).getPlaceId(),
-                                numberOfLikes);
+                                yo);
+                        Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
 
                         restaurantList.add(restaurantItem);
                     } else {
@@ -251,7 +255,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                         + "maxwidth=2304"
                                         + "&photoreference=" + photoReferences
                                         + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(i).getPlaceId(),
-                                numberOfLikes);
+                                yo);
+                        Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
                         restaurantList.add(restaurantItem);
                     }
                     adapter.notifyDataSetChanged();

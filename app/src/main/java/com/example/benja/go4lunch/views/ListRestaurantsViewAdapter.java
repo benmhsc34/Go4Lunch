@@ -100,9 +100,9 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             viewHolder.starThree.setVisibility(View.VISIBLE);
 
         }
-        int numberOfPeople = (int) restaurantItem.getNbrLikes();
+        int numberOfPeopleInt = (int) restaurantItem.getNbrLikes();
 
-        viewHolder.numberOfPeople.setText("(" + numberOfPeople + ")");
+        viewHolder.numberOfPeople.setText("(" + numberOfPeopleInt + ")");
 
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 
