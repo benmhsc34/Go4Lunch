@@ -3,7 +3,9 @@ package com.example.benja.go4lunch.controllers.Activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -463,19 +465,32 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 DocumentReference documentReference = FirebaseFirestore.getInstance().document("utilisateurs/" + this.getCurrentUser().getUid());
                 documentReference.get().addOnSuccessListener(documentSnapshot -> {
-                    String name = documentSnapshot.getString("restaurantName");
-                    String picture = documentSnapshot.getString("pictureRestaurant");
-                    String placeId = documentSnapshot.getString("placeId");
-                    String address = documentSnapshot.getString("address");
+                    if (documentSnapshot.getString("restaurantName") != null) {
+                        String name = documentSnapshot.getString("restaurantName");
+                        String picture = documentSnapshot.getString("pictureRestaurant");
+                        String placeId = documentSnapshot.getString("placeId");
+                        String address = documentSnapshot.getString("address");
 
-                    SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-                    mPreferences.edit().putString("name", name).apply();
-                    mPreferences.edit().putString("image", picture).apply();
-                    mPreferences.edit().putString("placeId", placeId).apply();
-                    mPreferences.edit().putString("address", address).apply();
+                        SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                        mPreferences.edit().putString("name", name).apply();
+                        mPreferences.edit().putString("image", picture).apply();
+                        mPreferences.edit().putString("placeId", placeId).apply();
+                        mPreferences.edit().putString("address", address).apply();
 
-                    Intent myRestaurantIntent = new Intent(this, RestaurantActivity.class);
-                    startActivity(myRestaurantIntent);
+                        Intent myRestaurantIntent = new Intent(this, RestaurantActivity.class);
+                        startActivity(myRestaurantIntent);
+                    } else {
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+                        builder1.setMessage("You haven't chosen a restaurant yet");
+                        builder1.setCancelable(true);
+
+                        builder1.setPositiveButton(
+                                "Ok",
+                                (dialog, id1) -> dialog.cancel());
+
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
+                    }
                 });
 
 
