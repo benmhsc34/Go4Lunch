@@ -35,6 +35,11 @@
     <string name="facebook_application_id" translatable="false">311621429564012</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb311621429564012</string>
 
+    <string name="twitter_consumer_key" translatable="false">5IyvMhlV9h6IkWXN6fxlBRyzm</string>
+    <string name="twitter_consumer_secret" translatable="false">hRpNADvKDvHPJiorcgrjPJf9Q3JHWjuyC0xLsKfHUG5DVTJpCV</string>
+
+
+
     <!-- BOTTOM NAVIGATION VIEW -->
     <string name="bottom_navigation_menu_map_view">Map</string>
     <string name="bottom_navigation_menu_list_view">Restaurants</string>

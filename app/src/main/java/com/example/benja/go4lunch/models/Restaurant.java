@@ -10,7 +10,7 @@ public class Restaurant {
     @Nullable private Boolean mOpeningTime;  // Opening time of Restaurant
     @Nullable private String mDistance;     // Distance where the restaurant is from the current position
 //    @Nullable private long mNbrParticipants;// Number of participants
-    private double mNbrLikes;        // Number of likes that the restaurant got
+    private Object mNbrLikes;        // Number of likes that the restaurant got
     @Nullable private String mPhotoUrl;     // URL of the Restaurant photo
     @Nullable private String mPlaceId;
 //    @Nullable private String mWebSiteUrl;   // URL of the Web site
@@ -20,7 +20,7 @@ public class Restaurant {
 //    @Nullable private String mPhone;        // Phone number to call the Restaurant
 
 
-    public Restaurant(String name, @Nullable String address, @Nullable Boolean openingTime, @Nullable String distance, @Nullable String photoUrl, @Nullable String placeId, double nbrLikes) {
+    public Restaurant(String name, @Nullable String address, @Nullable Boolean openingTime, @Nullable String distance, @Nullable String photoUrl, @Nullable String placeId, Object nbrLikes) {
         mName = name;
         mAddress = address;
         mOpeningTime = openingTime;
@@ -49,7 +49,7 @@ public class Restaurant {
         return mDistance;
     }
 
-    public double getNbrLikes() {
+    public Object getNbrLikes() {
         return mNbrLikes;
     }
 

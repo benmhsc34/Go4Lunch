@@ -121,7 +121,7 @@ public class ListWorkmatesViewFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
 
-                if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
                     if (model.getPicture() != null) {
                         if (model.getRestaurantName() != null) {
                             holder.setUserName(getText(R.string.you_eating_at)+ " " + model.getRestaurantName());

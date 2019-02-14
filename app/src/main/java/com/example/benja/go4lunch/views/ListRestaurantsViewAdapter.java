@@ -35,7 +35,6 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
     private List<Restaurant> restaurantList;
     private Context context;
     private OnItemClickListener mListener;
-    private float numberOfPeople = 0;
     private float averageLikes;
 
     public interface OnItemClickListener {
@@ -75,34 +74,32 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         }
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
 
-        float goldenState = (float) restaurantItem.getNbrLikes();
-        averageLikes = goldenState / numberOfPeople;
+        String floatResto = restaurantItem.getNbrLikes().toString();
+        int numberOfPeople = Integer.parseInt(floatResto);
 
-        if (averageLikes == 0.0) {
+
+        if (numberOfPeople == 1) {
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.INVISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
+        } else if (numberOfPeople == 2) {
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.VISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
+        } else if (numberOfPeople > 2) {
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.VISIBLE);
+            viewHolder.starThree.setVisibility(View.VISIBLE);
+        } else {
             viewHolder.starOne.setVisibility(View.INVISIBLE);
             viewHolder.starTwo.setVisibility(View.INVISIBLE);
             viewHolder.starThree.setVisibility(View.INVISIBLE);
 
         }
-        if (0.1 >= averageLikes) {
-            viewHolder.starOne.setVisibility(View.VISIBLE);
-            viewHolder.starTwo.setVisibility(View.INVISIBLE);
-            viewHolder.starThree.setVisibility(View.INVISIBLE);
 
-        } else if (0.4 >= averageLikes) {
-            viewHolder.starOne.setVisibility(View.VISIBLE);
-            viewHolder.starTwo.setVisibility(View.VISIBLE);
-            viewHolder.starThree.setVisibility(View.INVISIBLE);
-
-        } else {
-            viewHolder.starOne.setVisibility(View.VISIBLE);
-            viewHolder.starTwo.setVisibility(View.VISIBLE);
-            viewHolder.starThree.setVisibility(View.VISIBLE);
-
-        }
-        int numberOfPeopleInt = (int) restaurantItem.getNbrLikes();
-
-        viewHolder.numberOfPeople.setText("(" + numberOfPeopleInt + ")");
+        viewHolder.numberOfPeople.setText("(" + floatResto + ")");
 
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 

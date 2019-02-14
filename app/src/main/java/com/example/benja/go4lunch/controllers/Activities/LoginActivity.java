@@ -24,6 +24,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.twitter.sdk.android.core.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterConfig;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,7 +66,9 @@ public class LoginActivity extends BaseActivity {
         super.onResume();
         // 5 - Update UI when activity is resuming
     //    this.updateUIWhenResuming();
+
         FirebaseApp.initializeApp(this);
+     //   Twitter.initialize(this);
 
         Button connectionButton = findViewById(R.id.main_activity_button_login);
 
@@ -108,6 +113,7 @@ public class LoginActivity extends BaseActivity {
                         .setAvailableProviders(
                                 Arrays.asList(new AuthUI.IdpConfig.EmailBuilder().build(), //EMAIL
                                         new AuthUI.IdpConfig.GoogleBuilder().build(), // SUPPORT GOOGLE
+                                        new AuthUI.IdpConfig.TwitterBuilder().build(), //TWITTER
                                         new AuthUI.IdpConfig.FacebookBuilder().build())) // FACEBOOK
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.mainlogo)

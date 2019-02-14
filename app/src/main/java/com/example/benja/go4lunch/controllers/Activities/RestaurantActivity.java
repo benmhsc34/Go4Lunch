@@ -212,6 +212,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
                         mDocRef.update(updates);
                         mPreferences.edit().putInt("alreadyGoing", 0).apply();
+                        mPreferences.edit().putString("goingRestaurant", "").apply();
                     }
 
                 }

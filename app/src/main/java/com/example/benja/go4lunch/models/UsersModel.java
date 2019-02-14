@@ -3,6 +3,7 @@ package com.example.benja.go4lunch.models;
 public class UsersModel {
 
     private String userName;
+    private String email;
     private String picture;
     private String restaurantName;
     private String pictureRestaurant;
@@ -12,13 +13,14 @@ public class UsersModel {
     public UsersModel() {
     }
 
-    public UsersModel(String userName, String picture, String restaurantName, String pictureRestaurant, String address, String placeId) {
+    public UsersModel(String userName, String picture, String restaurantName, String pictureRestaurant, String address, String placeId, String email) {
         this.userName = userName;
         this.picture = picture;
         this.restaurantName = restaurantName;
         this.pictureRestaurant = pictureRestaurant;
         this.address = address;
         this.placeId = placeId;
+        this.email = email;
     }
 
     public String getPictureRestaurant() {
@@ -43,5 +45,9 @@ public class UsersModel {
 
     public String getPlaceId() {
         return placeId;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

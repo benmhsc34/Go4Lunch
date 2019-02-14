@@ -26,9 +26,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity android:name=".controllers.Activities.MainActivity" />
         <activity android:name=".controllers.Activities.RestaurantCardActivity" />
+
+
 
         <uses-library
             android:name="org.apache.http.legacy"
