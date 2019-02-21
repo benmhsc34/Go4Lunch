@@ -68,13 +68,13 @@ public class ExampleInstrumentedTest {
     @Test
     public void tabSwitch() {
         onView(withId(R.id.action_map_view)).perform(click()).check(matches(isSelected()));
-        SystemClock.sleep(800); //Need some time for the articles to load
+        SystemClock.sleep(800); //Need some time for the tabs to load
 
         onView(withId(R.id.action_list_view)).perform(click()).check(matches(isSelected()));
-        SystemClock.sleep(800); //Need some time for the articles to load
+        SystemClock.sleep(800); //Need some time for the tabs to load
 
         onView(withId(R.id.action_workmates)).perform(click()).check(matches(isSelected()));
-        SystemClock.sleep(800); //Need some time for the articles to load
+        SystemClock.sleep(800); //Need some time for the tabs to load
     }
 
     @Test

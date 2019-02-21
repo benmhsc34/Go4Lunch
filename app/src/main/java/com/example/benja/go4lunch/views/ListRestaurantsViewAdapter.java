@@ -96,7 +96,6 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             viewHolder.starOne.setVisibility(View.INVISIBLE);
             viewHolder.starTwo.setVisibility(View.INVISIBLE);
             viewHolder.starThree.setVisibility(View.INVISIBLE);
-
         }
 
         viewHolder.numberOfPeople.setText("(" + floatResto + ")");

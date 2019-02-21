@@ -83,14 +83,10 @@ public class RestaurantActivity extends AppCompatActivity {
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
-
-
-
 
         //Declaring different Views
         LinearLayout callButton = findViewById(R.id.callButton);
@@ -179,20 +175,24 @@ public class RestaurantActivity extends AppCompatActivity {
 
                         Map<String, Object> dataToSave = new HashMap<>();
                         dataToSave.put("restaurantName", name);
-                        mDocRef.set(dataToSave, SetOptions.merge());
+                        //   mDocRef.set(dataToSave, SetOptions.merge());
+                        notebookRef.document(currentFirebaseUser.getUid()).set(dataToSave, SetOptions.merge());
 
                         Map<String, Object> placeIdMap = new HashMap<>();
                         placeIdMap.put("placeId", placeId);
-                        mDocRef.set(placeIdMap, SetOptions.merge());
+//                        mDocRef.set(placeIdMap, SetOptions.merge());
+                        notebookRef.document(currentFirebaseUser.getUid()).set(placeIdMap, SetOptions.merge());
 
 
                         Map<String, Object> pictureMap = new HashMap<>();
                         pictureMap.put("pictureRestaurant", image);
-                        mDocRef.set(pictureMap, SetOptions.merge());
+//                        mDocRef.set(pictureMap, SetOptions.merge());
+                        notebookRef.document(currentFirebaseUser.getUid()).set(pictureMap, SetOptions.merge());
 
                         Map<String, Object> addressMap = new HashMap<>();
                         addressMap.put("address", address);
-                        mDocRef.set(addressMap, SetOptions.merge());
+//                        mDocRef.set(addressMap, SetOptions.merge());
+                        notebookRef.document(currentFirebaseUser.getUid()).set(addressMap, SetOptions.merge());
 
 
                         mPreferences.edit().putInt("alreadyGoing", 1).apply();
@@ -210,14 +210,16 @@ public class RestaurantActivity extends AppCompatActivity {
                         Map<String, Object> updates = new HashMap<>();
                         updates.put("restaurantName", FieldValue.delete());
 
-                        mDocRef.update(updates);
+//                        mDocRef.update(updates);
+                        notebookRef.document(currentFirebaseUser.getUid()).update(updates);
+
                         mPreferences.edit().putInt("alreadyGoing", 0).apply();
                         mPreferences.edit().putString("goingRestaurant", "").apply();
                     }
 
                 }
         );
-        mDocRef.get().addOnSuccessListener(documentSnapshot -> {
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 Object restosLiked = documentSnapshot.get("listTesting");
                 arrayList = (ArrayList) restosLiked;
@@ -234,55 +236,63 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-        notebookRef.get().addOnSuccessListener((queryDocumentSnapshots) -> {
-            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+//        notebookRef.get().addOnSuccessListener((queryDocumentSnapshots) -> {
+//            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+//
+//                Object listTesting = documentSnapshot.get("listTesting");
+//                likeAverage = (ArrayList) listTesting;
+//
+//                if (likeAverage != null) {
+//                    for (int i = 0; i < likeAverage.size(); i++) {
+//                        if (likeAverage.get(i).equals(name)) {
+//                            numberOfLikes++;
+//                        }
+//                    }
+//                }
 
-                Object listTesting = documentSnapshot.get("listTesting");
-                likeAverage = (ArrayList) listTesting;
+        //           }
 
-                if (likeAverage != null) {
-                    for (int i = 0; i < likeAverage.size(); i++) {
-                        if (likeAverage.get(i).equals(name)) {
-                            numberOfLikes++;
-                        }
-                    }
-                }
-                numberOfPeople++;
-
+        DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
+        mDocReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.get("likes") != null) {
+                String floatResto = documentSnapshot.get("likes").toString();
+                numberOfLikes = Integer.parseInt(floatResto);
+            } else {
+                numberOfLikes = 0;
             }
-            averageLikes = numberOfLikes / numberOfPeople;
-            Log.d("whatisitworth", averageLikes + "");
-            if (averageLikes == 0.0) {
+            Log.d("whatisitworth", numberOfLikes + "");
+            if (numberOfLikes == 3) {
                 starOne.setVisibility(View.INVISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
             }
-            if (0.1 >= averageLikes) {
+            if (numberOfLikes == 1) {
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
-            } else if (0.4 >= averageLikes) {
+            } else if (numberOfLikes == 2) {
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.VISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
             } else {
-                starOne.setVisibility(View.VISIBLE);
-                starTwo.setVisibility(View.VISIBLE);
-                starThree.setVisibility(View.VISIBLE);
+                starOne.setVisibility(View.INVISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
 
             }
-
         });
+
+
 
 
 
         likeButton.setOnClickListener(view -> {
             Log.d("whatshappening", "we click");
 
-            DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
+//            DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
 
 
             if (!like) {
@@ -301,7 +311,7 @@ public class RestaurantActivity extends AppCompatActivity {
                 mDocReference.set(dataToSave, SetOptions.merge());
 
 
-                mDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
 
                     if (documentSnapshot.exists()) {
                         Object restosLiked = documentSnapshot.get("listTesting");
@@ -317,7 +327,7 @@ public class RestaurantActivity extends AppCompatActivity {
                     }
                     Map<String, Object> arrayMapList = new HashMap<>();
                     arrayMapList.put("listTesting", arrayList);
-                    mDocRef.update(arrayMapList);
+                    notebookRef.document(currentFirebaseUser.getUid()).update(arrayMapList);
                 });
 
 
@@ -417,11 +427,11 @@ public class RestaurantActivity extends AppCompatActivity {
                     if (model.getRestaurantName().equals(name)) {
 
                         //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all about the details))
-                        if (model.getUserName().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+                        if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
 
                             if (model.getPicture() != null) {
-                                    holder.setUserName((String) getText(R.string.you_eating_here));
-                                    holder.setPicture(model.getPicture());
+                                holder.setUserName((String) getText(R.string.you_eating_here));
+                                holder.setPicture(model.getPicture());
 
                             } else {
                                 if (model.getRestaurantName() != null) {
@@ -441,7 +451,7 @@ public class RestaurantActivity extends AppCompatActivity {
                                 }
                             } else {
                                 if (model.getRestaurantName() != null) {
-                                    holder.setUserName(model.getUserName()  + " " + getText(R.string.eating_here));
+                                    holder.setUserName(model.getUserName() + " " + getText(R.string.eating_here));
                                     holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
                                 } else {
                                     holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
