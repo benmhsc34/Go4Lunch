@@ -150,9 +150,9 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
-        initialiseGoingToCurrentRestaurant();
+        initialiseGoingNotGoingStatus();
 
-        goingButton.setOnClickListener(view -> toggleGoingToCurrentRestaurant());
+        goingButton.setOnClickListener(view -> toggleGoingNotGoingStatus());
 
         DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
         mDocReference.get().addOnSuccessListener(documentSnapshot -> {
@@ -368,7 +368,7 @@ public class RestaurantActivity extends AppCompatActivity {
         }
     }
 
-    private void initialiseGoingToCurrentRestaurant() {
+    private void initialiseGoingNotGoingStatus() {
         notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -386,7 +386,7 @@ public class RestaurantActivity extends AppCompatActivity {
         });
     }
 
-    private void toggleGoingToCurrentRestaurant() {
+    private void toggleGoingNotGoingStatus() {
         notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
