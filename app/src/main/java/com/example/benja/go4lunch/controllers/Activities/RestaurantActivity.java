@@ -1,15 +1,13 @@
 package com.example.benja.go4lunch.controllers.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +22,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
-import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.models.UsersModel;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -42,19 +38,15 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,14 +66,23 @@ public class RestaurantActivity extends AppCompatActivity {
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
     ArrayList arrayList = new ArrayList<>();
     ArrayList likeAverage = new ArrayList<>();
-    Boolean like = false;
-    Boolean alreadyGoing = false;
+//    Boolean like = false;
+
     float numberOfLikes = 0;
     long likes = 0;
     float numberOfPeople = 0;
     float averageLikes;
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
 
+    private SharedPreferences mPreferences;
+    private String image;
+    private String name;
+    private String address;
+    private String placeId;
+    private String restaurantName;
+
+    //views
+    private Button goingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,16 +104,14 @@ public class RestaurantActivity extends AppCompatActivity {
         ImageView starTwo = findViewById(R.id.starTwo);
         ImageView starThree = findViewById(R.id.starThree);
 
-        Button goingButton = findViewById(R.id.goingButton);
-
+        goingButton = findViewById(R.id.goingButton);
 
         //Fetching data from SP
-        SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-        String image = mPreferences.getString("image", "A PICTURE OBVIOUSLY");
-        String name = mPreferences.getString("name", "Corben House");
-        String address = mPreferences.getString("address", "2290 Av.ALbert Einstein");
-        String placeId = mPreferences.getString("placeId", "A PLACE ID IDRK");
-        String restaurantName = mPreferences.getString("goingRestaurant", "something");
+        mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+        image = mPreferences.getString("image", "A PICTURE OBVIOUSLY");
+        name = mPreferences.getString("name", "Corben House");
+        address = mPreferences.getString("address", "2290 Av.ALbert Einstein");
+        placeId = mPreferences.getString("placeId", "A PLACE ID IDRK");
 
         //Setting data to respective Views
         restaurantNameTV.setText(name);
@@ -127,7 +126,6 @@ public class RestaurantActivity extends AppCompatActivity {
         Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
         Api api = retrofit.create(Api.class);
-
 
         Call<PlaceDetails> call1 = api.getPlaceDetails(placeId);
         call1.enqueue(new Callback<PlaceDetails>() {
@@ -158,83 +156,25 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
+        initialiseGoingToCurrentRestaurant();
 
-        if (restaurantName.equals(name)) {
-            goingButton.setText("✔");
-            goingButton.setTextColor(GREEN);
-            goingButton.setTextSize(25);
-            alreadyGoing = true;
-        }
+        goingButton.setOnClickListener(view -> toggleGoingToCurrentRestaurant());
 
-        goingButton.setOnClickListener(view -> {
-
-                    if (!(alreadyGoing)) {
-                        goingButton.setText("✔");
-                        goingButton.setTextColor(GREEN);
-                        goingButton.setTextSize(25);
-
-                        Map<String, Object> dataToSave = new HashMap<>();
-                        dataToSave.put("restaurantName", name);
-                        //   mDocRef.set(dataToSave, SetOptions.merge());
-                        notebookRef.document(currentFirebaseUser.getUid()).set(dataToSave, SetOptions.merge());
-
-                        Map<String, Object> placeIdMap = new HashMap<>();
-                        placeIdMap.put("placeId", placeId);
-//                        mDocRef.set(placeIdMap, SetOptions.merge());
-                        notebookRef.document(currentFirebaseUser.getUid()).set(placeIdMap, SetOptions.merge());
-
-
-                        Map<String, Object> pictureMap = new HashMap<>();
-                        pictureMap.put("pictureRestaurant", image);
-//                        mDocRef.set(pictureMap, SetOptions.merge());
-                        notebookRef.document(currentFirebaseUser.getUid()).set(pictureMap, SetOptions.merge());
-
-                        Map<String, Object> addressMap = new HashMap<>();
-                        addressMap.put("address", address);
-//                        mDocRef.set(addressMap, SetOptions.merge());
-                        notebookRef.document(currentFirebaseUser.getUid()).set(addressMap, SetOptions.merge());
-
-
-                        mPreferences.edit().putInt("alreadyGoing", 1).apply();
-                        mPreferences.edit().putString("goingRestaurant", name).apply();
-                        alreadyGoing = true;
-
-                    } else {
-                        goingButton.setText("Going?");
-                        goingButton.setTextColor(BLACK);
-                        goingButton.setTextSize(15);
-
-                        alreadyGoing = false;
-
-
-                        Map<String, Object> updates = new HashMap<>();
-                        updates.put("restaurantName", FieldValue.delete());
-
-//                        mDocRef.update(updates);
-                        notebookRef.document(currentFirebaseUser.getUid()).update(updates);
-
-                        mPreferences.edit().putInt("alreadyGoing", 0).apply();
-                        mPreferences.edit().putString("goingRestaurant", "").apply();
-                    }
-
-                }
-        );
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                Object restosLiked = documentSnapshot.get("listTesting");
-                arrayList = (ArrayList) restosLiked;
-                if (arrayList != null) {
-                    for (int i = 0; i < arrayList.size(); i++) {
-                        if (arrayList.get(i).equals(name)) {
-                            likePhotoIV.setImageResource(R.drawable.liked);
-                            likeTV.setText("LIKED");
-                            like = true;
-
-                        }
-                    }
-                }
-            }
-        });
+        //        notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+//            if (documentSnapshot.exists()) {
+//                Object restosLiked = documentSnapshot.get("listTesting");
+//                arrayList = (ArrayList) restosLiked;
+//                if (arrayList != null) {
+//                    for (int i = 0; i < arrayList.size(); i++) {
+//                        if (arrayList.get(i).equals(name)) {
+//                            likePhotoIV.setImageResource(R.drawable.liked);
+//                            likeTV.setText("LIKED");
+//                            like = true;
+//                        }
+//                    }
+//                }
+//            }
+//        });
 
 //        notebookRef.get().addOnSuccessListener((queryDocumentSnapshots) -> {
 //            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
@@ -255,29 +195,46 @@ public class RestaurantActivity extends AppCompatActivity {
         DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
         mDocReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.get("likes") != null) {
+                Log.d("testt", "likeButton: \"likes\" != null");
                 String floatResto = documentSnapshot.get("likes").toString();
                 numberOfLikes = Integer.parseInt(floatResto);
+
+                likePhotoIV.setImageResource(R.drawable.liked);
+                likeTV.setText("LIKED");
             } else {
+
+                Log.d("testt", "likeButton: \"likes\" = null");
+                Map<String, Object> newLikesField = new HashMap<>();
+                newLikesField.put("likes", 0);
+                mDocReference.set(newLikesField, SetOptions.merge());
                 numberOfLikes = 0;
+
+                likePhotoIV.setImageResource(R.drawable.like);
+                likeTV.setText("LIKE");
             }
             Log.d("whatisitworth", numberOfLikes + "");
             if (numberOfLikes == 3) {
+                Log.d("testt", "likeButton: likes = 3");
+
                 starOne.setVisibility(View.INVISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
             }
             if (numberOfLikes == 1) {
+                Log.d("testt", "likeButton: likes = 1");
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
             } else if (numberOfLikes == 2) {
+                Log.d("testt", "likeButton: likes = 2");
                 starOne.setVisibility(View.VISIBLE);
                 starTwo.setVisibility(View.VISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
 
             } else {
+                Log.d("testt", "likeButton: else");
                 starOne.setVisibility(View.INVISIBLE);
                 starTwo.setVisibility(View.INVISIBLE);
                 starThree.setVisibility(View.INVISIBLE);
@@ -285,8 +242,27 @@ public class RestaurantActivity extends AppCompatActivity {
             }
         });
 
+        //update listTesting on the basis of the updated like/unlike status
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
 
+            if (documentSnapshot.exists()) {
+                Object restosLiked = documentSnapshot.get("listTesting");
+                arrayList = (ArrayList) restosLiked;
+                if (arrayList.contains(name)) {
+                    Log.d("testt", "notebookRef removing");
+                    arrayList.remove(name);
+                } else {
+                    Log.d("testt", "notebookRef adding");
+                    arrayList.add(name);
+                }
+//                    like = true;
+            }
 
+            Map<String, Object> arrayMapList = new HashMap<>();
+            arrayMapList.put("listTesting", arrayList);
+//                notebookRef.document(currentFirebaseUser.getUid()).update(arrayMapList);
+            mDocRef.update(arrayMapList);
+        });
 
 
         likeButton.setOnClickListener(view -> {
@@ -294,94 +270,102 @@ public class RestaurantActivity extends AppCompatActivity {
 
 //            DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
 
+            Map<String, Object> dataToSave = new HashMap<>();
 
-            if (!like) {
-                likePhotoIV.setImageResource(R.drawable.liked);
-                likeTV.setText("LIKED");
+            //get current like/unlike status
+            mDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                Object restosLiked = documentSnapshot.get("listTesting");
+                arrayList = (ArrayList) restosLiked;
 
-                mDocReference.get().addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        likes = (long) documentSnapshot.get("likes");
+                final long[] likes = new long[1];
+
+                mDocReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(
+                        @Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e
+                    ) {
+                        Log.d("testt", "likeButton click onEvent");
+                        likes[0] = (long) documentSnapshot.get("likes");
                     }
                 });
 
-                Map<String, Object> dataToSave = new HashMap<>();
+                if (arrayList.contains(name)) {
+                    Log.d("testt", "likeButton click contains(name)");
+                    arrayList.remove(name);
+                    likePhotoIV.setImageResource(R.drawable.like);
+                    likeTV.setText("LIKE");
 
-                dataToSave.put("likes", likes + 1);
-                mDocReference.set(dataToSave, SetOptions.merge());
+                    Log.d("likes_false", likes[0] + "");
+                    dataToSave.put("likes", likes[0] - 1);
+                } else {
+                    Log.d("testt", "likeButton click doesn't contain(name)");
+                    arrayList.add(name);
+                    likePhotoIV.setImageResource(R.drawable.liked);
+                    likeTV.setText("LIKED");
 
+                    Log.d("likes_true", likes[0] + "");
+                    dataToSave.put("likes", likes[0] + 1);
+                }
+            });
 
-                notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+            //update like/unlike status
+            mDocReference.set(dataToSave, SetOptions.merge());
+            Map<String, Object> arrayMapList = new HashMap<>();
+            arrayMapList.put("listTesting", arrayList);
+//                notebookRef.document(currentFirebaseUser.getUid()).update(arrayMapList);
+            mDocRef.update(arrayMapList);
 
-                    if (documentSnapshot.exists()) {
-                        Object restosLiked = documentSnapshot.get("listTesting");
-                        arrayList = (ArrayList) restosLiked;
-                        arrayList.add(name);
-                        like = true;
-
-                    } else {
-                        arrayList.add(name);
-                        Log.d("whatshappening", "ADD");
-
-                        like = true;
-                    }
-                    Map<String, Object> arrayMapList = new HashMap<>();
-                    arrayMapList.put("listTesting", arrayList);
-                    notebookRef.document(currentFirebaseUser.getUid()).update(arrayMapList);
-                });
-
-
-            } else {
-                Log.d("whatshappening", "ELSE");
-
-                likePhotoIV.setImageResource(R.drawable.like);
-                likeTV.setText("LIKE");
-
-
-                mDocReference.get().addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        likes = (long) documentSnapshot.get("likes");
-                    }
-                });
-
-
-                Map<String, Object> dataToSave = new HashMap<>();
-                dataToSave.put("likes", likes - 1);
-                mDocReference.set(dataToSave, SetOptions.merge());
-
-
-                mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-
-                    Object restosLiked;
-                    if (documentSnapshot.exists()) {
-                        restosLiked = documentSnapshot.get("listTesting");
-
-                        arrayList = (ArrayList) restosLiked;
-                        if (arrayList != null) {
-                            for (int i = 0; i < arrayList.size(); i++) {
-                                if (arrayList.get(i).equals(name)) {
-                                    arrayList.remove(i);
-                                    Log.d("whatshappening", "remove");
-
-                                    like = false;
-
-                                }
-                                like = false;
-
-                            }
-                            like = false;
-
-                        }
-                        like = false;
-
-                    }
-                    Map<String, Object> arrayMapList = new HashMap<>();
-                    arrayMapList.put("listTesting", arrayList);
-                    mDocRef.update(arrayMapList);
-                });
-
-
-            }
+//            if (!like) {
+//                likePhotoIV.setImageResource(R.drawable.liked);
+//                likeTV.setText("LIKED");
+//
+//                mDocReference.get().addOnSuccessListener(documentSnapshot -> {
+//                    if (documentSnapshot.exists()) {
+//                        likes = (long) documentSnapshot.get("likes");
+//                    }
+//                });
+//
+//                Map<String, Object> dataToSave = new HashMap<>();
+//
+//                dataToSave.put("likes", likes + 1);
+//                mDocReference.set(dataToSave, SetOptions.merge());
+//
+//
+//            } else {
+//                Log.d("whatshappening", "ELSE");
+//
+//                mDocRef.get().addOnSuccessListener(documentSnapshot -> {
+//
+//                    Object restosLiked;
+//                    if (documentSnapshot.exists()) {
+//                        restosLiked = documentSnapshot.get("listTesting");
+//
+//                        arrayList = (ArrayList) restosLiked;
+//                        if (arrayList != null) {
+//                            for (int i = 0; i < arrayList.size(); i++) {
+//                                if (arrayList.get(i).equals(name)) {
+//                                    arrayList.remove(i);
+//                                    Log.d("whatshappening", "remove");
+//
+//                                    like = false;
+//
+//                                }
+//                                like = false;
+//
+//                            }
+//                            like = false;
+//
+//                        }
+//                        like = false;
+//
+//                    }
+//                    Map<String, Object> arrayMapList = new HashMap<>();
+//                    arrayMapList.put("listTesting", arrayList);
+//                    mDocRef.update(arrayMapList);
+//                });
+//
+//
+//            }
         });
 
         websiteButton.setOnClickListener(view -> {
@@ -480,7 +464,6 @@ public class RestaurantActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-
     private class UsersViewHolder extends RecyclerView.ViewHolder {
         private View view;
 
@@ -506,6 +489,105 @@ public class RestaurantActivity extends AppCompatActivity {
                     .apply(RequestOptions.circleCropTransform())
                     .into(imageView);
         }
+    }
+
+    private void initialiseGoingToCurrentRestaurant() {
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.contains("restaurantName") && document.get("restaurantName")
+                    .equals(name)) {
+                    Log.d("testt", "init going ui");
+                    updateToGoingUI();
+                } else {
+                    Log.d("testt", "init not-going ui");
+                    updateToNotGoingUI();
+                }
+            } else {
+                Log.d("testt", "get failed with ", task.getException());
+            }
+        });
+    }
+
+    private void toggleGoingToCurrentRestaurant() {
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists() && document.contains("restaurantName") && document.get("restaurantName")
+                    .equals(name)) {
+                    Log.d("testt", "toggle to not-going ui");
+                    markThisRestaurantAsNotGoing();
+                } else {
+                    Log.d("testt", "toggle to going ui");
+                    if (document != null) {
+                        Log.d("testt", "document not null");
+                        if (document.exists()) {
+                            Log.d("testt", "document exists");
+                            if (document.contains("restaurantName")) {
+                                Log.d("testt", "contains restaurant name");
+                                if (document.get("restaurantName").equals(name)) {
+                                    Log.d("testt", name);
+                                }
+                            }
+                        }
+                    }
+                    markThisRestaurantAsGoing();
+                }
+            } else {
+                Log.d("testt", "get failed with ", task.getException());
+            }
+        });
+    }
+
+    private void markThisRestaurantAsGoing() {
+        Map<String, Object> dataToSave = new HashMap<>();
+        dataToSave.put("restaurantName", name);
+        notebookRef.document(currentFirebaseUser.getUid()).set(dataToSave, SetOptions.merge());
+
+        Map<String, Object> placeIdMap = new HashMap<>();
+        placeIdMap.put("placeId", placeId);
+        notebookRef.document(currentFirebaseUser.getUid()).set(placeIdMap, SetOptions.merge());
+
+
+        Map<String, Object> pictureMap = new HashMap<>();
+        pictureMap.put("pictureRestaurant", image);
+        notebookRef.document(currentFirebaseUser.getUid()).set(pictureMap, SetOptions.merge());
+
+        Map<String, Object> addressMap = new HashMap<>();
+        addressMap.put("address", address);
+        notebookRef.document(currentFirebaseUser.getUid()).set(addressMap, SetOptions.merge());
+
+        mPreferences.edit().putInt("alreadyGoing", 1).apply();
+        mPreferences.edit().putString("goingRestaurant", name).apply();
+
+        updateToGoingUI();
+    }
+
+    private void markThisRestaurantAsNotGoing() {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("restaurantName", FieldValue.delete());
+        updates.put("placeId", FieldValue.delete());
+        updates.put("pictureRestaurant", FieldValue.delete());
+        updates.put("address", FieldValue.delete());
+
+        notebookRef.document(currentFirebaseUser.getUid()).update(updates);
+
+        mPreferences.edit().putInt("alreadyGoing", 0).apply();
+        mPreferences.edit().putString("goingRestaurant", "").apply();
+
+        updateToNotGoingUI();
+    }
+
+    private void updateToNotGoingUI() {
+        goingButton.setText("Going?");
+        goingButton.setTextColor(BLACK);
+        goingButton.setTextSize(15);
+    }
+
+    private void updateToGoingUI() {
+        goingButton.setText("✔");
+        goingButton.setTextColor(GREEN);
+        goingButton.setTextSize(25);
     }
 
     @Override
