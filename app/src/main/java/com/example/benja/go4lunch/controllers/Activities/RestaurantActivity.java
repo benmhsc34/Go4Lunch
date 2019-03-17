@@ -24,6 +24,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.models.UsersModel;
 import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.utils.Constants;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -404,51 +405,24 @@ public class RestaurantActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
 
+                String userPicture = model.getPicture();
+
                 //Avoid crash
-                if (model.getRestaurantName() != null) {
-
+                if (model.getRestaurantName() != null && model.getRestaurantName().equals(name)) {
                     //Check if user should be added to this Restaurant
-                    if (model.getRestaurantName().equals(name)) {
-
-                        //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all about the details))
-                        if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
-
-                            if (model.getPicture() != null) {
-                                holder.setUserName((String) getText(R.string.you_eating_here));
-                                holder.setPicture(model.getPicture());
-
-                            } else {
-                                if (model.getRestaurantName() != null) {
-                                    holder.setUserName((String) getText(R.string.you_eating_here));
-                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
-                                } else {
-                                    holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
-                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
-                                }
-                            }
-                        } else {
-
-                            if (model.getPicture() != null) {
-                                if (model.getRestaurantName() != null) {
-                                    holder.setUserName(model.getUserName() + " " + getText(R.string.eating_here));
-                                    holder.setPicture(model.getPicture());
-                                }
-                            } else {
-                                if (model.getRestaurantName() != null) {
-                                    holder.setUserName(model.getUserName() + " " + getText(R.string.eating_here));
-                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
-                                } else {
-                                    holder.setUserName(model.getUserName() + getText(R.string.hasnt_decided));
-                                    holder.setPicture("http://farrellaudiovideo.com/wp-content/uploads/2016/02/default-profile-pic.png");
-                                }
-                            }
-                        }
+                    holder.itemView.setVisibility(View.VISIBLE);
+                    //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all
+                    // about the details))
+                    if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
+                        holder.setUserName(getString(R.string.you_eating_here));
                     } else {
-                        holder.setPicture(null);
-                        holder.setUserName("You know I ain't broke ahh");
-                        holder.setHeight(0);
-
+                        holder.setUserName(model.getUserName() + " " + getString(R.string.eating_here));
                     }
+                    holder.setPicture(userPicture == null ? Constants.DEFAULT_PROFILE_PIC_URL : userPicture);
+                } else {
+                    holder.setPicture(null);
+                    holder.setUserName("You know I ain't broke ahh");
+                    holder.itemView.setVisibility(View.GONE);
                 }
             }
 
@@ -457,10 +431,10 @@ public class RestaurantActivity extends AppCompatActivity {
             @Override
             public UsersViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
                 View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.user_layout, viewGroup, false);
-
                 return new UsersViewHolder(view);
             }
         };
+
         recyclerView.setAdapter(adapter);
     }
 
@@ -519,18 +493,6 @@ public class RestaurantActivity extends AppCompatActivity {
                     markThisRestaurantAsNotGoing();
                 } else {
                     Log.d("testt", "toggle to going ui");
-                    if (document != null) {
-                        Log.d("testt", "document not null");
-                        if (document.exists()) {
-                            Log.d("testt", "document exists");
-                            if (document.contains("restaurantName")) {
-                                Log.d("testt", "contains restaurant name");
-                                if (document.get("restaurantName").equals(name)) {
-                                    Log.d("testt", name);
-                                }
-                            }
-                        }
-                    }
                     markThisRestaurantAsGoing();
                 }
             } else {
@@ -597,7 +559,6 @@ public class RestaurantActivity extends AppCompatActivity {
             adapter.startListening();
         }
     }
-
 
     @Override
     public void onStop() {
