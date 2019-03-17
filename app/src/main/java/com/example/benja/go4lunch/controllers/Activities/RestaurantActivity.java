@@ -61,18 +61,12 @@ public class RestaurantActivity extends AppCompatActivity {
 
     String thephoneNumber;
     String theWebsite = "";
-    //   String restaurantName = "initial";
     FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
     ArrayList arrayList = new ArrayList<>();
-    ArrayList likeAverage = new ArrayList<>();
-//    Boolean like = false;
 
     float numberOfLikes = 0;
-    long likes = 0;
-    float numberOfPeople = 0;
-    float averageLikes;
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
 
     private SharedPreferences mPreferences;
@@ -80,7 +74,6 @@ public class RestaurantActivity extends AppCompatActivity {
     private String name;
     private String address;
     private String placeId;
-    private String restaurantName;
 
     //views
     private Button goingButton;
@@ -161,38 +154,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
         goingButton.setOnClickListener(view -> toggleGoingToCurrentRestaurant());
 
-        //        notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-//            if (documentSnapshot.exists()) {
-//                Object restosLiked = documentSnapshot.get("listTesting");
-//                arrayList = (ArrayList) restosLiked;
-//                if (arrayList != null) {
-//                    for (int i = 0; i < arrayList.size(); i++) {
-//                        if (arrayList.get(i).equals(name)) {
-//                            likePhotoIV.setImageResource(R.drawable.liked);
-//                            likeTV.setText("LIKED");
-//                            like = true;
-//                        }
-//                    }
-//                }
-//            }
-//        });
-
-//        notebookRef.get().addOnSuccessListener((queryDocumentSnapshots) -> {
-//            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-//
-//                Object listTesting = documentSnapshot.get("listTesting");
-//                likeAverage = (ArrayList) listTesting;
-//
-//                if (likeAverage != null) {
-//                    for (int i = 0; i < likeAverage.size(); i++) {
-//                        if (likeAverage.get(i).equals(name)) {
-//                            numberOfLikes++;
-//                        }
-//                    }
-//                }
-
-        //           }
-
         DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
         mDocReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.get("likes") != null) {
@@ -245,7 +206,6 @@ public class RestaurantActivity extends AppCompatActivity {
 
         //update listTesting on the basis of the updated like/unlike status
         notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-
             if (documentSnapshot.exists()) {
                 Object restosLiked = documentSnapshot.get("listTesting");
                 arrayList = (ArrayList) restosLiked;
@@ -256,20 +216,16 @@ public class RestaurantActivity extends AppCompatActivity {
                     Log.d("testt", "notebookRef adding");
                     arrayList.add(name);
                 }
-//                    like = true;
             }
 
             Map<String, Object> arrayMapList = new HashMap<>();
             arrayMapList.put("listTesting", arrayList);
-//                notebookRef.document(currentFirebaseUser.getUid()).update(arrayMapList);
             mDocRef.update(arrayMapList);
         });
 
-
+        //TODO: Fix this in the same way as going/not-going
         likeButton.setOnClickListener(view -> {
             Log.d("whatshappening", "we click");
-
-//            DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
 
             Map<String, Object> dataToSave = new HashMap<>();
 
@@ -313,60 +269,7 @@ public class RestaurantActivity extends AppCompatActivity {
             mDocReference.set(dataToSave, SetOptions.merge());
             Map<String, Object> arrayMapList = new HashMap<>();
             arrayMapList.put("listTesting", arrayList);
-//                notebookRef.document(currentFirebaseUser.getUid()).update(arrayMapList);
             mDocRef.update(arrayMapList);
-
-//            if (!like) {
-//                likePhotoIV.setImageResource(R.drawable.liked);
-//                likeTV.setText("LIKED");
-//
-//                mDocReference.get().addOnSuccessListener(documentSnapshot -> {
-//                    if (documentSnapshot.exists()) {
-//                        likes = (long) documentSnapshot.get("likes");
-//                    }
-//                });
-//
-//                Map<String, Object> dataToSave = new HashMap<>();
-//
-//                dataToSave.put("likes", likes + 1);
-//                mDocReference.set(dataToSave, SetOptions.merge());
-//
-//
-//            } else {
-//                Log.d("whatshappening", "ELSE");
-//
-//                mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-//
-//                    Object restosLiked;
-//                    if (documentSnapshot.exists()) {
-//                        restosLiked = documentSnapshot.get("listTesting");
-//
-//                        arrayList = (ArrayList) restosLiked;
-//                        if (arrayList != null) {
-//                            for (int i = 0; i < arrayList.size(); i++) {
-//                                if (arrayList.get(i).equals(name)) {
-//                                    arrayList.remove(i);
-//                                    Log.d("whatshappening", "remove");
-//
-//                                    like = false;
-//
-//                                }
-//                                like = false;
-//
-//                            }
-//                            like = false;
-//
-//                        }
-//                        like = false;
-//
-//                    }
-//                    Map<String, Object> arrayMapList = new HashMap<>();
-//                    arrayMapList.put("listTesting", arrayList);
-//                    mDocRef.update(arrayMapList);
-//                });
-//
-//
-//            }
         });
 
         websiteButton.setOnClickListener(view -> {
