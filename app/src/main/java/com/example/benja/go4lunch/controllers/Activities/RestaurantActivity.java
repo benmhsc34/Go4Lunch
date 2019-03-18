@@ -29,6 +29,8 @@ import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -64,6 +66,7 @@ public class RestaurantActivity extends AppCompatActivity {
     FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
+    private CollectionReference restaurantRef = FirebaseFirestore.getInstance().collection("restaurants");
     ArrayList arrayList = new ArrayList<>();
 
     float numberOfLikes = 0;
@@ -78,6 +81,10 @@ public class RestaurantActivity extends AppCompatActivity {
     //views
     private Button goingButton;
 
+    //like/unlike
+    TextView likeTV;
+    ImageView likePhotoIV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,10 +97,10 @@ public class RestaurantActivity extends AppCompatActivity {
 
         TextView restaurantNameTV = findViewById(R.id.name);
         TextView addressTV = findViewById(R.id.address);
-        TextView likeTV = findViewById(R.id.likeText);
+        likeTV = findViewById(R.id.likeText);
 
         ImageView photoRestaurant = findViewById(R.id.picture);
-        ImageView likePhotoIV = findViewById(R.id.likeImageButton);
+        likePhotoIV = findViewById(R.id.likeImageButton);
         ImageView starOne = findViewById(R.id.starOne);
         ImageView starTwo = findViewById(R.id.starTwo);
         ImageView starThree = findViewById(R.id.starThree);
@@ -151,126 +158,63 @@ public class RestaurantActivity extends AppCompatActivity {
         });
 
         initialiseGoingNotGoingStatus();
+        initialiseLikeUnlikeGoingStats();
 
         goingButton.setOnClickListener(view -> toggleGoingNotGoingStatus());
 
-        DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
-        mDocReference.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.get("likes") != null) {
-                Log.d("testt", "likeButton: \"likes\" != null");
-                String floatResto = documentSnapshot.get("likes").toString();
-                numberOfLikes = Integer.parseInt(floatResto);
+//        DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
+//        mDocReference.get().addOnSuccessListener(documentSnapshot -> {
+//            if (documentSnapshot.get("likes") != null) {
+//                Log.d("testt", "likeButton: \"likes\" != null");
+//                String floatResto = documentSnapshot.get("likes").toString();
+//                numberOfLikes = Integer.parseInt(floatResto);
+//
+//                likePhotoIV.setImageResource(R.drawable.liked);
+//                likeTV.setText("LIKED");
+//            } else {
+//
+//                Log.d("testt", "likeButton: \"likes\" = null");
+//                Map<String, Object> newLikesField = new HashMap<>();
+//                newLikesField.put("likes", 0);
+//                mDocReference.set(newLikesField, SetOptions.merge());
+//                numberOfLikes = 0;
+//
+//                likePhotoIV.setImageResource(R.drawable.like);
+//                likeTV.setText("LIKE");
+//            }
+//            Log.d("whatisitworth", numberOfLikes + "");
+//            if (numberOfLikes == 3) {
+//                Log.d("testt", "likeButton: likes = 3");
+//
+//                starOne.setVisibility(View.INVISIBLE);
+//                starTwo.setVisibility(View.INVISIBLE);
+//                starThree.setVisibility(View.INVISIBLE);
+//
+//            }
+//            if (numberOfLikes == 1) {
+//                Log.d("testt", "likeButton: likes = 1");
+//                starOne.setVisibility(View.VISIBLE);
+//                starTwo.setVisibility(View.INVISIBLE);
+//                starThree.setVisibility(View.INVISIBLE);
+//
+//            } else if (numberOfLikes == 2) {
+//                Log.d("testt", "likeButton: likes = 2");
+//                starOne.setVisibility(View.VISIBLE);
+//                starTwo.setVisibility(View.VISIBLE);
+//                starThree.setVisibility(View.INVISIBLE);
+//
+//            } else {
+//                Log.d("testt", "likeButton: else");
+//                starOne.setVisibility(View.INVISIBLE);
+//                starTwo.setVisibility(View.INVISIBLE);
+//                starThree.setVisibility(View.INVISIBLE);
+//
+//            }
+//        });
 
-                likePhotoIV.setImageResource(R.drawable.liked);
-                likeTV.setText("LIKED");
-            } else {
-
-                Log.d("testt", "likeButton: \"likes\" = null");
-                Map<String, Object> newLikesField = new HashMap<>();
-                newLikesField.put("likes", 0);
-                mDocReference.set(newLikesField, SetOptions.merge());
-                numberOfLikes = 0;
-
-                likePhotoIV.setImageResource(R.drawable.like);
-                likeTV.setText("LIKE");
-            }
-            Log.d("whatisitworth", numberOfLikes + "");
-            if (numberOfLikes == 3) {
-                Log.d("testt", "likeButton: likes = 3");
-
-                starOne.setVisibility(View.INVISIBLE);
-                starTwo.setVisibility(View.INVISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            }
-            if (numberOfLikes == 1) {
-                Log.d("testt", "likeButton: likes = 1");
-                starOne.setVisibility(View.VISIBLE);
-                starTwo.setVisibility(View.INVISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            } else if (numberOfLikes == 2) {
-                Log.d("testt", "likeButton: likes = 2");
-                starOne.setVisibility(View.VISIBLE);
-                starTwo.setVisibility(View.VISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            } else {
-                Log.d("testt", "likeButton: else");
-                starOne.setVisibility(View.INVISIBLE);
-                starTwo.setVisibility(View.INVISIBLE);
-                starThree.setVisibility(View.INVISIBLE);
-
-            }
-        });
-
-        //update listTesting on the basis of the updated like/unlike status
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                Object restosLiked = documentSnapshot.get("listTesting");
-                arrayList = (ArrayList) restosLiked;
-                if (arrayList.contains(name)) {
-                    Log.d("testt", "notebookRef removing");
-                    arrayList.remove(name);
-                } else {
-                    Log.d("testt", "notebookRef adding");
-                    arrayList.add(name);
-                }
-            }
-
-            Map<String, Object> arrayMapList = new HashMap<>();
-            arrayMapList.put("listTesting", arrayList);
-            mDocRef.update(arrayMapList);
-        });
 
         //TODO: Fix this in the same way as going/not-going
-        likeButton.setOnClickListener(view -> {
-            Log.d("whatshappening", "we click");
-
-            Map<String, Object> dataToSave = new HashMap<>();
-
-            //get current like/unlike status
-            mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-                Object restosLiked = documentSnapshot.get("listTesting");
-                arrayList = (ArrayList) restosLiked;
-
-                final long[] likes = new long[1];
-
-                mDocReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(
-                        @Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e
-                    ) {
-                        Log.d("testt", "likeButton click onEvent");
-                        likes[0] = (long) documentSnapshot.get("likes");
-                    }
-                });
-
-                if (arrayList.contains(name)) {
-                    Log.d("testt", "likeButton click contains(name)");
-                    arrayList.remove(name);
-                    likePhotoIV.setImageResource(R.drawable.like);
-                    likeTV.setText("LIKE");
-
-                    Log.d("likes_false", likes[0] + "");
-                    dataToSave.put("likes", likes[0] - 1);
-                } else {
-                    Log.d("testt", "likeButton click doesn't contain(name)");
-                    arrayList.add(name);
-                    likePhotoIV.setImageResource(R.drawable.liked);
-                    likeTV.setText("LIKED");
-
-                    Log.d("likes_true", likes[0] + "");
-                    dataToSave.put("likes", likes[0] + 1);
-                }
-            });
-
-            //update like/unlike status
-            mDocReference.set(dataToSave, SetOptions.merge());
-            Map<String, Object> arrayMapList = new HashMap<>();
-            arrayMapList.put("listTesting", arrayList);
-            mDocRef.update(arrayMapList);
-        });
+        likeButton.setOnClickListener(v -> toggleLikeUnlikeStatus());
 
         websiteButton.setOnClickListener(view -> {
 
@@ -341,6 +285,7 @@ public class RestaurantActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
+
     private class UsersViewHolder extends RecyclerView.ViewHolder {
         private View view;
 
@@ -368,12 +313,32 @@ public class RestaurantActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (adapter != null) {
+            adapter.stopListening();
+        }
+    }
+
+
+    ///////////////////////////////////////// GOING / NOT GOING METHODS ////////////////////////////////////////////////////////
+
     private void initialiseGoingNotGoingStatus() {
         notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.contains("restaurantName") && document.get("restaurantName")
-                    .equals(name)) {
+                        .equals(name)) {
                     Log.d("testt", "init going ui");
                     updateToGoingUI();
                 } else {
@@ -391,7 +356,7 @@ public class RestaurantActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null && document.exists() && document.contains("restaurantName") && document.get("restaurantName")
-                    .equals(name)) {
+                        .equals(name)) {
                     Log.d("testt", "toggle to not-going ui");
                     markThisRestaurantAsNotGoing();
                 } else {
@@ -455,20 +420,135 @@ public class RestaurantActivity extends AppCompatActivity {
         goingButton.setTextSize(25);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (adapter != null) {
-            adapter.startListening();
-        }
+    ///////////////////////////////////////// LIKE / UNLIKE METHODS ////////////////////////////////////////////////////////
+
+
+    private void toggleLikeUnlikeStatus() {
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    ArrayList listTesting = (ArrayList) document.get("listTesting");
+                    if (listTesting.contains(name) && listTesting.contains(name)) {
+                        Log.d("testt", "init going ui");
+                        markThisRestaurantAsUnliked();
+                    } else {
+                        Log.d("testt", "init not-going ui");
+                        markThisRestaurantAsLiked();
+                    }
+                } else {
+                    Log.d("testt", "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
+    private void markThisRestaurantAsUnliked() {
 
-        if (adapter != null) {
-            adapter.stopListening();
-        }
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    ArrayList listTesting = (ArrayList) document.get("listTesting");
+                    for (int i = 0; i < listTesting.size(); i++) {
+                        if (listTesting.get(i).equals(name)) {
+                            listTesting.remove(i);
+                        }
+                    }
+
+                    Map<String, Object> dataToSave = new HashMap<>();
+                    dataToSave.put("listTesting", listTesting);
+                    notebookRef.document(currentFirebaseUser.getUid()).set(dataToSave, SetOptions.merge());
+                }
+            }
+        });
+
+        restaurantRef.document(name).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                long likes;
+                if (document != null && document.get("likes") != null) {
+                    likes = (long) document.get("likes");
+                } else {
+                    likes = 0L;
+                }
+
+                Map<String, Object> dataToSave = new HashMap<>();
+                dataToSave.put("likes", likes - 1);
+                restaurantRef.document(name).set(dataToSave, SetOptions.merge());
+            }
+
+        });
+
+        updateToUnlikeUI();
+
     }
+
+    private void markThisRestaurantAsLiked() {
+
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    ArrayList listTesting = (ArrayList) document.get("listTesting");
+                    listTesting.add(name);
+
+                    Map<String, Object> dataToSave = new HashMap<>();
+                    dataToSave.put("listTesting", listTesting);
+                    notebookRef.document(currentFirebaseUser.getUid()).set(dataToSave, SetOptions.merge());
+                }
+            }
+        });
+
+        restaurantRef.document(name).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                long likes;
+                if (document != null && document.get("likes") != null) {
+                    likes = (long) document.get("likes");
+                } else {
+                    likes = 0L;
+                }
+
+                Map<String, Object> dataToSave = new HashMap<>();
+                dataToSave.put("likes", likes + 1);
+                restaurantRef.document(name).set(dataToSave, SetOptions.merge());
+            }
+        });
+
+        updateToLikeUI();
+
+    }
+
+    private void initialiseLikeUnlikeGoingStats() {
+        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null) {
+                    ArrayList listTesting = (ArrayList) document.get("listTesting");
+                    if (listTesting.contains(name) && listTesting.contains(name)) {
+                        Log.d("testt", "init going ui");
+                        updateToLikeUI();
+                    } else {
+                        Log.d("testt", "init not-going ui");
+                        updateToUnlikeUI();
+                    }
+                } else {
+                    Log.d("testt", "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void updateToUnlikeUI() {
+        likePhotoIV.setImageResource(R.drawable.like);
+        likeTV.setText("LIKE");
+    }
+
+    private void updateToLikeUI() {
+        likePhotoIV.setImageResource(R.drawable.liked);
+        likeTV.setText("LIKED");
+    }
+
+
 }
