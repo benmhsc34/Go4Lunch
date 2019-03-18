@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +19,15 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 
@@ -35,7 +40,8 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
     private List<Restaurant> restaurantList;
     private Context context;
     private OnItemClickListener mListener;
-    private float averageLikes;
+    int numberOfLikes = 0;
+
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -74,31 +80,37 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         }
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
 
-        String floatResto = restaurantItem.getNbrLikes().toString();
-        int numberOfPeople = Integer.parseInt(floatResto);
+        numberOfLikes = (int) restaurantItem.getNbrLikes();
+        if (numberOfLikes == 3) {
+            Log.d("testt", "likeButton: likes = 3");
 
-
-        if (numberOfPeople == 1) {
-            viewHolder.starOne.setVisibility(View.VISIBLE);
-            viewHolder.starTwo.setVisibility(View.INVISIBLE);
-            viewHolder.starThree.setVisibility(View.INVISIBLE);
-
-        } else if (numberOfPeople == 2) {
-            viewHolder.starOne.setVisibility(View.VISIBLE);
-            viewHolder.starTwo.setVisibility(View.VISIBLE);
-            viewHolder.starThree.setVisibility(View.INVISIBLE);
-
-        } else if (numberOfPeople > 2) {
             viewHolder.starOne.setVisibility(View.VISIBLE);
             viewHolder.starTwo.setVisibility(View.VISIBLE);
             viewHolder.starThree.setVisibility(View.VISIBLE);
+
+
+        } else if (numberOfLikes == 1) {
+            Log.d("testt", "likeButton: likes = 1");
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.INVISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
+        } else if (numberOfLikes == 2) {
+            Log.d("testt", "likeButton: likes = 2");
+            viewHolder.starOne.setVisibility(View.VISIBLE);
+            viewHolder.starTwo.setVisibility(View.VISIBLE);
+            viewHolder.starThree.setVisibility(View.INVISIBLE);
+
         } else {
+            Log.d("testt", "likeButton: else");
             viewHolder.starOne.setVisibility(View.INVISIBLE);
             viewHolder.starTwo.setVisibility(View.INVISIBLE);
             viewHolder.starThree.setVisibility(View.INVISIBLE);
-        }
 
-        viewHolder.numberOfPeople.setText("(" + floatResto + ")");
+        }
+        int number = (int) numberOfLikes;
+        viewHolder.numberOfPeople.setText("(" + number + ")");
+
 
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
 

@@ -85,6 +85,11 @@ public class RestaurantActivity extends AppCompatActivity {
     TextView likeTV;
     ImageView likePhotoIV;
 
+    //star rating
+    ImageView starOne;
+    ImageView starTwo;
+    ImageView starThree;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,9 +106,9 @@ public class RestaurantActivity extends AppCompatActivity {
 
         ImageView photoRestaurant = findViewById(R.id.picture);
         likePhotoIV = findViewById(R.id.likeImageButton);
-        ImageView starOne = findViewById(R.id.starOne);
-        ImageView starTwo = findViewById(R.id.starTwo);
-        ImageView starThree = findViewById(R.id.starThree);
+        starOne = findViewById(R.id.starOne);
+        starTwo = findViewById(R.id.starTwo);
+        starThree = findViewById(R.id.starThree);
 
         goingButton = findViewById(R.id.goingButton);
 
@@ -159,58 +164,9 @@ public class RestaurantActivity extends AppCompatActivity {
 
         initialiseGoingNotGoingStatus();
         initialiseLikeUnlikeGoingStats();
+        setNumberOfStarsDisplayed();
 
         goingButton.setOnClickListener(view -> toggleGoingNotGoingStatus());
-
-//        DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
-//        mDocReference.get().addOnSuccessListener(documentSnapshot -> {
-//            if (documentSnapshot.get("likes") != null) {
-//                Log.d("testt", "likeButton: \"likes\" != null");
-//                String floatResto = documentSnapshot.get("likes").toString();
-//                numberOfLikes = Integer.parseInt(floatResto);
-//
-//                likePhotoIV.setImageResource(R.drawable.liked);
-//                likeTV.setText("LIKED");
-//            } else {
-//
-//                Log.d("testt", "likeButton: \"likes\" = null");
-//                Map<String, Object> newLikesField = new HashMap<>();
-//                newLikesField.put("likes", 0);
-//                mDocReference.set(newLikesField, SetOptions.merge());
-//                numberOfLikes = 0;
-//
-//                likePhotoIV.setImageResource(R.drawable.like);
-//                likeTV.setText("LIKE");
-//            }
-//            Log.d("whatisitworth", numberOfLikes + "");
-//            if (numberOfLikes == 3) {
-//                Log.d("testt", "likeButton: likes = 3");
-//
-//                starOne.setVisibility(View.INVISIBLE);
-//                starTwo.setVisibility(View.INVISIBLE);
-//                starThree.setVisibility(View.INVISIBLE);
-//
-//            }
-//            if (numberOfLikes == 1) {
-//                Log.d("testt", "likeButton: likes = 1");
-//                starOne.setVisibility(View.VISIBLE);
-//                starTwo.setVisibility(View.INVISIBLE);
-//                starThree.setVisibility(View.INVISIBLE);
-//
-//            } else if (numberOfLikes == 2) {
-//                Log.d("testt", "likeButton: likes = 2");
-//                starOne.setVisibility(View.VISIBLE);
-//                starTwo.setVisibility(View.VISIBLE);
-//                starThree.setVisibility(View.INVISIBLE);
-//
-//            } else {
-//                Log.d("testt", "likeButton: else");
-//                starOne.setVisibility(View.INVISIBLE);
-//                starTwo.setVisibility(View.INVISIBLE);
-//                starThree.setVisibility(View.INVISIBLE);
-//
-//            }
-//        });
 
 
         //TODO: Fix this in the same way as going/not-going
@@ -267,9 +223,8 @@ public class RestaurantActivity extends AppCompatActivity {
                     }
                     holder.setPicture(userPicture == null ? Constants.DEFAULT_PROFILE_PIC_URL : userPicture);
                 } else {
-                    holder.setPicture(null);
-                    holder.setUserName("You know I ain't broke ahh");
                     holder.itemView.setVisibility(View.GONE);
+
                 }
             }
 
@@ -551,4 +506,47 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
 
+    private void setNumberOfStarsDisplayed() {
+        DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
+        mDocReference.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.get("likes") != null) {
+                String stringResto = documentSnapshot.get("likes").toString();
+                numberOfLikes = Integer.parseInt(stringResto);
+
+            } else {
+
+                Map<String, Object> newLikesField = new HashMap<>();
+                newLikesField.put("likes", 0);
+                mDocReference.set(newLikesField, SetOptions.merge());
+                numberOfLikes = 0;
+            }
+
+            if (numberOfLikes == 3) {
+                Log.d("testt", "likeButton: likes = 3");
+
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.VISIBLE);
+                starThree.setVisibility(View.VISIBLE);
+
+            } else if (numberOfLikes == 1) {
+                Log.d("testt", "likeButton: likes = 1");
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            } else if (numberOfLikes == 2) {
+                Log.d("testt", "likeButton: likes = 2");
+                starOne.setVisibility(View.VISIBLE);
+                starTwo.setVisibility(View.VISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            } else {
+                Log.d("testt", "likeButton: else");
+                starOne.setVisibility(View.INVISIBLE);
+                starTwo.setVisibility(View.INVISIBLE);
+                starThree.setVisibility(View.INVISIBLE);
+
+            }
+        });
+    }
 }

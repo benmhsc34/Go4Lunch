@@ -27,9 +27,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -133,54 +136,60 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(i).getName());
 
                     int finalI = i;
-                    mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            numberOfLikes = documentSnapshot.get("likes");
-                            if (numberOfLikes == null){
+
+                    SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
+                    String searchInput = mPreferences.getString("searchInput", "");
+                    if (theListOfResults.get(finalI).getName().contains(searchInput)) {
+                        DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(finalI).getName());
+                        mDocReference.get().addOnSuccessListener(documentSnapshoty -> {
+                            if (documentSnapshoty.get("likes") != null) {
+                                String stringResto = documentSnapshoty.get("likes").toString();
+                                numberOfLikes = Integer.parseInt(stringResto);
+                            } else {
+
+                                Map<String, Object> newLikesField = new HashMap<>();
+                                newLikesField.put("likes", 0);
+                                mDocReference.set(newLikesField, SetOptions.merge());
                                 numberOfLikes = 0;
                             }
+
                             if (theListOfResults.get(finalI).getPhotos() != null) {
                                 photoReferences = theListOfResults.get(finalI).getPhotos().get(0).getPhotoReference();
                             } else {
                                 photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
                             }
-                            SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
-                            String searchInput = mPreferences.getString("searchInput", "");
-                            if (theListOfResults.get(finalI).getName().contains(searchInput)) {
-                                if (theListOfResults.get(finalI).getOpeningHours() != null) {
-                                    Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
-                                            theListOfResults.get(finalI).getAddress(),
-                                            theListOfResults.get(finalI).getOpeningHours().getOpenNow(),
-                                            distance + "m",
-                                            "https://maps.googleapis.com/maps/api/place/photo?"
-                                                    + "maxwidth=2304"
-                                                    + "&photoreference=" + photoReferences
-                                                    + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
-                                            theListOfResults.get(finalI).getPlaceId(),
-                                            numberOfLikes);
-                                    //       Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
 
-                                    restaurantList.add(restaurantItem);
-                                } else {
-                                    Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
-                                            theListOfResults.get(finalI).getAddress(),
-                                            false,
-                                            distance + "m",
-                                            "https://maps.googleapis.com/maps/api/place/photo?"
-                                                    + "maxwidth=2304"
-                                                    + "&photoreference=" + photoReferences
-                                                    + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(finalI).getPlaceId(),
-                                            numberOfLikes);
-                                    restaurantList.add(restaurantItem);
-                                    //      Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
+                            if (theListOfResults.get(finalI).getOpeningHours() != null) {
+                                Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
+                                        theListOfResults.get(finalI).getAddress(),
+                                        theListOfResults.get(finalI).getOpeningHours().getOpenNow(),
+                                        distance + "m",
+                                        "https://maps.googleapis.com/maps/api/place/photo?"
+                                                + "maxwidth=2304"
+                                                + "&photoreference=" + photoReferences
+                                                + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
+                                        theListOfResults.get(finalI).getPlaceId(), numberOfLikes
+                                );
+                                //    Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
 
-                                }
-                                adapter.notifyDataSetChanged();
+                                restaurantList.add(restaurantItem);
+                            } else {
+                                Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
+                                        theListOfResults.get(finalI).getAddress(),
+                                        false,
+                                        distance + "m",
+                                        "https://maps.googleapis.com/maps/api/place/photo?"
+                                                + "maxwidth=2304"
+                                                + "&photoreference=" + photoReferences
+                                                + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(finalI).getPlaceId(), numberOfLikes
+                                );
+                                //     Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
+                                restaurantList.add(restaurantItem);
                             }
-                        }
-                    });
-
-
+                            adapter.notifyDataSetChanged();
+                        });
+                    }
+                    adapter.notifyDataSetChanged();
                 }
             }
 
@@ -220,56 +229,59 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     DocumentReference mDocRef = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(i).getName());
 
                     int finalI = i;
-                    mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot != null) {
-                            numberOfLikes = documentSnapshot.get("likes");
-                            if (numberOfLikes == null) {
-                                numberOfLikes = 0;
-                            }
-
-                            if (theListOfResults.get(finalI).getPhotos() != null) {
-                                photoReferences = theListOfResults.get(finalI).getPhotos().get(0).getPhotoReference();
-                            } else {
-                                photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
-                            }
 
 
-                            if (theListOfResults.get(finalI).getOpeningHours() != null) {
-                                Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
-                                        theListOfResults.get(finalI).getAddress(),
-                                        theListOfResults.get(finalI).getOpeningHours().getOpenNow(),
-                                        distance + "m",
-                                        "https://maps.googleapis.com/maps/api/place/photo?"
-                                                + "maxwidth=2304"
-                                                + "&photoreference=" + photoReferences
-                                                + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
-                                        theListOfResults.get(finalI).getPlaceId(),
-                                        numberOfLikes);
-                                //    Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
+                    DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(finalI).getName());
+                    mDocReference.get().addOnSuccessListener(documentSnapshoty -> {
+                        if (documentSnapshoty.get("likes") != null) {
+                            String stringResto = documentSnapshoty.get("likes").toString();
+                            numberOfLikes = Integer.parseInt(stringResto);
+                        } else {
 
-                                restaurantList.add(restaurantItem);
-                            } else {
-                                Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
-                                        theListOfResults.get(finalI).getAddress(),
-                                        false,
-                                        distance + "m",
-                                        "https://maps.googleapis.com/maps/api/place/photo?"
-                                                + "maxwidth=2304"
-                                                + "&photoreference=" + photoReferences
-                                                + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(finalI).getPlaceId(),
-                                        numberOfLikes);
-                                //     Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
-                                restaurantList.add(restaurantItem);
-                            }
-                            adapter.notifyDataSetChanged();
+                            Map<String, Object> newLikesField = new HashMap<>();
+                            newLikesField.put("likes", 0);
+                            mDocReference.set(newLikesField, SetOptions.merge());
+                            numberOfLikes = 0;
+                        }
 
+                        if (theListOfResults.get(finalI).getPhotos() != null) {
+                            photoReferences = theListOfResults.get(finalI).getPhotos().get(0).getPhotoReference();
+                        } else {
+                            photoReferences = "CmRaAAAA0-j6NJjMJf_0-AXUEIl2CFiU1djE4V5inVAiHFXafJILjxZiLLisEdQDx_m9133Pbe2TWPJ_KVhyTQSHW_4J_LmkGKmgwoTphY9Ul1vO8dbd4oFXbzb8zEz7eK751glhEhBLRvmxTtdf6gOhkX2Y9_4IGhSbVmaZ8vWI3o3oVrzjGehz6Ck1zA";
+                        }
+
+                        if (theListOfResults.get(finalI).getOpeningHours() != null) {
+                            Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
+                                    theListOfResults.get(finalI).getAddress(),
+                                    theListOfResults.get(finalI).getOpeningHours().getOpenNow(),
+                                    distance + "m",
+                                    "https://maps.googleapis.com/maps/api/place/photo?"
+                                            + "maxwidth=2304"
+                                            + "&photoreference=" + photoReferences
+                                            + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
+                                    theListOfResults.get(finalI).getPlaceId(), numberOfLikes
+                            );
+                            //    Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
+
+                            restaurantList.add(restaurantItem);
+                        } else {
+                            Restaurant restaurantItem = new Restaurant(theListOfResults.get(finalI).getName(),
+                                    theListOfResults.get(finalI).getAddress(),
+                                    false,
+                                    distance + "m",
+                                    "https://maps.googleapis.com/maps/api/place/photo?"
+                                            + "maxwidth=2304"
+                                            + "&photoreference=" + photoReferences
+                                            + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(finalI).getPlaceId(), numberOfLikes
+                            );
+                            //     Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
+                            restaurantList.add(restaurantItem);
                         }
                         adapter.notifyDataSetChanged();
-
                     });
-
-
                 }
+                adapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -287,6 +299,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
     public interface UpdateList {
         public void updateList();
+
     }
 
     double latitude;
