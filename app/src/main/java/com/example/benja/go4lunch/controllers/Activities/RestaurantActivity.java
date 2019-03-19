@@ -78,6 +78,8 @@ public class RestaurantActivity extends AppCompatActivity {
     private String address;
     private String placeId;
 
+    TextView textView;
+
     //views
     private Button goingButton;
 
@@ -223,8 +225,10 @@ public class RestaurantActivity extends AppCompatActivity {
                     }
                     holder.setPicture(userPicture == null ? Constants.DEFAULT_PROFILE_PIC_URL : userPicture);
                 } else {
-                    holder.itemView.setVisibility(View.GONE);
-
+                    holder.setUserName("ya");
+                    if (holder.getUserName().equals("ya")) {
+                        holder.view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 0));
+                    }
                 }
             }
 
@@ -250,8 +254,13 @@ public class RestaurantActivity extends AppCompatActivity {
         }
 
         void setUserName(String userName) {
-            TextView textView = view.findViewById(R.id.userNameTV);
+            textView = view.findViewById(R.id.userNameTV);
             textView.setText(userName);
+        }
+
+        String getUserName() {
+            textView = view.findViewById(R.id.userNameTV);
+            return textView.getText().toString();
         }
 
         void setHeight(int height) {
