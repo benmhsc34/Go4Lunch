@@ -77,14 +77,20 @@ public class ListWorkmatesViewFragment extends Fragment {
 
             RelativeLayout relativeLayout = view.findViewById(R.id.relativeLayout);
             relativeLayout.setOnClickListener(view -> {
-                SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
-                mPreferences.edit().putString("image", restaurantPicture).apply();
-                mPreferences.edit().putString("name", restaurantName).apply();
-                mPreferences.edit().putString("placeId", placeId).apply();
-                mPreferences.edit().putString("address", address).apply();
 
-                Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
-                startActivity(myIntent);
+                if (restaurantPicture != null) {
+                    SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
+                    mPreferences.edit().putString("image", restaurantPicture).apply();
+                    mPreferences.edit().putString("name", restaurantName).apply();
+                    mPreferences.edit().putString("placeId", placeId).apply();
+                    mPreferences.edit().putString("address", address).apply();
+
+                    Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
+                    startActivity(myIntent);
+                } else {
+
+                    Toast.makeText(getContext(), "No restaurants selected yet", Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }
@@ -124,7 +130,7 @@ public class ListWorkmatesViewFragment extends Fragment {
                 if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
                     if (model.getPicture() != null) {
                         if (model.getRestaurantName() != null) {
-                            holder.setUserName(getText(R.string.you_eating_at)+ " " + model.getRestaurantName());
+                            holder.setUserName(getText(R.string.you_eating_at) + " " + model.getRestaurantName());
 
                             holder.setPicture(model.getPicture());
                         } else {
@@ -144,11 +150,11 @@ public class ListWorkmatesViewFragment extends Fragment {
                 } else {
                     if (model.getPicture() != null) {
                         if (model.getRestaurantName() != null) {
-                            holder.setUserName(model.getUserName() + " " + getText(R.string.eating_at)+ " " + model.getRestaurantName());
+                            holder.setUserName(model.getUserName() + " " + getText(R.string.eating_at) + " " + model.getRestaurantName());
 
                             holder.setPicture(model.getPicture());
                         } else {
-                            holder.setUserName(model.getUserName() + " " +getText(R.string.hasnt_decided));
+                            holder.setUserName(model.getUserName() + " " + getText(R.string.hasnt_decided));
                             holder.setPicture(model.getPicture());
                         }
                     } else {
