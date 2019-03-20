@@ -3,10 +3,15 @@ package com.example.benja.go4lunch;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
+import com.example.benja.go4lunch.controllers.Activities.MainActivity;
+import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -17,6 +22,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -30,8 +36,10 @@ public class FirebaseCloudMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         showNotification();
-
     }
+
+    
+
 
     private void showNotification() {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -65,10 +73,16 @@ public class FirebaseCloudMessagingService extends FirebaseMessagingService {
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
                         .setContentText("with " + coworkersComing.toString().replace("[", "").replace("]", ""));
 
+                notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0,
+                        new Intent(this, RestaurantActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
+
                 notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+
+
             }
         }));
     }
+
 
     @Override
     public void onNewToken(String s) {
