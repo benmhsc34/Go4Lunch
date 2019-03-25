@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.benja.go4lunch.R;
@@ -18,21 +17,18 @@ import com.example.benja.go4lunch.base.BaseFragment;
 import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.utils.Api;
-import com.example.benja.go4lunch.utils.PlaceDetails;
-import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ListRestaurantsViewAdapter;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,33 +36,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+@SuppressWarnings("ALL")
 public class ListRestaurantsViewFragment extends BaseFragment {
 
-
-    // Adding @BindView in order to indicate to ButterKnife to get & serialise it
-//    @BindView(R.id.fragment_list_restaurant_view_recycler_view)
-    RecyclerView mRecyclerView;
-
-    // View of the Fragment
-    private View mListView;
 
     private RecyclerView.Adapter adapter;
     private List<Restaurant> restaurantList;
     private Object numberOfLikes = 0;
-    float numberOfPeople = 0;
-    double averageLikes;
-    ArrayList likeAverage = new ArrayList<>();
-    int number;
 
-
-    private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
 
     private String photoReferences;
-    String phoneNumber;
-    String website;
-
-    // Declare Adapter of the RecyclerView
-    private ListRestaurantsViewAdapter mAdapter;
 
     @SuppressLint("ValidFragment")
     private ListRestaurantsViewFragment() {
@@ -104,7 +83,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
         recyclerView.setAdapter(adapter);
 
 
-        ((MainActivity) getActivity()).updateList(() -> call.clone().enqueue(new Callback<PlaceNearBySearch>() {
+        ((MainActivity) Objects.requireNonNull(getActivity())).updateList(() -> call.clone().enqueue(new Callback<PlaceNearBySearch>() {
             @Override
             public void onResponse(Call<PlaceNearBySearch> call1, Response<PlaceNearBySearch> response) {
                 PlaceNearBySearch articles = response.body();
@@ -136,13 +115,13 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
                     int finalI = i;
 
-                    SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
+                    SharedPreferences mPreferences = Objects.requireNonNull(getContext()).getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
                     String searchInput = mPreferences.getString("searchInput", "");
-                    if (theListOfResults.get(finalI).getName().contains(searchInput)) {
+                    if (theListOfResults.get(finalI).getName().contains(Objects.requireNonNull(searchInput))) {
                         DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(finalI).getName());
                         mDocReference.get().addOnSuccessListener(documentSnapshoty -> {
                             if (documentSnapshoty.get("likes") != null) {
-                                String stringResto = documentSnapshoty.get("likes").toString();
+                                String stringResto = Objects.requireNonNull(documentSnapshoty.get("likes")).toString();
                                 numberOfLikes = Integer.parseInt(stringResto);
                             } else {
 
@@ -233,7 +212,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                     DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + theListOfResults.get(finalI).getName());
                     mDocReference.get().addOnSuccessListener(documentSnapshoty -> {
                         if (documentSnapshoty.get("likes") != null) {
-                            String stringResto = documentSnapshoty.get("likes").toString();
+                            String stringResto = Objects.requireNonNull(documentSnapshoty.get("likes")).toString();
                             numberOfLikes = Integer.parseInt(stringResto);
                         } else {
 
@@ -308,8 +287,8 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     public void onAttach(Context context) {
 
         SharedPreferences preferences = context.getSharedPreferences("PREFERENCE_KEY_NAME", 0);
-        latitude = Double.valueOf(preferences.getString("locationLatitude", "0"));
-        longitude = Double.valueOf(preferences.getString("locationLongitude", "0"));
+        latitude = Double.valueOf(Objects.requireNonNull(preferences.getString("locationLatitude", "0")));
+        longitude = Double.valueOf(Objects.requireNonNull(preferences.getString("locationLongitude", "0")));
 
         super.onAttach(context);
     }

@@ -3,6 +3,7 @@ package com.example.benja.go4lunch.utils;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 public class PlaceDetails {
 
     @SerializedName("result")

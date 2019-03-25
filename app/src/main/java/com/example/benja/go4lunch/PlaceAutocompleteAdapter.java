@@ -13,7 +13,6 @@ import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.data.DataBufferUtils;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.AutocompletePrediction;
@@ -25,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -34,6 +34,7 @@ import java.util.concurrent.TimeoutException;
  * {@link AutocompletePrediction} results from the API are frozen and stored directly in this
  * adapter. (See {@link AutocompletePrediction#freeze()}.)
  */
+@SuppressWarnings("ALL")
 public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePrediction> implements Filterable {
 
     private static final String TAG = "PlaceAutocompleteAd";
@@ -51,7 +52,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
     /**
      * The bounds used for Places Geo Data autocomplete API requests.
      */
-    private LatLngBounds mBounds;
+    private final LatLngBounds mBounds;
 
     /**
      * The autocomplete filter used to restrict queries to a specific set of place types.
@@ -69,13 +70,6 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
         mGeoDataClient = geoDataClient;
         mBounds = bounds;
         mPlaceFilter = filter;
-    }
-
-    /**
-     * Sets the bounds for all subsequent queries.
-     */
-    public void setBounds(LatLngBounds bounds) {
-        mBounds = bounds;
     }
 
     /**
@@ -104,9 +98,9 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
 
         AutocompletePrediction item = getItem(position);
 
-        TextView textView1 = (TextView) row.findViewById(android.R.id.text1);
-        TextView textView2 = (TextView) row.findViewById(android.R.id.text2);
-        textView1.setText(item.getPrimaryText(STYLE_BOLD));
+        TextView textView1 = row.findViewById(android.R.id.text1);
+        TextView textView2 = row.findViewById(android.R.id.text2);
+        textView1.setText(Objects.requireNonNull(item).getPrimaryText(STYLE_BOLD));
         textView2.setText(item.getSecondaryText(STYLE_BOLD));
 
         return row;
@@ -202,7 +196,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
         try {
             AutocompletePredictionBufferResponse autocompletePredictions = results.getResult();
 
-            Log.i(TAG, "Query completed. Received " + autocompletePredictions.getCount()
+            Log.i(TAG, "Query completed. Received " + Objects.requireNonNull(autocompletePredictions).getCount()
                     + " predictions.");
 
             // Freeze the results immutable representation that can be stored safely.

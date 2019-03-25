@@ -6,10 +6,10 @@ import com.google.gson.annotations.SerializedName;
 public class Location {
     @SerializedName("lat")
     @Expose
-    private Double lat;
+    private final Double lat;
     @SerializedName("lng")
     @Expose
-    private Double lng;
+    private final Double lng;
 
     public Location(Double lat, Double lng) {
         this.lat = lat;
@@ -20,15 +20,8 @@ public class Location {
         return lat;
     }
 
-    public void setLat(Double lat) {
-        this.lat = lat;
-    }
-
     public Double getLng() {
         return lng;
     }
 
-    public void setLng(Double lng) {
-        this.lng = lng;
-    }
 }

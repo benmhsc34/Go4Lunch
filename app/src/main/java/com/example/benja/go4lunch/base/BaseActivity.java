@@ -1,11 +1,8 @@
 package com.example.benja.go4lunch.base;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
 
@@ -36,18 +33,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    // Force to implement those methods
-    protected abstract View getCoordinatorLayout(); // Layout of the CoordinatorLayout of the Child Activity
     protected abstract int getFragmentLayout();
 
     // --------------------
     // UI
     // --------------------
-
-    protected void configureToolbar(){
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-    }
 
     // ---------------------------------------------------------------------------------------------
     //                                        PERMISSIONS
@@ -57,22 +47,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
-    // Check if current user is logged in
-    protected Boolean isCurrentUserLogged(){
-        return (this.getCurrentUser() != null);
-    }
-
     // ---------------------------------------------------------------------------------------------
     //                                       ERROR HANDLER
     // ---------------------------------------------------------------------------------------------
     protected OnFailureListener onFailureListener(){
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(BaseActivity.this.getApplicationContext(),
-                        BaseActivity.this.getString(R.string.error_unknown_error),
-                        Toast.LENGTH_LONG).show();
-            }
-        };
+        return e -> Toast.makeText(BaseActivity.this.getApplicationContext(),
+                BaseActivity.this.getString(R.string.error_unknown_error),
+                Toast.LENGTH_LONG).show();
     }
 }

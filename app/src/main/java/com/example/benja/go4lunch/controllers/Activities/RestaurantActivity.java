@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,17 +28,13 @@ import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
@@ -47,8 +42,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.annotation.Nullable;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,15 +53,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.GREEN;
 
+@SuppressWarnings("unchecked")
 public class RestaurantActivity extends AppCompatActivity {
 
     private String thephoneNumber;
     private String theWebsite = "";
     private final FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-    private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
     private final CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
     private final CollectionReference restaurantRef = FirebaseFirestore.getInstance().collection("restaurants");
-    ArrayList arrayList = new ArrayList<>();
 
     private float numberOfLikes = 0;
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
@@ -77,8 +70,6 @@ public class RestaurantActivity extends AppCompatActivity {
     private String name;
     private String address;
     private String placeId;
-
-    private TextView textView;
 
     //views
     private Button goingButton;
@@ -213,22 +204,25 @@ public class RestaurantActivity extends AppCompatActivity {
                 String userPicture = model.getPicture();
 
                 //Avoid crash
+                //noinspection StatementWithEmptyBody
                 if (model.getRestaurantName() != null && model.getRestaurantName().equals(name)) {
                     //Check if user should be added to this Restaurant
                     holder.itemView.setVisibility(View.VISIBLE);
                     //See if the user is the current user (in that case use 2nd person instead of 3rd (it's all
                     // about the details))
-                    if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
+                    if (model.getEmail().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail())) {
                         holder.setUserName(getString(R.string.you_eating_here));
                     } else {
                         holder.setUserName(model.getUserName() + " " + getString(R.string.eating_here));
                     }
                     holder.setPicture(userPicture == null ? Constants.DEFAULT_PROFILE_PIC_URL : userPicture);
+                        holder.view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
                 } else {
-//                    holder.setUserName("ya");
-//                    if (holder.getUserName().equals("ya")) {
-//                        holder.view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 0));
-//                    }
+                    holder.setUserName("ya");
+                    if (holder.getUserName().equals("ya")) {
+                        holder.view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 0));
+                    }
                 }
             }
 
@@ -254,18 +248,13 @@ public class RestaurantActivity extends AppCompatActivity {
         }
 
         void setUserName(String userName) {
-            textView = view.findViewById(R.id.userNameTV);
+            TextView textView = view.findViewById(R.id.userNameTV);
             textView.setText(userName);
         }
 
-        String getUserName() {
-            textView = view.findViewById(R.id.userNameTV);
+        String getUserName(){
+            TextView textView = view.findViewById(R.id.userNameTV);
             return textView.getText().toString();
-        }
-
-        void setHeight(int height) {
-            RelativeLayout relativeLayout = view.findViewById(R.id.relativeLayout);
-            relativeLayout.getLayoutParams().height = height;
         }
 
         void setPicture(String picture) {
@@ -298,10 +287,10 @@ public class RestaurantActivity extends AppCompatActivity {
     ///////////////////////////////////////// GOING / NOT GOING METHODS ////////////////////////////////////////////////////////
 
     private void initialiseGoingNotGoingStatus() {
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if (document != null && document.contains("restaurantName") && document.get("restaurantName")
+                if (document != null && document.contains("restaurantName") && Objects.requireNonNull(document.get("restaurantName"))
                         .equals(name)) {
                     Log.d("testt", "init going ui");
                     updateToGoingUI();
@@ -316,10 +305,10 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void toggleGoingNotGoingStatus() {
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists() && document.contains("restaurantName") && document.get("restaurantName")
+                if (document != null && document.exists() && document.contains("restaurantName") && Objects.requireNonNull(document.get("restaurantName"))
                         .equals(name)) {
                     Log.d("testt", "toggle to not-going ui");
                     markThisRestaurantAsNotGoing();
@@ -336,7 +325,7 @@ public class RestaurantActivity extends AppCompatActivity {
     private void markThisRestaurantAsGoing() {
         Map<String, Object> dataToSave = new HashMap<>();
         dataToSave.put("restaurantName", name);
-        notebookRef.document(currentFirebaseUser.getUid()).set(dataToSave, SetOptions.merge());
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).set(dataToSave, SetOptions.merge());
 
         Map<String, Object> placeIdMap = new HashMap<>();
         placeIdMap.put("placeId", placeId);
@@ -364,7 +353,7 @@ public class RestaurantActivity extends AppCompatActivity {
         updates.put("pictureRestaurant", FieldValue.delete());
         updates.put("address", FieldValue.delete());
 
-        notebookRef.document(currentFirebaseUser.getUid()).update(updates);
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).update(updates);
 
         mPreferences.edit().putInt("alreadyGoing", 0).apply();
         mPreferences.edit().putString("goingRestaurant", "").apply();
@@ -388,12 +377,12 @@ public class RestaurantActivity extends AppCompatActivity {
 
 
     private void toggleLikeUnlikeStatus() {
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
                     ArrayList listTesting = (ArrayList) document.get("listTesting");
-                    if (listTesting.contains(name) && listTesting.contains(name)) {
+                    if (Objects.requireNonNull(listTesting).contains(name) && listTesting.contains(name)) {
                         Log.d("testt", "init going ui");
                         markThisRestaurantAsUnliked();
                     } else {
@@ -407,14 +396,15 @@ public class RestaurantActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressWarnings("SuspiciousListRemoveInLoop")
     private void markThisRestaurantAsUnliked() {
 
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
                     ArrayList listTesting = (ArrayList) document.get("listTesting");
-                    for (int i = 0; i < listTesting.size(); i++) {
+                    for (int i = 0; i < Objects.requireNonNull(listTesting).size(); i++) {
                         if (listTesting.get(i).equals(name)) {
                             listTesting.remove(i);
                         }
@@ -450,12 +440,12 @@ public class RestaurantActivity extends AppCompatActivity {
 
     private void markThisRestaurantAsLiked() {
 
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
                     ArrayList listTesting = (ArrayList) document.get("listTesting");
-                    listTesting.add(name);
+                    Objects.requireNonNull(listTesting).add(name);
 
                     Map<String, Object> dataToSave = new HashMap<>();
                     dataToSave.put("listTesting", listTesting);
@@ -485,12 +475,12 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void initialiseLikeUnlikeGoingStats() {
-        notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
+        notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document != null) {
                     ArrayList listTesting = (ArrayList) document.get("listTesting");
-                    if (listTesting.contains(name) && listTesting.contains(name)) {
+                    if (Objects.requireNonNull(listTesting).contains(name) && listTesting.contains(name)) {
                         Log.d("testt", "init going ui");
                         updateToLikeUI();
                     } else {
@@ -519,7 +509,7 @@ public class RestaurantActivity extends AppCompatActivity {
         DocumentReference mDocReference = FirebaseFirestore.getInstance().document("restaurants/" + name);
         mDocReference.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.get("likes") != null) {
-                String stringResto = documentSnapshot.get("likes").toString();
+                String stringResto = Objects.requireNonNull(documentSnapshot.get("likes")).toString();
                 numberOfLikes = Integer.parseInt(stringResto);
 
             } else {

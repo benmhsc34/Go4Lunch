@@ -12,21 +12,10 @@ public class Go4LunchViewModel extends ViewModel {
     private boolean mLocationPermissionGranted;
 
     // For save Restaurants List
-    private Map<String,Restaurant> mListRestaurant = new LinkedHashMap<>();
-
-    public boolean isLocationPermissionGranted() {
-        return mLocationPermissionGranted;
-    }
-
-    public void setLocationPermissionGranted(boolean locationPermissionGranted) {
-        mLocationPermissionGranted = locationPermissionGranted;
-    }
+    private final Map<String,Restaurant> mListRestaurant = new LinkedHashMap<>();
 
     public Map<String,Restaurant> getListRestaurant() {
         return mListRestaurant;
     }
 
-    public void setListRestaurant(Map<String,Restaurant> listRestaurant) {
-        mListRestaurant = listRestaurant;
-    }
 }

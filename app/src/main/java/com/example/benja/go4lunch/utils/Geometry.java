@@ -7,7 +7,7 @@ public class Geometry {
 
     @SerializedName("location")
     @Expose
-    private Location location;
+    private final Location location;
 
     public Geometry(Location location) {
         this.location = location;
@@ -17,7 +17,4 @@ public class Geometry {
         return location;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 }

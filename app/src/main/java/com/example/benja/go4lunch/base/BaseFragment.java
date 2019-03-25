@@ -8,6 +8,7 @@ import com.example.benja.go4lunch.models.Go4LunchViewModel;
 import com.example.benja.go4lunch.models.Restaurant;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class BaseFragment extends Fragment {
 
@@ -21,7 +22,7 @@ public class BaseFragment extends Fragment {
     protected Map<String,Restaurant> getRestaurantMapOfTheModel(){
         Log.d(TAG, "getRestaurantMapOfTheModel: ");
 
-        Go4LunchViewModel model = ViewModelProviders.of(getActivity()).get(Go4LunchViewModel.class);
+        Go4LunchViewModel model = ViewModelProviders.of(Objects.requireNonNull(getActivity())).get(Go4LunchViewModel.class);
 
         return model.getListRestaurant();
     }

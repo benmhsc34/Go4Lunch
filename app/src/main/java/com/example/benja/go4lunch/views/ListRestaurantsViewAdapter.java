@@ -13,27 +13,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.ButterKnife;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
 
 public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaurantsViewAdapter.ViewHolder> {
@@ -41,15 +32,9 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
     private final List<Restaurant> restaurantList;
     private final Context context;
     private OnItemClickListener mListener;
-    private int numberOfLikes = 0;
 
-
-    interface OnItemClickListener {
+    public interface OnItemClickListener {
         void onItemClick(int position);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mListener = listener;
     }
 
     public ListRestaurantsViewAdapter(List<Restaurant> listItems, Context context) {
@@ -64,6 +49,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         return new ViewHolder(v);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
@@ -82,7 +68,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         }
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
 
-        numberOfLikes = (int) restaurantItem.getNbrLikes();
+        int numberOfLikes = (int) restaurantItem.getNbrLikes();
         if (numberOfLikes == 3) {
             Log.d("testt", "likeButton: likes = 3");
 
@@ -110,8 +96,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             viewHolder.starThree.setVisibility(View.INVISIBLE);
 
         }
-        int number = (int) numberOfLikes;
-        viewHolder.numberOfPeople.setText("(" + number + ")");
+        viewHolder.numberOfPeople.setText("(" +  numberOfLikes + ")");
 
 
         Picasso.get().load(restaurantItem.getPhotoUrl()).into(viewHolder.restaurantImage);
@@ -170,8 +155,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
             itemView.setOnClickListener(view -> {
                 if (mListener != null) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) ;
-                    {
+                    if (position != RecyclerView.NO_POSITION){
                         mListener.onItemClick(position);
                     }
                 }

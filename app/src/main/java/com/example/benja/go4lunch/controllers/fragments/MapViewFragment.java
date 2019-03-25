@@ -3,27 +3,20 @@ package com.example.benja.go4lunch.controllers.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Location;
-import android.net.wifi.hotspot2.pps.HomeSp;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.Toast;
 
 import com.example.benja.go4lunch.MarkerObject;
-import com.example.benja.go4lunch.PlaceAutocompleteAdapter;
 import com.example.benja.go4lunch.base.BaseFragment;
 import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
@@ -32,12 +25,6 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.utils.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
-import com.facebook.share.Share;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.location.places.AutocompletePrediction;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,7 +32,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.CollectionReference;
@@ -56,6 +42,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,20 +77,12 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     // ==> For update UI Location
     private static final float DEFAULT_ZOOM = 16f;
 
-    // Restaurants List
-    private Map<String, Restaurant> mListRestaurants;
-
     private double latitude;
     private double longitude;
 
     private String photoReferences;
-    String placeIdReferences;
-    String nameReferences;
-    String addressReferences;
-    String imageReferences;
     private final CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
     private String userSelectedRestaurant;
-    int finalI;
     private int j = 0;
 
 
@@ -112,11 +91,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     @Override
     public boolean onMarkerClick(Marker marker) {
         MarkerObject markerObject = (MarkerObject) marker.getTag();
-        Log.d("logloglog", markerObject.getName());
+        Log.d("logloglog", Objects.requireNonNull(markerObject).getName());
 
         Intent myIntent = new Intent(getContext(), RestaurantActivity.class);
 
-        SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+        SharedPreferences mPreferences = Objects.requireNonNull(getContext()).getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
         mPreferences.edit().putString("image", markerObject.getPhotos()).apply();
         mPreferences.edit().putString("name", markerObject.getName()).apply();
         mPreferences.edit().putString("address", markerObject.getAddress()).apply();
@@ -129,7 +108,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     // ==> CallBack
     // Interface for ShowSnakeBar
     public interface ShowSnackBarListener {
-        void showSnackBar(String message);
     }
 
     public interface UpdateFrag {
@@ -141,10 +119,8 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         void updateMapView();
     }
 
-    // Interface Object for use CallBack
-    private ShowSnackBarListener mListener;
 
-
+    @SuppressWarnings("WeakerAccess")
     @SuppressLint("ValidFragment")
     public MapViewFragment() {
         // Required empty public constructor
@@ -176,7 +152,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     //                                    ENTRY POINT
     // ---------------------------------------------------------------------------------------------
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: ");
 
@@ -186,23 +162,24 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         //==> For use Api Google Play Service : Location
         // _ The geographical location where the device is currently located.
         // _ That is, the last-known location retrieved by the Fused Location Provider.
-        Location lastKnownLocation = gson.fromJson(getArguments().getString(KEY_LAST_KNOW_LOCATION, ""), Location.class);
+        Location lastKnownLocation = gson.fromJson(Objects.requireNonNull(getArguments()).getString(KEY_LAST_KNOW_LOCATION, ""), Location.class);
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_map_view, container, false);
 
         // Load Restaurant List of the ViewModel
-        mListRestaurants = getRestaurantMapOfTheModel();
+        // Restaurants List
+        Map<String, Restaurant> listRestaurants = getRestaurantMapOfTheModel();
 
         // Configure the Maps Service of Google
         configurePlayServiceMaps();
 
 
-        ((MainActivity) getActivity()).updateApi(() -> {
+        ((MainActivity) Objects.requireNonNull(getActivity())).updateApi(() -> {
 
-            SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-            double latitude = Double.parseDouble(mPreferences.getString("viewportLatitude", "12"));
-            double longitude = Double.parseDouble(mPreferences.getString("viewportLongitude", "12"));
+            SharedPreferences mPreferences = Objects.requireNonNull(getContext()).getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+            double latitude = Double.parseDouble(Objects.requireNonNull(mPreferences.getString("viewportLatitude", "12")));
+            double longitude = Double.parseDouble(Objects.requireNonNull(mPreferences.getString("viewportLongitude", "12")));
             String restaurantClicked = mPreferences.getString("theRestaurantClicked", "Corben House");
 
             //Defining api call
@@ -298,7 +275,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                                 .position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
 
-                        for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot userSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
 
                             userSelectedRestaurant = userSnapshot.getString("restaurantName");
 
@@ -335,7 +312,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
             }
         });
 
-        ((MainActivity) getActivity()).updateMap(() -> call.clone().enqueue(new Callback<PlaceNearBySearch>() {
+        ((MainActivity) Objects.requireNonNull(getActivity())).updateMap(() -> call.clone().enqueue(new Callback<PlaceNearBySearch>() {
             @Override
             public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
                 PlaceNearBySearch articles = response.body();
@@ -346,16 +323,16 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
                     for (PlaceNearBySearchResult nearbyPlace : nearbyPlacesList) {
 
-                        SharedPreferences mPrefs = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                        SharedPreferences mPrefs = Objects.requireNonNull(getContext()).getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
                         String searchInput = mPrefs.getString("searchInput", "");
 
-                        if (nearbyPlace.getName().contains(searchInput)) {
+                        if (nearbyPlace.getName().contains(Objects.requireNonNull(searchInput))) {
 
                             marker = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(nearbyPlace.getGeometry().getLocation().getLat(), nearbyPlace.getGeometry().getLocation().getLng()))
                                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_marker_orange)));
                         }
-                        for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot userSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
 
                             userSelectedRestaurant = userSnapshot.getString("restaurantName");
                             if (nearbyPlace.getName().contains(searchInput)) {
@@ -396,7 +373,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
 
         //Cute blue dot
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -472,13 +449,11 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     public void onAttach(Context context) {
         super.onAttach(context);
         SharedPreferences preferences = context.getSharedPreferences("PREFERENCE_KEY_NAME", 0);
-        latitude = Double.valueOf(preferences.getString("locationLatitude", "0"));
-        longitude = Double.valueOf(preferences.getString("locationLongitude", "0"));
+        latitude = Double.valueOf(Objects.requireNonNull(preferences.getString("locationLatitude", "0")));
+        longitude = Double.valueOf(Objects.requireNonNull(preferences.getString("locationLongitude", "0")));
         Log.d("ajbxng", String.valueOf(latitude));
         // CallBack for ShowSnackBar
-        if (context instanceof ShowSnackBarListener) {
-            mListener = (ShowSnackBarListener) context;
-        } else {
+        if (!(context instanceof ShowSnackBarListener)) {
             throw new ClassCastException(context.toString()
                     + " must implement showSnackBarListener");
         }

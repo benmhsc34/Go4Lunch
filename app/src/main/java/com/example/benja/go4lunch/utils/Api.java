@@ -1,7 +1,5 @@
 package com.example.benja.go4lunch.utils;
 
-import android.database.Observable;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

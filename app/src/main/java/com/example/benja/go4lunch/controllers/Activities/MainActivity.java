@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -27,9 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +38,6 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -53,9 +49,6 @@ import com.example.benja.go4lunch.controllers.fragments.ListRestaurantsViewFragm
 import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragment;
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.PlaceInfo;
-import com.example.benja.go4lunch.utils.Api;
-import com.example.benja.go4lunch.utils.PlaceNearBySearch;
-import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ScrollableViewPager;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
@@ -69,25 +62,15 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
 
-import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -112,17 +95,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
 
-    private static double latMin;
-    private static double latMax;
-    private static double longMin;
-    private static double longMax;
-
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
 
-    private GeoDataClient mGeoDataClient;
     private PlaceInfo mPlace;
-
 
     private Location mLastKnownLocation;
 
@@ -164,13 +140,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     }
 
                     // Get new Instance ID token
-                    String token = task.getResult().getToken();
+                    String token = Objects.requireNonNull(task.getResult()).getToken();
 
                     SharedPreferences mPrefs = getSharedPreferences("SHARED", MODE_PRIVATE);
                     mPrefs.edit().putString("token", token).apply();
 
                     // Log and toast
-                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
                     Log.d("tokenValue", token);
                 });
 
@@ -183,10 +158,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         String locationLatitude = mPreferences.getString("locationLatitude", "43.61076833333333");
         String locationLongitude = mPreferences.getString("locationLongitude", "3.8767149999999995");
 
-        latMin = Double.parseDouble(locationLatitude) - 0.0012753;
-        latMax = Double.parseDouble(locationLatitude) + 0.0012753;
-        longMin = Double.parseDouble(locationLongitude) - 0.05174298;
-        longMax = Double.parseDouble(locationLongitude) + 0.05174298;
+        double latMin = Double.parseDouble(Objects.requireNonNull(locationLatitude)) - 0.0012753;
+        double latMax = Double.parseDouble(locationLatitude) + 0.0012753;
+        double longMin = Double.parseDouble(Objects.requireNonNull(locationLongitude)) - 0.05174298;
+        double longMax = Double.parseDouble(locationLongitude) + 0.05174298;
 
         LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(latMin, longMin), new LatLng(latMax, longMax));
 
@@ -201,8 +176,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         //Declaring search edit text
         AutoCompleteTextView searchEditText = mToolbar.findViewById(R.id.myEditText);
-        mGeoDataClient = Places.getGeoDataClient(this, null);
-        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this, mGeoDataClient, LAT_LNG_BOUNDS, null);
+        GeoDataClient geoDataClient = Places.getGeoDataClient(this, null);
+        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(this, geoDataClient, LAT_LNG_BOUNDS, null);
         searchEditText.setVisibility(View.INVISIBLE);
         searchEditText.setOnItemClickListener(mAutoCompleteClickListener);
         searchEditText.setAdapter(mPlaceAutocompleteAdapter);
@@ -222,57 +197,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
 
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        searchEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                Retrofit retrofit = new Retrofit.Builder().baseUrl(Api.BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
-
-                Api api = retrofit.create(Api.class);
-
-                SharedPreferences mPreferences = getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-                String locationLatitude = mPreferences.getString("locationLatitude", "43.61076833333333");
-                String locationLongitude = mPreferences.getString("locationLongitude", "3.8767149999999995");
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
 
-                Call<PlaceNearBySearch> call = api.getPlaceNearBySearch(locationLatitude + "," + locationLongitude);
-
-                call.enqueue(new Callback<PlaceNearBySearch>() {
-                    @Override
-                    public void onResponse(Call<PlaceNearBySearch> call, Response<PlaceNearBySearch> response) {
-                        PlaceNearBySearch articles = response.body();
-                        List<PlaceNearBySearchResult> theListOfResults = articles.getResults();
-
-                        for (int i = 0; i < theListOfResults.size(); i++) {
-                            if (theListOfResults.get(i).getName().contains(searchEditText.getText().toString())) {
-                                //  mPreferences.edit().putString("", theListOfResults.get(i).getName()).apply();
-
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<PlaceNearBySearch> call, Throwable t) {
-
-                    }
-                });
-
-
-            }
-
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
 
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
@@ -303,7 +230,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
         } else {
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
@@ -368,7 +294,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    @Override
     protected View getCoordinatorLayout() {
         return mCoordinatorLayout;
     }
@@ -533,13 +458,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void signOutUserFromFirebase() {
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted(SIGN_OUT_TASK));
+                .addOnSuccessListener(this, this.updateUIAfterRESTRequestsCompleted());
     }
 
     // 3 - Create OnCompleteListener called after tasks ended
-    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted(final int origin) {
+    private OnSuccessListener<Void> updateUIAfterRESTRequestsCompleted() {
         return aVoid -> {
-            switch (origin) {
+            switch (MainActivity.SIGN_OUT_TASK) {
                 case SIGN_OUT_TASK:
                     finish();
                     break;
@@ -567,11 +492,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    @Override
-    public void showSnackBar(String message) {
-
-    }
-
     // ---------------------------------------------------------------------------------------------
     //                                      FRAGMENTS
     // ---------------------------------------------------------------------------------------------
@@ -586,7 +506,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Save the active Fragment
         // Declare an object fragment which will contain the active fragment
-        Fragment activeFragment = mapViewFragment;
 
         // Obtain SupportFragmentManager Object
         // Declare an object fragment Manager
@@ -603,6 +522,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
+    @SuppressWarnings("SameReturnValue")
     private Boolean updateMainFragment(Integer integer) {
         switch (integer) {
             case R.id.action_map_view:
@@ -651,7 +571,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (!places.getStatus().isSuccess()) {
             Log.d("TAG", "Place didn't complete successfully" + places.getStatus().toString());
             places.release();
-            return;
         } else {
             final Place place = places.get(0);
 
@@ -659,11 +578,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 mPlace = new PlaceInfo();
                 mPlace.setName(place.getName().toString());
-                mPlace.setAddress(place.getAddress().toString());
-                mPlace.setAttributions(place.getAttributions().toString());
+                mPlace.setAddress(Objects.requireNonNull(place.getAddress()).toString());
+                mPlace.setAttributions(Objects.requireNonNull(place.getAttributions()).toString());
                 mPlace.setLatlng(place.getLatLng());
                 mPlace.setRating(place.getRating());
-                mPlace.setPhoneNumber(place.getPhoneNumber().toString());
+                mPlace.setPhoneNumber(Objects.requireNonNull(place.getPhoneNumber()).toString());
                 mPlace.setWebsite(place.getWebsiteUri());
 
                 Log.d("TAG", mPlace.toString());
@@ -672,7 +591,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
 
             SharedPreferences mPreferences = this.getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
-            mPreferences.edit().putString("viewportLatitude", place.getViewport().getCenter().latitude + "").apply();
+            mPreferences.edit().putString("viewportLatitude", Objects.requireNonNull(place.getViewport()).getCenter().latitude + "").apply();
             mPreferences.edit().putString("viewportLongitude", place.getViewport().getCenter().longitude + "").apply();
             mPreferences.edit().putString("theRestaurantClicked", place.getName() + "").apply();
             updatfrag.updatefrag();
@@ -687,10 +606,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private final AdapterView.OnItemClickListener mAutoCompleteClickListener = (parent, view, position, id) -> {
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+        inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
         final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(position);
-        final String placeId = item.getPlaceId();
+        final String placeId = Objects.requireNonNull(item).getPlaceId();
 
         PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
         placeResult.setResultCallback(mUpdatePlaceDetailsCallback);

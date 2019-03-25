@@ -9,13 +9,11 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.api.UserHelper;
 import com.example.benja.go4lunch.base.BaseActivity;
-import com.example.benja.go4lunch.models.UsersModel;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -25,15 +23,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.twitter.sdk.android.core.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterConfig;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindView;
 
@@ -41,13 +37,7 @@ public class LoginActivity extends BaseActivity {
 
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
-    protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
-
-
-    @Override
-    protected View getCoordinatorLayout() {
-        return null;
-    }
+    private Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
 
     @Override
     public int getFragmentLayout() { return R.layout.activity_login; }
@@ -93,9 +83,9 @@ public class LoginActivity extends BaseActivity {
                 md.update(signature.toByteArray());
                 Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (PackageManager.NameNotFoundException ignored) {
 
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException ignored) {
 
         }
     }
@@ -173,7 +163,7 @@ public class LoginActivity extends BaseActivity {
             } else { // ERRORS
                 if (response == null) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_authentication_canceled));
-                } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
+                } else if (Objects.requireNonNull(response.getError()).getErrorCode() == ErrorCodes.NO_NETWORK) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
                     showSnackBar(this.coordinatorLayout, getString(R.string.error_unknown_error));
@@ -203,15 +193,15 @@ public class LoginActivity extends BaseActivity {
 
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
+        DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + Objects.requireNonNull(currentFirebaseUser).getUid());
 
         Map<String, Object> dataToSave = new HashMap<>();
-        dataToSave.put("userName", currentFirebaseUser.getDisplayName());
-        dataToSave.put("email", currentFirebaseUser.getEmail());
+        dataToSave.put("userName", Objects.requireNonNull(currentFirebaseUser.getDisplayName()));
+        dataToSave.put("email", Objects.requireNonNull(currentFirebaseUser.getEmail()));
         mDocRef.set(dataToSave, SetOptions.merge()).addOnSuccessListener(aVoid -> Log.d("success", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
 
         Map<String, Object> imageToSave = new HashMap<>();
-        imageToSave.put("picture", currentFirebaseUser.getPhotoUrl().toString());
+        imageToSave.put("picture", Objects.requireNonNull(currentFirebaseUser.getPhotoUrl()).toString());
         mDocRef.set(imageToSave, SetOptions.merge());
 
         Intent intent = new Intent(this, MainActivity.class);

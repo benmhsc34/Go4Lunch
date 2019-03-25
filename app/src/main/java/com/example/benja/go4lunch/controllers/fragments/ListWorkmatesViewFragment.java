@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,28 +23,27 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.UsersModel;
-import com.facebook.share.Share;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
 
+@SuppressWarnings("NullableProblems")
 public class ListWorkmatesViewFragment extends Fragment {
 
     //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
 
+    @SuppressWarnings("WeakerAccess")
     public ListWorkmatesViewFragment() {
         // Required empty public constructor
     }
 
     public static ListWorkmatesViewFragment newInstance() {
-        ListWorkmatesViewFragment fragment = new ListWorkmatesViewFragment();
-        return fragment;
+        return new ListWorkmatesViewFragment();
     }
 
 
@@ -67,7 +65,7 @@ public class ListWorkmatesViewFragment extends Fragment {
 
         void setPicture(String picture) {
             ImageView imageView = view.findViewById(R.id.pictureIV);
-            Glide.with(getContext())
+            Glide.with(Objects.requireNonNull(getContext()))
                     .load(picture)
                     .apply(RequestOptions.circleCropTransform())
                     .into(imageView);
@@ -79,7 +77,7 @@ public class ListWorkmatesViewFragment extends Fragment {
             relativeLayout.setOnClickListener(view -> {
 
                 if (restaurantPicture != null) {
-                    SharedPreferences mPreferences = getContext().getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
+                    SharedPreferences mPreferences = Objects.requireNonNull(getContext()).getSharedPreferences("PREFERENCE_KEY_NAME", Context.MODE_PRIVATE);
                     mPreferences.edit().putString("image", restaurantPicture).apply();
                     mPreferences.edit().putString("name", restaurantName).apply();
                     mPreferences.edit().putString("placeId", placeId).apply();
@@ -127,7 +125,7 @@ public class ListWorkmatesViewFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull UsersViewHolder holder, int position, @NonNull UsersModel model) {
 
-                if (model.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
+                if (model.getEmail().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail())) {
                     if (model.getPicture() != null) {
                         if (model.getRestaurantName() != null) {
                             holder.setUserName(getText(R.string.you_eating_at) + " " + model.getRestaurantName());

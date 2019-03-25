@@ -8,31 +8,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 
+@SuppressWarnings("unchecked")
 public class FirebaseCloudMessagingService extends FirebaseMessagingService  {
 
     private final CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
@@ -60,7 +54,7 @@ public class FirebaseCloudMessagingService extends FirebaseMessagingService  {
         DocumentReference documentReference = FirebaseFirestore.getInstance().document("utilisateurs/" + this.getCurrentUser().getUid());
         documentReference.get().addOnSuccessListener(documentSnapshot -> notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
 
-            for (QueryDocumentSnapshot userSnapshot : queryDocumentSnapshots) {
+            for (QueryDocumentSnapshot userSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
                 String whichResto = (String) userSnapshot.get("restaurantName");
                 if (whichResto != null) {
                     if (whichResto.equals(documentSnapshot.get("restaurantName"))) {
