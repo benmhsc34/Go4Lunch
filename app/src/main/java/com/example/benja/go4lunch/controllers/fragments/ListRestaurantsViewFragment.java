@@ -50,10 +50,9 @@ public class ListRestaurantsViewFragment extends BaseFragment {
     // View of the Fragment
     private View mListView;
 
-    private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private List<Restaurant> restaurantList;
-    Object numberOfLikes = 0;
+    private Object numberOfLikes = 0;
     float numberOfPeople = 0;
     double averageLikes;
     ArrayList likeAverage = new ArrayList<>();
@@ -62,7 +61,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
     private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
 
-    String photoReferences;
+    private String photoReferences;
     String phoneNumber;
     String website;
 
@@ -91,7 +90,7 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
 
         View rootView = inflater.inflate(R.layout.fragment_list_restaurants_view, container, false);
-        recyclerView = rootView.findViewById(R.id.fragment_list_restaurant_view_recycler_view);
+        RecyclerView recyclerView = rootView.findViewById(R.id.fragment_list_restaurant_view_recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         restaurantList = new ArrayList<>();
@@ -298,12 +297,12 @@ public class ListRestaurantsViewFragment extends BaseFragment {
 
 
     public interface UpdateList {
-        public void updateList();
+        void updateList();
 
     }
 
-    double latitude;
-    double longitude;
+    private double latitude;
+    private double longitude;
 
     @Override
     public void onAttach(Context context) {

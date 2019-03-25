@@ -2,10 +2,10 @@ package com.example.benja.go4lunch;
 
 public class MarkerObject {
 
-    String address;
-    String name;
-    String photos;
-    String placeId;
+    private final String address;
+    private final String name;
+    private final String photos;
+    private final String placeId;
 
     public MarkerObject(String address, String name, String photos, String placeId) {
         this.address = address;

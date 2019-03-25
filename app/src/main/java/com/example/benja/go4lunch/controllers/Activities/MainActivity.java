@@ -41,6 +41,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -68,10 +69,15 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 import java.util.List;
 
@@ -106,42 +112,34 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private static final int SIGN_OUT_TASK = 10;
     private static final int DELETE_USER_TASK = 20;
 
-    static double latMin;
-    static double latMax;
-    static double longMin;
-    static double longMax;
-
-    // Declare three fragment for used with the Bottom Navigation view
-    private Fragment mMapViewFragment;
-    private Fragment mListRestaurantsViewFragment;
-    private Fragment mListWorkmatesViewFragment;
-    // Declare an object fragment which will contain the active fragment
-    private Fragment mActiveFragment;
-    // Declare an object fragment Manager
-    private FragmentManager mFragmentManager;
+    private static double latMin;
+    private static double latMax;
+    private static double longMin;
+    private static double longMax;
 
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
 
-    protected GeoDataClient mGeoDataClient;
+    private GeoDataClient mGeoDataClient;
     private PlaceInfo mPlace;
 
 
-    Location mLastKnownLocation;
+    private Location mLastKnownLocation;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
 
-    ListRestaurantsViewFragment.UpdateList mUpdateList;
+    private ListRestaurantsViewFragment.UpdateList mUpdateList;
 
     public void updateList(ListRestaurantsViewFragment.UpdateList listener) {
         mUpdateList = listener;
     }
 
-    MapViewFragment.UpdateMapView mUpdateMapView ;
+    private MapViewFragment.UpdateMapView mUpdateMapView ;
     public void updateMap(MapViewFragment.UpdateMapView listener) {
         mUpdateMapView = listener;
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -157,6 +155,24 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.configureNavigationHeader();
         this.configureNavigationView();
         this.configureBottomView();
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("TAG", "getInstanceId failed", task.getException());
+                        return;
+                    }
+
+                    // Get new Instance ID token
+                    String token = task.getResult().getToken();
+
+                    SharedPreferences mPrefs = getSharedPreferences("SHARED", MODE_PRIVATE);
+                    mPrefs.edit().putString("token", token).apply();
+
+                    // Log and toast
+                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                    Log.d("tokenValue", token);
+                });
 
         PagerAdapter viewPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3, mLastKnownLocation);
 
@@ -363,7 +379,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return R.layout.activity_main;
     }
 
-    protected void configureToolBar() {
+    private void configureToolBar() {
 
         // Change the toolbar Title
         setTitle("I'm Hungry!");
@@ -562,16 +578,19 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void addFragmentsInFragmentManager() {
 
         //Instantiate fragment used by BottomNavigationView
-        mMapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
-        mListRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
-        mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance();
+        // Declare three fragment for used with the Bottom Navigation view
+        Fragment mapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
+        Fragment listRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
+        Fragment listWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance();
         //   mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance(null);
 
         // Save the active Fragment
-        mActiveFragment = mMapViewFragment;
+        // Declare an object fragment which will contain the active fragment
+        Fragment activeFragment = mapViewFragment;
 
         // Obtain SupportFragmentManager Object
-        mFragmentManager = getSupportFragmentManager();
+        // Declare an object fragment Manager
+        FragmentManager fragmentManager = getSupportFragmentManager();
         // Add the three fragment in fragmentManager and leave active only the fragment MapViewFragment
 
       /*  mFragmentManager.beginTransaction()
@@ -621,14 +640,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
      -------------------------------------  google places autocomplete API suggestions ------------------------------------
    */
 
-    MapViewFragment.UpdateFrag updatfrag;
+    private MapViewFragment.UpdateFrag updatfrag;
 
     public void updateApi(MapViewFragment.UpdateFrag listener) {
         updatfrag = listener;
     }
 
 
-    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = places -> {
+    private final ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = places -> {
         if (!places.getStatus().isSuccess()) {
             Log.d("TAG", "Place didn't complete successfully" + places.getStatus().toString());
             places.release();
@@ -665,7 +684,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     };
 
-    private AdapterView.OnItemClickListener mAutoCompleteClickListener = (parent, view, position, id) -> {
+    private final AdapterView.OnItemClickListener mAutoCompleteClickListener = (parent, view, position, id) -> {
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),

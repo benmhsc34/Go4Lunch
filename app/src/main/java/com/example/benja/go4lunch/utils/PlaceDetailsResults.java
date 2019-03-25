@@ -7,10 +7,10 @@ public class PlaceDetailsResults {
 
     @SerializedName("website")
     @Expose
-    private String website;
+    private final String website;
     @SerializedName("formatted_phone_number")
     @Expose
-    private String phoneNumber;
+    private final String phoneNumber;
 
     public PlaceDetailsResults(String website, String phoneNumber) {
         this.website = website;

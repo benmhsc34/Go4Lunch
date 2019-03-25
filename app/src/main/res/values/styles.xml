@@ -23,7 +23,7 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="italic">
+    <style name="italic" tools:keep="@style/italic">
         <item name="android:fontStyle" tools:targetApi="o">italic</item>
         <item name="android:color">#696969</item>
     </style>

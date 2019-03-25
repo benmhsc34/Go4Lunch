@@ -1,5 +1,6 @@
 package com.example.benja.go4lunch.views;
 
+import android.annotation.SuppressLint;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -25,6 +26,7 @@ public class ScrollableViewPager extends ViewPager {
         this.canScroll = canScroll;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         return canScroll && super.onTouchEvent(ev);

@@ -14,8 +14,8 @@ import java.util.List;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
-    int mNoOfTabs;
-    android.location.Location lastKnownLocation;
+    private final int mNoOfTabs;
+    private final android.location.Location lastKnownLocation;
     public PagerAdapter(FragmentManager fm, int noOfTabs, android.location.Location lastKnownLocation) {
         super(fm);
         this.mNoOfTabs = noOfTabs;

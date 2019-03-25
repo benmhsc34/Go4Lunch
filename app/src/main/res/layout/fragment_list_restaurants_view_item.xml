@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,7 +8,6 @@
     android:padding="@dimen/recycler_padding">
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/fragment_list_restaurant_view_item_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -28,6 +28,7 @@
                 android:layout_marginStart="@dimen/half_margin"
                 android:layout_weight="1.3"
                 android:gravity="center"
+                tools:ignore="HardcodedText"
                 android:orientation="vertical">
 
                 <!-- First line -->
@@ -38,7 +39,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="restaurant name"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="NestedWeights" />
 
                 <!-- Second line -->
                 <!-- Address of the Restaurant -->
@@ -77,16 +79,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    tools:ignore="NestedWeights">
 
                     <TextView
                         android:id="@+id/fragment_list_restaurant_view_item_distance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
-                        android:gravity="right"
+                        android:gravity="end"
                         android:hint="800m"
-                        android:maxLines="1" />
+                        android:maxLines="1"
+                        tools:ignore="HardcodedText" />
 
                 </LinearLayout>
 
@@ -96,20 +100,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="horizontal">
-
-                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="end"
-                        android:orientation="horizontal">
-
+                    android:orientation="horizontal"
+                    tools:ignore="UseCompoundDrawables">
 
                         <ImageView
-                            android:id="@+id/fragment_list_restaurant_view_item_participants_smiley"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/ic_person_black_24dp"/>
+                            android:background="@drawable/ic_person_black_24dp"
+                            tools:ignore="ContentDescription" />
 
                         <TextView
                             android:id="@+id/fragment_list_restaurant_view_item_participants"
@@ -117,10 +115,10 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:hint="(0)"
-                            android:maxLines="1" />
+                            android:maxLines="1"
+                            tools:ignore="HardcodedText" />
 
                     </LinearLayout>
-                </LinearLayout>
 
                 <!-- Third line -->
                 <!-- display Stars -->
@@ -134,7 +132,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_margin="1dp"
-                        android:background="@drawable/star_white" />
+                        android:background="@drawable/star_white"
+                        tools:ignore="ContentDescription" />
 
                     <ImageView
                         android:id="@+id/fragment_list_restaurant_view_item_star_two"
@@ -142,7 +141,8 @@
                         android:layout_height="20dp"
                         android:layout_margin="1dp"
                         android:layout_toEndOf="@+id/fragment_list_restaurant_view_item_star_three"
-                        android:background="@drawable/star_white" />
+                        android:background="@drawable/star_white"
+                        tools:ignore="ContentDescription" />
 
                     <ImageView
                         android:id="@+id/fragment_list_restaurant_view_item_star_one"
@@ -150,7 +150,8 @@
                         android:layout_height="20dp"
                         android:layout_margin="1dp"
                         android:layout_toEndOf="@+id/fragment_list_restaurant_view_item_star_two"
-                        android:background="@drawable/star_white" />
+                        android:background="@drawable/star_white"
+                        tools:ignore="ContentDescription" />
 
                 </RelativeLayout>
 
@@ -165,7 +166,8 @@
                 android:layout_margin="@dimen/recycler_image_margin"
                 android:layout_marginTop="@dimen/margin"
                 android:layout_marginBottom="@dimen/margin"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 

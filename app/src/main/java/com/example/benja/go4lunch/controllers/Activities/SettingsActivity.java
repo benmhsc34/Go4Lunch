@@ -36,16 +36,6 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mDocRef.addSnapshotListener((documentSnapshot, e) -> {
-            TextView display = findViewById(R.id.TV);
-
-            if (documentSnapshot.exists()) {
-                String quote = documentSnapshot.getString("quote");
-                String author = documentSnapshot.getString("author");
-
-                display.setText(quote + " -- " + author);
-            }
-        });
 
 
     }
@@ -54,41 +44,6 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        Button saveButton = findViewById(R.id.saveButton);
-        Button fetchButton = findViewById(R.id.fetchButton);
-
-        saveButton.setOnClickListener(view -> saveQuote());
-
-        fetchButton.setOnClickListener(view -> fetchQuote());
-
-
-    }
-
-    public void saveQuote() {
-
-        EditText quoteView = findViewById(R.id.quote);
-        EditText authorView = findViewById(R.id.author);
-
-        String quote = quoteView.getText().toString();
-        String author = authorView.getText().toString();
-
-        Map<String, Object> dataToSave = new HashMap<>();
-        dataToSave.put("quote", quote);
-        dataToSave.put("author", author);
-        mDocRef.set(dataToSave).addOnSuccessListener(aVoid -> Log.d("sucess", "Files have successfully been sent to the Firestore")).addOnFailureListener(e -> Log.d("failure", "Files have failed", e));
-    }
-
-    public void fetchQuote() {
-        TextView display = findViewById(R.id.TV);
-
-        mDocRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                String quote = documentSnapshot.getString("quote");
-                String author = documentSnapshot.getString("author");
-
-                display.setText(quote + " -- " + author);
-            }
-        });
 
     }
 }

@@ -7,7 +7,7 @@ public class PlaceDetails {
 
     @SerializedName("result")
     @Expose
-    private PlaceDetailsResults result;
+    private final PlaceDetailsResults result;
 
     public PlaceDetails(PlaceDetailsResults results) {
         this.result = results;

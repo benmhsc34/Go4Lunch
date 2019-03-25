@@ -13,7 +13,7 @@ public class RestaurantHelper {
 
     // --- COLLECTION REFERENCE ---
 
-    public static CollectionReference getRestaurantsCollection(){
+    private static CollectionReference getRestaurantsCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
 

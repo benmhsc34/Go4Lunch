@@ -16,7 +16,7 @@ public class UserHelper {
 
     // --- COLLECTION REFERENCE ---
 
-    public static CollectionReference getUsersCollection() {
+    private static CollectionReference getUsersCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
 

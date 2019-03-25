@@ -61,15 +61,15 @@ import static android.graphics.Color.GREEN;
 
 public class RestaurantActivity extends AppCompatActivity {
 
-    String thephoneNumber;
-    String theWebsite = "";
-    FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    private String thephoneNumber;
+    private String theWebsite = "";
+    private final FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private DocumentReference mDocRef = FirebaseFirestore.getInstance().document("utilisateurs/" + currentFirebaseUser.getUid());
-    private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
-    private CollectionReference restaurantRef = FirebaseFirestore.getInstance().collection("restaurants");
+    private final CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
+    private final CollectionReference restaurantRef = FirebaseFirestore.getInstance().collection("restaurants");
     ArrayList arrayList = new ArrayList<>();
 
-    float numberOfLikes = 0;
+    private float numberOfLikes = 0;
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
 
     private SharedPreferences mPreferences;
@@ -78,19 +78,19 @@ public class RestaurantActivity extends AppCompatActivity {
     private String address;
     private String placeId;
 
-    TextView textView;
+    private TextView textView;
 
     //views
     private Button goingButton;
 
     //like/unlike
-    TextView likeTV;
-    ImageView likePhotoIV;
+    private TextView likeTV;
+    private ImageView likePhotoIV;
 
     //star rating
-    ImageView starOne;
-    ImageView starTwo;
-    ImageView starThree;
+    private ImageView starOne;
+    private ImageView starTwo;
+    private ImageView starThree;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,10 +225,10 @@ public class RestaurantActivity extends AppCompatActivity {
                     }
                     holder.setPicture(userPicture == null ? Constants.DEFAULT_PROFILE_PIC_URL : userPicture);
                 } else {
-                    holder.setUserName("ya");
-                    if (holder.getUserName().equals("ya")) {
-                        holder.view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 0));
-                    }
+//                    holder.setUserName("ya");
+//                    if (holder.getUserName().equals("ya")) {
+//                        holder.view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 0));
+//                    }
                 }
             }
 
@@ -246,7 +246,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
 
     private class UsersViewHolder extends RecyclerView.ViewHolder {
-        private View view;
+        private final View view;
 
         UsersViewHolder(View itemView) {
             super(itemView);
@@ -373,7 +373,7 @@ public class RestaurantActivity extends AppCompatActivity {
     }
 
     private void updateToNotGoingUI() {
-        goingButton.setText("Going?");
+        goingButton.setText(R.string.going);
         goingButton.setTextColor(BLACK);
         goingButton.setTextSize(15);
     }
@@ -506,12 +506,12 @@ public class RestaurantActivity extends AppCompatActivity {
 
     private void updateToUnlikeUI() {
         likePhotoIV.setImageResource(R.drawable.like);
-        likeTV.setText("LIKE");
+        likeTV.setText(R.string.like);
     }
 
     private void updateToLikeUI() {
         likePhotoIV.setImageResource(R.drawable.liked);
-        likeTV.setText("LIKED");
+        likeTV.setText(R.string.liked);
     }
 
 

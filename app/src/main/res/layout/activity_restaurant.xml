@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,7 +13,8 @@
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/mainlogo" />
+        android:src="@drawable/mainlogo"
+        tools:ignore="ContentDescription" />
 
     <Button
         android:id="@+id/goingButton"
@@ -25,7 +25,7 @@
         android:layout_marginTop="-22dp"
         android:layout_marginEnd="7dp"
         android:background="@drawable/roundedbutton"
-        android:text="Going?" />
+        android:text="@string/going" />
 
     <LinearLayout
         android:id="@+id/LL1"
@@ -50,7 +50,8 @@
                 android:maxWidth="250dp"
                 android:text="The Corben Restaurant"
                 android:textColor="#FFF"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="HardcodedText" />
 
             <ImageView
                 android:id="@+id/starOne"
@@ -60,7 +61,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/name"
                 android:background="#ff471a"
-                android:src="@drawable/star" />
+                android:src="@drawable/star"
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/starTwo"
@@ -70,7 +72,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/starOne"
                 android:background="#ff471a"
-                android:src="@drawable/star" />
+                android:src="@drawable/star"
+                tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/starThree"
@@ -80,7 +83,8 @@
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@+id/starTwo"
                 android:background="#ff471a"
-                android:src="@drawable/star" />
+                android:src="@drawable/star"
+                tools:ignore="ContentDescription" />
         </RelativeLayout>
 
         <TextView
@@ -92,7 +96,8 @@
             android:layout_marginBottom="25dp"
             android:text="2290 Av. Albert Eisntein"
             android:textColor="#FFF"
-            android:textSize="11sp" />
+            android:textSize="12sp"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 
@@ -102,13 +107,8 @@
         android:layout_height="80dp"
         android:layout_below="@+id/LL1"
         android:layout_marginTop="5dp"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:weightSum="3">
+        android:orientation="horizontal"
+        tools:ignore="DisableBaselineAlignment">
 
             <LinearLayout
                 android:id="@+id/callButton"
@@ -116,18 +116,20 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:weightSum="2">
+                android:weightSum="2"
+                tools:ignore="UseCompoundDrawables">
 
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:src="@drawable/call" />
+                    android:src="@drawable/call"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="CALL"
+                    android:text="@string/call"
                     android:textColor="#ff471a" />
 
             </LinearLayout>
@@ -138,20 +140,22 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:weightSum="2">
+                android:weightSum="2"
+                tools:ignore="UseCompoundDrawables">
 
                 <ImageView
                     android:id="@+id/likeImageButton"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:src="@drawable/like" />
+                    android:src="@drawable/like"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/likeText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="LIKE"
+                    android:text="@string/like"
                     android:textColor="#ff471a" />
 
             </LinearLayout>
@@ -162,27 +166,26 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:weightSum="2">
+                android:weightSum="2"
+                tools:ignore="UseCompoundDrawables">
 
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:src="@drawable/earth" />
+                    android:src="@drawable/earth"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="WEBSITE"
+                    android:text="@string/website"
                     android:textColor="#ff471a" />
 
             </LinearLayout>
 
 
         </LinearLayout>
-
-
-    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

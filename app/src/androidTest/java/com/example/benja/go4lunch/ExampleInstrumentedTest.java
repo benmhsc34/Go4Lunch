@@ -52,7 +52,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Rule
-    public ActivityTestRule<MainActivity> mainActivityActivityTestRule =
+    public final ActivityTestRule<MainActivity> mainActivityActivityTestRule =
             new ActivityTestRule<>(MainActivity.class);
 
     private MainActivity mActivity = null;

@@ -38,7 +38,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     // Force to implement those methods
     protected abstract View getCoordinatorLayout(); // Layout of the CoordinatorLayout of the Child Activity
-    public abstract int getFragmentLayout();
+    protected abstract int getFragmentLayout();
 
     // --------------------
     // UI

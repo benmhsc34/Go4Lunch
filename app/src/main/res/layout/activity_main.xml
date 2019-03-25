@@ -25,7 +25,6 @@
             <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/toolbar"
-                colorControlNormal="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"
@@ -42,11 +41,11 @@
                     android:imeOptions="actionDone"
                     android:textCursorDrawable="@null"
                     android:inputType="text"
-                    android:drawableRight="@drawable/ic_cancel_white_24dp"
+                    android:drawableEnd="@drawable/ic_cancel_white_24dp"
                     android:hint="Search"
                     android:textColorHint="#FFF"
 
-                    />
+                    tools:ignore="HardcodedText" />
             </android.support.v7.widget.Toolbar>
 
             <!-- Body layout -->

@@ -5,14 +5,14 @@ import android.support.annotation.Nullable;
 public class Restaurant {
 
 //    private String mIdentifier;             // Restaurant Identifier
-    private String mName;                   // Name of the Restaurant
-    @Nullable private String mAddress;      // Address of Restaurant
-    @Nullable private Boolean mOpeningTime;  // Opening time of Restaurant
-    @Nullable private String mDistance;     // Distance where the restaurant is from the current position
+    private final String mName;                   // Name of the Restaurant
+    @Nullable private final String mAddress;      // Address of Restaurant
+    @Nullable private final Boolean mOpeningTime;  // Opening time of Restaurant
+    @Nullable private final String mDistance;     // Distance where the restaurant is from the current position
 //    @Nullable private long mNbrParticipants;// Number of participants
-    private Object mNbrLikes;        // Number of likes that the restaurant got
-    @Nullable private String mPhotoUrl;     // URL of the Restaurant photo
-    @Nullable private String mPlaceId;
+    private final Object mNbrLikes;        // Number of likes that the restaurant got
+    @Nullable private final String mPhotoUrl;     // URL of the Restaurant photo
+    @Nullable private final String mPlaceId;
 //    @Nullable private String mWebSiteUrl;   // URL of the Web site
 //    @Nullable private String mType;         // Type of the Restaurant
 //    @Nullable private String mLat;          // Latitude  of the Restaurant on the Map

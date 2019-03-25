@@ -7,7 +7,7 @@ public class Photo {
 
     @SerializedName("photo_reference")
     @Expose
-    private String photoReference;
+    private final String photoReference;
 
     public Photo(String photoReference) {
         this.photoReference = photoReference;

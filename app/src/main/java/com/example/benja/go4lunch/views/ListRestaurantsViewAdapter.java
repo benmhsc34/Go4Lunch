@@ -1,5 +1,6 @@
 package com.example.benja.go4lunch.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,13 +38,13 @@ import static android.graphics.Color.RED;
 
 public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaurantsViewAdapter.ViewHolder> {
 
-    private List<Restaurant> restaurantList;
-    private Context context;
+    private final List<Restaurant> restaurantList;
+    private final Context context;
     private OnItemClickListener mListener;
-    int numberOfLikes = 0;
+    private int numberOfLikes = 0;
 
 
-    public interface OnItemClickListener {
+    interface OnItemClickListener {
         void onItemClick(int position);
     }
 
@@ -63,6 +64,7 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         return new ViewHolder(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         final Restaurant restaurantItem = restaurantList.get(i);
@@ -71,11 +73,11 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
         viewHolder.restaurantAddress.setText(restaurantItem.getAddress());
 
         if (restaurantItem.getOpeningTime()) {
-            viewHolder.restaurantOpeningHours.setText("OPEN");
+            viewHolder.restaurantOpeningHours.setText(R.string.open);
             viewHolder.restaurantOpeningHours.setTextColor(Color.parseColor("#2b7f37"));
 
         } else {
-            viewHolder.restaurantOpeningHours.setText("CLOSED");
+            viewHolder.restaurantOpeningHours.setText(R.string.closed);
             viewHolder.restaurantOpeningHours.setTextColor(RED);
         }
         viewHolder.restaurantDistanceToUser.setText(restaurantItem.getDistance());
@@ -135,19 +137,19 @@ public class ListRestaurantsViewAdapter extends RecyclerView.Adapter<ListRestaur
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView restaurantName;
-        public TextView restaurantAddress;
-        public TextView restaurantOpeningHours;
-        public TextView restaurantDistanceToUser;
-        public ImageView restaurantImage;
-        public LinearLayout linearLayout;
-        public ImageView starOne;
-        public ImageView starTwo;
-        public ImageView starThree;
-        public TextView numberOfPeople;
+        final TextView restaurantName;
+        final TextView restaurantAddress;
+        final TextView restaurantOpeningHours;
+        final TextView restaurantDistanceToUser;
+        final ImageView restaurantImage;
+        final LinearLayout linearLayout;
+        final ImageView starOne;
+        final ImageView starTwo;
+        final ImageView starThree;
+        final TextView numberOfPeople;
 
 
-        public ViewHolder(@NonNull final View itemView) {
+        ViewHolder(@NonNull final View itemView) {
             super(itemView);
 
             restaurantName = itemView.findViewById(R.id.fragment_list_restaurant_view_item_name);

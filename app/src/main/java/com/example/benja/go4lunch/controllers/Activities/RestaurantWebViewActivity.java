@@ -11,7 +11,6 @@ import android.webkit.WebViewClient;
 import com.example.benja.go4lunch.R;
 
 public class RestaurantWebViewActivity extends AppCompatActivity {
-    private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,16 +19,11 @@ public class RestaurantWebViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String website = intent.getStringExtra("websiteUrl");
 
-        mWebView = findViewById(R.id.spiderWebview);
+        WebView webView = findViewById(R.id.spiderWebview);
 
-
-        mWebView.setVisibility(View.VISIBLE);
-        mWebView.setWebViewClient(new WebViewClient());
-        mWebView.loadUrl(website);
-
-
-        Log.d("website", website);
-
+        webView.setVisibility(View.VISIBLE);
+        webView.setWebViewClient(new WebViewClient());
+        webView.loadUrl(website);
     }
 
 

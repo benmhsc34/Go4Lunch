@@ -34,10 +34,10 @@ public class PlaceNearBySearchResult {
     private String distance;
     @SerializedName("geometry")
     @Expose
-    private Geometry geometry;
+    private final Geometry geometry;
     @SerializedName("photos")
     @Expose
-    private List<Photo> photos;
+    private final List<Photo> photos;
 
     public PlaceNearBySearchResult(String icon, String address, String id, String name, OpeningHours openingHours, String placeId, String reference, String distance, Geometry geometry, List<Photo> photos) {
         this.icon = icon;

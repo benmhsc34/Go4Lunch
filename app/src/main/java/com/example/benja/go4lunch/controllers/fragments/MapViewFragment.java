@@ -91,27 +91,23 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     private static final float DEFAULT_ZOOM = 16f;
 
     // Restaurants List
-    Map<String, Restaurant> mListRestaurants;
+    private Map<String, Restaurant> mListRestaurants;
 
-    //==> For use Api Google Play Service : Location
-    // _ The geographical location where the device is currently located.
-    // _ That is, the last-known location retrieved by the Fused Location Provider.
-    private Location mLastKnownLocation;
-    double latitude;
-    double longitude;
+    private double latitude;
+    private double longitude;
 
-    String photoReferences;
+    private String photoReferences;
     String placeIdReferences;
     String nameReferences;
     String addressReferences;
     String imageReferences;
-    private CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
-    String userSelectedRestaurant;
+    private final CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
+    private String userSelectedRestaurant;
     int finalI;
-    int j = 0;
+    private int j = 0;
 
 
-    Marker marker;
+    private Marker marker;
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -137,16 +133,16 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     }
 
     public interface UpdateFrag {
-        public void updatefrag();
+        void updatefrag();
     }
 
 
     public interface UpdateMapView {
-        public void updateMapView();
+        void updateMapView();
     }
 
     // Interface Object for use CallBack
-    ShowSnackBarListener mListener;
+    private ShowSnackBarListener mListener;
 
 
     @SuppressLint("ValidFragment")
@@ -187,7 +183,10 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
         // Get data from Bundle (created in method newInstance)
         // Restoring the Date with a Gson Object
         Gson gson = new Gson();
-        mLastKnownLocation = gson.fromJson(getArguments().getString(KEY_LAST_KNOW_LOCATION, ""), Location.class);
+        //==> For use Api Google Play Service : Location
+        // _ The geographical location where the device is currently located.
+        // _ That is, the last-known location retrieved by the Fused Location Provider.
+        Location lastKnownLocation = gson.fromJson(getArguments().getString(KEY_LAST_KNOW_LOCATION, ""), Location.class);
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_map_view, container, false);
@@ -251,7 +250,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
     // ---------------------------------------------------------------------------------------------
     //                            GOOGLE PLAY SERVICE : MAPS
     // ---------------------------------------------------------------------------------------------
-    public void configurePlayServiceMaps() {
+    private void configurePlayServiceMaps() {
         Log.d(TAG, "configurePlayServiceMaps: ");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         if (mMapFragment == null) {

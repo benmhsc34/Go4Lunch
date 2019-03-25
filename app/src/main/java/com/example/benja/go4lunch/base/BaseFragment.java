@@ -18,7 +18,7 @@ public class BaseFragment extends Fragment {
     //                                        VIEW MODEL ACCESS
     // ---------------------------------------------------------------------------------------------
     // Get current restaurant list of the Model
-    public Map<String,Restaurant> getRestaurantMapOfTheModel(){
+    protected Map<String,Restaurant> getRestaurantMapOfTheModel(){
         Log.d(TAG, "getRestaurantMapOfTheModel: ");
 
         Go4LunchViewModel model = ViewModelProviders.of(getActivity()).get(Go4LunchViewModel.class);

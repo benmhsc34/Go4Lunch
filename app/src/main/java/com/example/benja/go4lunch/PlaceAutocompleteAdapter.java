@@ -46,7 +46,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
     /**
      * Handles autocomplete requests.
      */
-    private GeoDataClient mGeoDataClient;
+    private final GeoDataClient mGeoDataClient;
 
     /**
      * The bounds used for Places Geo Data autocomplete API requests.
@@ -56,7 +56,7 @@ public class PlaceAutocompleteAdapter extends ArrayAdapter<AutocompletePredictio
     /**
      * The autocomplete filter used to restrict queries to a specific set of place types.
      */
-    private AutocompleteFilter mPlaceFilter;
+    private final AutocompleteFilter mPlaceFilter;
 
     /**
      * Initializes with a resource for text rows and autocomplete query bounds.

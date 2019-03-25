@@ -1,5 +1,6 @@
 package com.example.benja.go4lunch.controllers.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -84,7 +85,7 @@ public class LoginActivity extends BaseActivity {
         });
 
         try {
-            PackageInfo info = getPackageManager().getPackageInfo(
+            @SuppressLint("PackageManagerGetSignatures") PackageInfo info = getPackageManager().getPackageInfo(
                     "com.example.benja.go4lunch",
                     PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {

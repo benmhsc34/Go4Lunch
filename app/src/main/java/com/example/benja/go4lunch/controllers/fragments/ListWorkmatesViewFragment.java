@@ -52,7 +52,7 @@ public class ListWorkmatesViewFragment extends Fragment {
     private FirestoreRecyclerAdapter<UsersModel, UsersViewHolder> adapter;
 
     private class UsersViewHolder extends RecyclerView.ViewHolder {
-        private View view;
+        private final View view;
 
         UsersViewHolder(View itemView) {
             super(itemView);
