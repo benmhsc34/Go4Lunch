@@ -1,25 +1,38 @@
 package com.example.benja.go4lunch;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.contrib.NavigationViewActions;
+import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.intent.Intents;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.widget.RecyclerView;
 import android.widget.AutoCompleteTextView;
 
 import com.example.benja.go4lunch.controllers.Activities.MainActivity;
+import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.isSelected;
@@ -39,7 +52,7 @@ public class ExampleInstrumentedTest {
     @Test
     public void useAppContext() {
         // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = getTargetContext();
 
         assertEquals("com.example.benja.go4lunch", appContext.getPackageName());
     }
@@ -54,7 +67,7 @@ public class ExampleInstrumentedTest {
     public void setUp() {
 
         mActivity = mainActivityActivityTestRule.getActivity();
-
+        Intents.init();
         assertThat(mActivity, notNullValue());
     }
 
@@ -107,5 +120,25 @@ public class ExampleInstrumentedTest {
         String inputSearch = tv.getText().toString();
 
         assertEquals("This is a test", inputSearch);
+    }
+    @Test
+    public void testRestaurantRecyclerView(){
+
+        onView(withId(R.id.action_list_view)).perform(click()).check(matches(isSelected()));
+        SystemClock.sleep(800); //Need some time for the tabs to load
+
+        RecyclerView rv = mActivity.findViewById(R.id.fragment_list_restaurant_view_recycler_view);
+        rv.setItemAnimator(null);
+
+        Espresso.onView(ViewMatchers.withId(R.id.fragment_list_restaurant_view_recycler_view))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(1, ViewActions.click()));
+
+        intended(hasComponent(new ComponentName(getTargetContext(), RestaurantActivity.class)));
+
+    }
+    
+    @After
+    public void tearDown(){
+        Intents.release();
     }
 }
