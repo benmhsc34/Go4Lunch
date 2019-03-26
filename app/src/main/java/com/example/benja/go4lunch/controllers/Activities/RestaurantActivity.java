@@ -167,7 +167,7 @@ public class RestaurantActivity extends AppCompatActivity {
 
         websiteButton.setOnClickListener(view -> {
 
-            if (theWebsite.equals("https://benjamincorben.com")) {
+            if (theWebsite == null || theWebsite.equals("https://benjamincorben.com")) {
                 Toast.makeText(RestaurantActivity.this, "No website for this restaurant", Toast.LENGTH_LONG).show();
             } else {
                 Intent intent = new Intent(RestaurantActivity.this, RestaurantWebViewActivity.class);

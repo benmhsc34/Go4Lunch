@@ -58,7 +58,7 @@ public class AlertReceiver extends BroadcastReceiver {
             for (QueryDocumentSnapshot userSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
                 String whichResto = (String) userSnapshot.get("restaurantName");
                 if (whichResto != null) {
-                    if (whichResto.equals(documentSnapshot.get("restaurantName"))) {
+                    if (whichResto.equals(documentSnapshot.get("restaurantName")) && userSnapshot.get("email") != getCurrentUser().getEmail()) {
                         coworkersComing.add(userSnapshot.get("userName"));
                     }
                 }

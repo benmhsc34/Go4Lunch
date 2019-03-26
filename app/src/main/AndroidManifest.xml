@@ -24,6 +24,7 @@
 
         <activity
             android:name=".controllers.Activities.LoginActivity"
+            android:screenOrientation="portrait"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,9 +35,11 @@
 
         <activity
             android:name=".controllers.Activities.MainActivity"
+            android:screenOrientation="portrait"
             tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".controllers.Activities.RestaurantCardActivity"
+            android:screenOrientation="portrait"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name=".RestaurantActivity" />
@@ -50,12 +53,14 @@
 
         <activity
             android:name=".controllers.Activities.RestaurantActivity"
+            android:screenOrientation="portrait"
             tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".controllers.Activities.RestaurantWebViewActivity"
             tools:ignore="InnerclassSeparator" />
         <activity
             android:name=".controllers.Activities.SettingsActivity"
+            android:screenOrientation="portrait"
             tools:ignore="InnerclassSeparator" />
 
         <service
@@ -68,7 +73,8 @@
 
         <receiver
             android:name=".AlertReceiver"
-            tools:ignore="ExportedReceiver">
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="my.action.string" />
             </intent-filter>
