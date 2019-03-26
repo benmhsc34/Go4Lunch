@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
 
     <application
         android:allowBackup="true"
@@ -20,7 +22,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4" />
 
-        <activity android:name=".controllers.Activities.LoginActivity"
+        <activity
+            android:name=".controllers.Activities.LoginActivity"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,9 +32,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".controllers.Activities.MainActivity"
+        <activity
+            android:name=".controllers.Activities.MainActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".controllers.Activities.RestaurantCardActivity"
+        <activity
+            android:name=".controllers.Activities.RestaurantCardActivity"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name=".RestaurantActivity" />
@@ -43,19 +48,31 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".controllers.Activities.RestaurantActivity"
+        <activity
+            android:name=".controllers.Activities.RestaurantActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".controllers.Activities.RestaurantWebViewActivity"
+        <activity
+            android:name=".controllers.Activities.RestaurantWebViewActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".controllers.Activities.SettingsActivity"
+        <activity
+            android:name=".controllers.Activities.SettingsActivity"
             tools:ignore="InnerclassSeparator" />
-        <service android:name=".FirebaseCloudMessagingService"
+
+        <service
+            android:name=".FirebaseCloudMessagingService"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
+        <receiver
+            android:name=".AlertReceiver"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="my.action.string" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
