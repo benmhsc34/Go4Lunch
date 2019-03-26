@@ -27,7 +27,7 @@ public class AlertReceiver extends BroadcastReceiver {
 
     Context mContext;
     private final CollectionReference notebookRef = FirebaseFirestore.getInstance().collection("utilisateurs");
-    private final ArrayList coworkersComing = new ArrayList();
+    private final ArrayList<Object> coworkersComing = new ArrayList<>();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -35,9 +35,11 @@ public class AlertReceiver extends BroadcastReceiver {
         final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         final PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
         mContext = context;
-        showNotification();
+        if (Objects.requireNonNull(intent.getAction()).equals("my.action.string")) {
+            Log.d("receiverReceives", "I send");
+            showNotification();
+        }
     }
 
     private void showNotification() {
@@ -52,36 +54,46 @@ public class AlertReceiver extends BroadcastReceiver {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        DocumentReference documentReference = FirebaseFirestore.getInstance().document("utilisateurs/" + getCurrentUser().getUid());
-        documentReference.get().addOnSuccessListener(documentSnapshot -> notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
+        if (getCurrentUser() != null) {
 
-            for (QueryDocumentSnapshot userSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
-                String whichResto = (String) userSnapshot.get("restaurantName");
-                if (whichResto != null) {
-                    if (whichResto.equals(documentSnapshot.get("restaurantName")) && userSnapshot.get("email") != getCurrentUser().getEmail()) {
-                        coworkersComing.add(userSnapshot.get("userName"));
+            DocumentReference documentReference = FirebaseFirestore.getInstance().document("utilisateurs/" + getCurrentUser().getUid());
+            documentReference.get().addOnSuccessListener(documentSnapshot -> notebookRef.addSnapshotListener((queryDocumentSnapshots, e) -> {
+
+                for (QueryDocumentSnapshot userSnapshot : Objects.requireNonNull(queryDocumentSnapshots)) {
+                    String whichResto = (String) userSnapshot.get("restaurantName");
+                    if (whichResto != null) {
+
+                        if (whichResto.equals(documentSnapshot.get("restaurantName")) && !(Objects.requireNonNull(userSnapshot.get("email")).equals(getCurrentUser().getEmail()))) {
+                            Log.d("receiverReceives", documentSnapshot.get("email") + " and " + getCurrentUser().getEmail() + "  v2");
+
+                            coworkersComing.add(userSnapshot.get("userName"));
+                        }
                     }
                 }
-            }
-            if (documentSnapshot.get("restaurantName") != null) {
-                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, NOTIF_CHANNEL_ID);
-                notificationBuilder.setAutoCancel(true)
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setWhen(System.currentTimeMillis())
-                        .setContentTitle("You are eating at " + documentSnapshot.get("restaurantName"))
-                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentText("with " + coworkersComing.toString().replace("[", "").replace("]", ""));
+                if (coworkersComing.isEmpty()) {
+                    coworkersComing.add("nobody");
+                }
+                if (documentSnapshot.get("restaurantName") != null) {
+                    NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, NOTIF_CHANNEL_ID);
+                    notificationBuilder.setAutoCancel(true)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("You are eating at " + documentSnapshot.get("restaurantName"))
+                            .setSmallIcon(R.drawable.ic_launcher_foreground)
+                            .setContentText("with " + coworkersComing.toString().replace("[", "").replace("]", ""));
 
-                notificationBuilder.setContentIntent(PendingIntent.getActivity(mContext, 0,
-                        new Intent(mContext, RestaurantActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
+                    notificationBuilder.setContentIntent(PendingIntent.getActivity(mContext, 0,
+                            new Intent(mContext, RestaurantActivity.class), PendingIntent.FLAG_UPDATE_CURRENT));
 
-                notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
-            }
-        }));
+                    notificationManager.notify(new Random().nextInt(), notificationBuilder.build());
+                }
+            }));
+        }
     }
 
     private FirebaseUser getCurrentUser() {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
+
 
 }

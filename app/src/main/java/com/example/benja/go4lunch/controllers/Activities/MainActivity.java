@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -241,21 +242,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    private void configureAlarmManager() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlertReceiver.class);
-        intent.setAction("my.action.string");
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
-
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.HOUR_OF_DAY, 12);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -522,23 +508,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Fragment mapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
         Fragment listRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
         Fragment listWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance();
-        //   mListWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance(null);
 
-        // Save the active Fragment
-        // Declare an object fragment which will contain the active fragment
 
-        // Obtain SupportFragmentManager Object
         // Declare an object fragment Manager
         FragmentManager fragmentManager = getSupportFragmentManager();
         // Add the three fragment in fragmentManager and leave active only the fragment MapViewFragment
 
-      /*  mFragmentManager.beginTransaction()
-                .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mListRestaurantsViewFragment,"ListViewFragment")
-                .commit();
-
-        mFragmentManager.beginTransaction()
-                .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mMapViewFragment, "MapViewFragment")
-                .commit(); */
     }
 
 
@@ -546,27 +521,16 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Boolean updateMainFragment(Integer integer) {
         switch (integer) {
             case R.id.action_map_view:
-                // Hide the active fragment and activates the fragment mMapViewFragment
-                // mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
                 mViewPager.setCurrentItem(0);
                 break;
             case R.id.action_list_view:
-                // Hide the active fragment and activates the fragment mListViewFragment
-                //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mListRestaurantsViewFragment).commit();
-                //   mActiveFragment = mListRestaurantsViewFragment;
                 mViewPager.setCurrentItem(1);
-
                 break;
             case R.id.action_workmates:
-                // Hide the active fragment and activates the fragment mWorkmatesFragment
-                //   mFragmentManager.beginTransaction().hide(mActiveFragment).show(mMapViewFragment).commit();
-                // mActiveFragment = mMapViewFragment;
                 mViewPager.setCurrentItem(2);
                 break;
         }
-   /*     mFragmentManager.beginTransaction()
-                .replace(R.id.activity_welcome_frame_layout_bottom_navigation, mActiveFragment, "MapViewFragment")
-                .commit(); */
+
         return true;
 
     }
@@ -576,9 +540,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
-    /*
-     -------------------------------------  google places autocomplete API suggestions ------------------------------------
-   */
+
+    ///////////////////////////////////// google places autocomplete API suggestions \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     private MapViewFragment.UpdateFrag updatfrag;
 
@@ -634,6 +597,29 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
         placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
     };
+
+    ///////////////////////////////////// SETTING UP ALERT RECEIVER \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+    private void configureAlarmManager() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        intent.setAction("my.action.string");
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        calendar.set(Calendar.MINUTE, 56);
+        calendar.set(Calendar.SECOND, 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
+    ///////////////////////////////////// AVOIDING ALERT RECEIVER TO BE CALLED \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
 
 
 }

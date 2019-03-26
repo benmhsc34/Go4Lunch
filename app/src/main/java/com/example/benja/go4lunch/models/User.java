@@ -5,13 +5,13 @@ import android.support.annotation.Nullable;
 import java.util.Map;
 
 public class User {
-    private String mUid;
-    private String mUserName;
+    public String mUid;
+    public String mUserName;
     @Nullable
-    private String mRestaurantIdentifier;
-    @Nullable private String mRestaurantName;
-    @Nullable private Map<String, String> mListRestaurantLiked;
-    @Nullable private String mUrlPicture;
+    public String mRestaurantIdentifier;
+    @Nullable public String mRestaurantName;
+    @Nullable public Map<String, String> mListRestaurantLiked;
+    @Nullable public String mUrlPicture;
 
     // Blank constructor necessary for use with FireBase
     public User(String uid, String userName, String urlPicture) { }

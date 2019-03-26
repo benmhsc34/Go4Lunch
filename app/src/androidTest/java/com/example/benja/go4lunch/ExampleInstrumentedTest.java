@@ -136,7 +136,7 @@ public class ExampleInstrumentedTest {
         intended(hasComponent(new ComponentName(getTargetContext(), RestaurantActivity.class)));
 
     }
-    
+
     @After
     public void tearDown(){
         Intents.release();
