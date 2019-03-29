@@ -79,6 +79,14 @@
                 <action android:name="my.action.string" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".views.secondAlertReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="my.second.action.string" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

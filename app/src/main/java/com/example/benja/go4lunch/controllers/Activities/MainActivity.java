@@ -55,6 +55,7 @@ import com.example.benja.go4lunch.controllers.fragments.ListWorkmatesViewFragmen
 import com.example.benja.go4lunch.controllers.fragments.MapViewFragment;
 import com.example.benja.go4lunch.models.PlaceInfo;
 import com.example.benja.go4lunch.views.ScrollableViewPager;
+import com.example.benja.go4lunch.views.secondAlertReceiver;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -615,9 +616,24 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         calendar.set(Calendar.SECOND, 0);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+
+        /////// Configuring second AlarmManager to clear Restaurant selected for the day after \\\\\\\\\
+
+        Intent secondIntent = new Intent(this, secondAlertReceiver.class);
+        secondIntent.setAction("my.second.action.string");
+
+        PendingIntent secondPendingIntent = PendingIntent.getBroadcast(this, 2, secondIntent, 0);
+
+        Calendar secondCalendar = Calendar.getInstance();
+
+        secondCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        secondCalendar.set(Calendar.MINUTE, 0);
+        secondCalendar.set(Calendar.SECOND, 0);
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, secondCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, secondPendingIntent);
     }
 
-    ///////////////////////////////////// AVOIDING ALERT RECEIVER TO BE CALLED \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
 
 
 
