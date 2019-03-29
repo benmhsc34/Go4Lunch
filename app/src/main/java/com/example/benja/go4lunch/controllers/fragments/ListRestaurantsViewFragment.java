@@ -16,7 +16,7 @@ import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.base.BaseFragment;
 import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.example.benja.go4lunch.models.Restaurant;
-import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.api.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.example.benja.go4lunch.views.ListRestaurantsViewAdapter;
@@ -146,6 +146,9 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                                 + "maxwidth=2304"
                                                 + "&photoreference=" + photoReferences
                                                 + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
+
+                                        //https://maps.googleapis.com/maps/api/place/photo?maxwidth=2304&photoreference=photoReferences&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4
+
                                         theListOfResults.get(finalI).getPlaceId(), numberOfLikes
                                 );
                                 //    Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
@@ -239,7 +242,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                             + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4",
                                     theListOfResults.get(finalI).getPlaceId(), numberOfLikes
                             );
-                            //    Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
 
                             restaurantList.add(restaurantItem);
                         } else {
@@ -252,7 +254,6 @@ public class ListRestaurantsViewFragment extends BaseFragment {
                                             + "&photoreference=" + photoReferences
                                             + "&key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4", theListOfResults.get(finalI).getPlaceId(), numberOfLikes
                             );
-                            //     Log.d("restooo", theListOfResults.get(i).getName() + "got " + yo + " likes");
                             restaurantList.add(restaurantItem);
                         }
                         adapter.notifyDataSetChanged();

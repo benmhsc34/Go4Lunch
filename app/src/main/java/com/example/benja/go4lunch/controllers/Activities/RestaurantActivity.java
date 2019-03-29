@@ -22,7 +22,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.benja.go4lunch.R;
 import com.example.benja.go4lunch.models.UsersModel;
-import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.api.Api;
 import com.example.benja.go4lunch.utils.Constants;
 import com.example.benja.go4lunch.utils.PlaceDetails;
 import com.example.benja.go4lunch.utils.PlaceDetailsResults;

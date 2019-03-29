@@ -505,7 +505,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private void addFragmentsInFragmentManager() {
 
         //Instantiate fragment used by BottomNavigationView
-        // Declare three fragment for used with the Bottom Navigation view
+        // Declare three fragment to be used with the Bottom Navigation view
         Fragment mapViewFragment = MapViewFragment.newInstance(mLastKnownLocation);
         Fragment listRestaurantsViewFragment = ListRestaurantsViewFragment.newInstance();
         Fragment listWorkmatesViewFragment = ListWorkmatesViewFragment.newInstance();
@@ -513,7 +513,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         // Declare an object fragment Manager
         FragmentManager fragmentManager = getSupportFragmentManager();
-        // Add the three fragment in fragmentManager and leave active only the fragment MapViewFragment
 
     }
 

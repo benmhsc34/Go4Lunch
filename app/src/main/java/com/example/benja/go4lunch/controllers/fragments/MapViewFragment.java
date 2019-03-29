@@ -22,7 +22,7 @@ import com.example.benja.go4lunch.controllers.Activities.MainActivity;
 import com.example.benja.go4lunch.controllers.Activities.RestaurantActivity;
 import com.example.benja.go4lunch.models.Restaurant;
 import com.example.benja.go4lunch.R;
-import com.example.benja.go4lunch.utils.Api;
+import com.example.benja.go4lunch.api.Api;
 import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 import com.example.benja.go4lunch.utils.PlaceNearBySearchResult;
 import com.google.android.gms.maps.CameraUpdate;
@@ -323,7 +323,7 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
 
                     for (PlaceNearBySearchResult nearbyPlace : nearbyPlacesList) {
 
-                        SharedPreferences mPrefs = Objects.requireNonNull(getContext()).getSharedPreferences("PREFERENCE_KEY_NAME", MODE_PRIVATE);
+                        SharedPreferences mPrefs = Objects.requireNonNull(getContext()).getSharedPreferences("SHARED", MODE_PRIVATE);
                         String searchInput = mPrefs.getString("searchInput", "");
 
                         if (nearbyPlace.getName().contains(Objects.requireNonNull(searchInput))) {
@@ -436,8 +436,6 @@ public class MapViewFragment extends BaseFragment implements OnMapReadyCallback,
                 new LatLng(latitude,
                         longitude), DEFAULT_ZOOM));
 
-        // Update Location UI
-        //  updateLocationUI();
     }
 
 

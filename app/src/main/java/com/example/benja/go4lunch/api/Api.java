@@ -1,4 +1,7 @@
-package com.example.benja.go4lunch.utils;
+package com.example.benja.go4lunch.api;
+
+import com.example.benja.go4lunch.utils.PlaceDetails;
+import com.example.benja.go4lunch.utils.PlaceNearBySearch;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -22,5 +25,10 @@ public interface Api {
     @GET("details/json?key=" + key)
     Call<PlaceDetails> getPlaceDetails(@Query("placeid") String placeId);
 
+    //Presentation links
+
+    //https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4&radius=1500&type=restaurant&location=43.61077209,3.876716
+
+    //https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyAR3xMop8hS0cX1S3u70q-EC15TBduuDo4&placeid=ChIJae76A6CvthIRrulM_EFrIkk
 
 }

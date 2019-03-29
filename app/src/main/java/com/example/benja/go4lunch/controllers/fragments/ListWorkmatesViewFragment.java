@@ -35,7 +35,6 @@ import java.util.Objects;
 @SuppressWarnings("NullableProblems")
 public class ListWorkmatesViewFragment extends Fragment {
 
-    //   private DocumentReference mDocumentReference = FirebaseFirestore.getInstance().document("sampleData/inspiration");
 
     @SuppressWarnings("WeakerAccess")
     public ListWorkmatesViewFragment() {
@@ -193,44 +192,4 @@ public class ListWorkmatesViewFragment extends Fragment {
             adapter.stopListening();
         }
     }
-
-
-
-
-
-  /*  @Override
-    public void onStart() {
-        mDocumentReference.get().addOnSuccessListener(documentSnapshot -> {
-
-            if (documentSnapshot.exists()) {
-                Log.d("sucess", "SUCCESS" + documentSnapshot.getString("quote"));
-                String quoteText = documentSnapshot.getString("quote");
-                String authorText = documentSnapshot.getString("author");
-                theTV.setText("\"" + quoteText + "\"" + "- by -" + authorText);
-            }
-
-        }).addOnFailureListener(e -> Log.d("failure", "EPIC FAIL",e));
-
-
-
-
-            db.collection("utilisateurs")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("SUCESS", document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.w("Failure", "Error getting documents.", task.getException());
-                        }
-                    });
-
-        });
-
-
-
-        super.onStart();
-    }
-*/
 }

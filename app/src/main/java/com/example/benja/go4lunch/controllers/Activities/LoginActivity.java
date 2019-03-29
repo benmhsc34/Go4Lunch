@@ -112,13 +112,7 @@ public class LoginActivity extends BaseActivity {
                 RC_SIGN_IN);
 
     }
-/*
-    // 3 - Launching Profile Activity
-    private void startProfileActivity(){
-        Intent intent = new Intent(this, ProfileActivity.class);
-        startActivity(intent);
-    }
-*/
+
     //FOR DESIGN
     // 1 - Get Coordinator Layout
     @BindView(R.id.main_activity_coordinator_layout)
@@ -140,12 +134,7 @@ public class LoginActivity extends BaseActivity {
     private void showSnackBar(CoordinatorLayout coordinatorLayout, String message) {
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_SHORT).show();
     }
-/*
-    //Update UI when activity is resuming
-    private void updateUIWhenResuming(){
-        this.buttonLogin.setText(this.isCurrentUserLogged() ? getString(R.string.button_login_text_logged) : getString(R.string.button_login_text_not_logged));
-    }
-*/
+
     // --------------------
     // UTILS
     // --------------------

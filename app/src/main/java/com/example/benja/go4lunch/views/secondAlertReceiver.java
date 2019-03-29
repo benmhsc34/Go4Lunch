@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -45,9 +46,9 @@ public class secondAlertReceiver extends BroadcastReceiver {
         if (Objects.requireNonNull(intent.getAction()).equals("my.second.action.string")) {
             notebookRef.document(currentFirebaseUser.getUid()).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()){
-                    Map<String, Object> dataToSave = new HashMap<>();
-                    dataToSave.put("restaurantName", null);
-                    notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).set(dataToSave, SetOptions.merge());
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("restaurantName", FieldValue.delete());
+                    notebookRef.document(Objects.requireNonNull(currentFirebaseUser).getUid()).set(updates, SetOptions.merge());
                 }
             });
         }
